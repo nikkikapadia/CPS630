@@ -1,6 +1,6 @@
 # CPS630
 
-# Running the Frontend
+## Running the Frontend
 
 `npm start`
 Starts the development server.
