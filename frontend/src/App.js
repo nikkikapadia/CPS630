@@ -1,6 +1,6 @@
 import "./App.css";
 import Navigation from "./nav";
-import { HomePage } from "./Home";
+import { HomePage } from "./home/Home";
 
 function App() {
   return (
