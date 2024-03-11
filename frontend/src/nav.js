@@ -14,6 +14,8 @@ import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "./tmu-trade-logo.svg";
+import { Link } from "react-router-dom";
+import { Box, Typography } from "@mui/material";
 
 export default function Navigation() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -48,36 +50,46 @@ export default function Navigation() {
   };
   return (
     <React.Fragment>
-      <div className="navBox">
-        <div className="logoOptionsBox">
-          <div className="logoIcon">
-            <img
-              src={logo}
-              style={{ marginRight: "1em" }}
-              height="40px"
-              alt="logo"
-            />
-            <div className="menuIcon">
-              <IconButton onClick={handleOpenNav}>
-                <MenuIcon sx={navStyles.navButton} />
-              </IconButton>
-            </div>
-          </div>
-          {/* Classes for when nav bar is open/collapsed in mobile */}
-          <div className={openNav ? "optionsBox" : "hideOptions"}>
-            <Button type="text" href="#" sx={navStyles.navButton}>
-              Items Wanted
-            </Button>
-            <Button type="text" href="#" sx={navStyles.navButton}>
-              Items for Sale
-            </Button>
-            <Button type="text" href="#" sx={navStyles.navButton}>
-              Academic Services
-            </Button>
-          </div>
-        </div>
-        {/* Classes for when nav bar is open/collapsed in mobile */}
-        <div className={openNav ? "accountBox" : "hideAccount"}>
+      <Box sx={navStyles.navBox}>
+        <Box sx={navStyles.logoOptionsBox}>
+          <img
+            src={logo}
+            style={{ marginRight: "1em" }}
+            height="40px"
+            alt="logo"
+          />
+          <Button type="text" href="#" sx={navStyles.navButton}>
+            Items Wanted
+          </Button>
+          <Button type="text" href="#" sx={navStyles.navButton}>
+            Items for Sale
+          </Button>
+          <Button type="text" href="#" sx={navStyles.navButton}>
+            Academic Services
+          </Button>
+        </Box>
+        <Box sx={navStyles.accountBox}>
+          <Button type="text" sx={navStyles.navButton}>
+            <Link to={"/register"} style={navStyles.link}>
+              <Typography
+                fontSize={"16px"}
+                sx={{ textTransform: "capitalize" }}
+              >
+                Register
+              </Typography>
+            </Link>
+          </Button>
+          <Button type="text" sx={navStyles.navButton}>
+            <Link to={"/login"} style={navStyles.link}>
+              <Typography
+                fontSize={"16px"}
+                sx={{ textTransform: "capitalize" }}
+              >
+                Login
+              </Typography>
+            </Link>
+          </Button>
+
           <Tooltip title="Account settings">
             <IconButton
               onClick={handleClick}
@@ -90,8 +102,8 @@ export default function Navigation() {
               <Avatar sx={{ width: 32, height: 32 }}></Avatar>
             </IconButton>
           </Tooltip>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Profile Menu Dropdown */}
       <Menu
@@ -162,7 +174,35 @@ export default function Navigation() {
 }
 
 const navStyles = {
+  navBox: {
+    display: "flex",
+    alignItems: "center",
+    textAlign: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#213555",
+    // sticky
+    top: 0,
+    width: "100%",
+    overflow: "hidden",
+  },
+  logoOptionsBox: {
+    padding: "1em",
+    display: "flex",
+    alignItems: "center",
+    textAlign: "center",
+    gap: "1em",
+  },
+  accountBox: {
+    display: "flex",
+    alignItems: "center",
+    textAlign: "center",
+    padding: "1em",
+  },
   navButton: {
+    color: "#E5D283",
+  },
+  link: {
+    textDecoration: "none",
     color: "#E5D283",
   },
 };
