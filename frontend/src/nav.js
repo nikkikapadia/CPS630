@@ -12,6 +12,8 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
 import logo from "./tmu-trade-logo.svg";
+import { Link } from "react-router-dom";
+import { Typography } from "@mui/material";
 
 export default function Navigation() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -43,6 +45,27 @@ export default function Navigation() {
           </Button>
         </Box>
         <Box sx={navStyles.accountBox}>
+          <Button type="text" sx={navStyles.navButton}>
+            <Link to={"/register"} style={navStyles.link}>
+              <Typography
+                fontSize={"16px"}
+                sx={{ textTransform: "capitalize" }}
+              >
+                Register
+              </Typography>
+            </Link>
+          </Button>
+          <Button type="text" sx={navStyles.navButton}>
+            <Link to={"/login"} style={navStyles.link}>
+              <Typography
+                fontSize={"16px"}
+                sx={{ textTransform: "capitalize" }}
+              >
+                Login
+              </Typography>
+            </Link>
+          </Button>
+
           <Tooltip title="Account settings">
             <IconButton
               onClick={handleClick}
@@ -132,6 +155,7 @@ const navStyles = {
     // sticky
     top: 0,
     width: "100%",
+    overflow: "hidden",
   },
   logoOptionsBox: {
     padding: "1em",
@@ -147,6 +171,10 @@ const navStyles = {
     padding: "1em",
   },
   navButton: {
+    color: "#E5D283",
+  },
+  link: {
+    textDecoration: "none",
     color: "#E5D283",
   },
 };
