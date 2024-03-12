@@ -70,12 +70,6 @@ function Row({ title, data }) {
             />
           );
         })}
-        {/* <ActionAreaCard />
-        <ActionAreaCard />
-        <ActionAreaCard />
-        <ActionAreaCard />
-        <ActionAreaCard />
-        <ActionAreaCard /> */}
       </Box>
     </Box>
   );

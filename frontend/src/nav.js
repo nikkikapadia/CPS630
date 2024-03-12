@@ -8,17 +8,21 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
+import SendIcon from "@mui/icons-material/Send";
 import Tooltip from "@mui/material/Tooltip";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "./tmu-trade-logo.svg";
+import { useNavigate } from "react-router-dom";
 
 export default function Navigation() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openNav, setOpenNav] = React.useState(false);
   const open = Boolean(anchorEl);
+
+  const navigate = useNavigate();
 
   const [width, setWidth] = React.useState(window.innerWidth);
   // following code chunk makes sure the menu isn't open when resized to mobile screen
@@ -53,9 +57,10 @@ export default function Navigation() {
           <div className="logoIcon">
             <img
               src={logo}
-              style={{ marginRight: "1em" }}
+              style={{ marginRight: "1em", cursor: "pointer" }}
               height="40px"
               alt="logo"
+              onClick={() => navigate("/")}
             />
             <div className="menuIcon">
               <IconButton onClick={handleOpenNav}>
@@ -65,20 +70,20 @@ export default function Navigation() {
           </div>
           {/* Classes for when nav bar is open/collapsed in mobile */}
           <div className={openNav ? "optionsBox" : "hideOptions"}>
-            <Button type="text" href="#" sx={navStyles.navButton}>
+            <Button type="text" href="/wanted" sx={navStyles.navButton}>
               Items Wanted
             </Button>
-            <Button type="text" href="#" sx={navStyles.navButton}>
+            <Button type="text" href="/sale" sx={navStyles.navButton}>
               Items for Sale
             </Button>
-            <Button type="text" href="#" sx={navStyles.navButton}>
+            <Button type="text" href="/services" sx={navStyles.navButton}>
               Academic Services
             </Button>
           </div>
         </div>
         {/* Classes for when nav bar is open/collapsed in mobile */}
         <div className={openNav ? "accountBox" : "hideAccount"}>
-          <Tooltip title="Account settings">
+          <Tooltip title="Account">
             <IconButton
               onClick={handleClick}
               size="small"
@@ -136,6 +141,12 @@ export default function Navigation() {
             <ArticleIcon fontSize="small" />
           </ListItemIcon>
           My Posts
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <ListItemIcon>
+            <SendIcon fontSize="small" />
+          </ListItemIcon>
+          Messages
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClose}>
