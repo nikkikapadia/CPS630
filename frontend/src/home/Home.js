@@ -109,7 +109,6 @@ function ActionAreaCard({ title, description, price, img }) {
 
 const homeStyles = {
   gradient: {
-    backgroundImage: "linear-gradient(#E5D283,#F0F0F0)",
     margin: "0px",
     padding: "1em",
     color: "#213555",
