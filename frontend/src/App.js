@@ -11,7 +11,14 @@ function App() {
         <Navigation />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/home" element={<HomePage />} />
+          {/* replace these when the pages are made */}
+          <Route path="/wanted" element={<div></div>} />
+          <Route path="/sale" element={<div></div>} />
+          <Route path="/services" element={<div></div>} />
+          <Route path="/settings" element={<div></div>} />
+          <Route path="/profile" element={<div></div>} />
+          <Route path="/posts" element={<div></div>} />
+          <Route path="/messages" element={<div></div>} />
           <Route path="*" element={<Page404 />} />
         </Routes>
       </BrowserRouter>
