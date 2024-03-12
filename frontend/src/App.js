@@ -9,6 +9,7 @@ import ItemsForSale from './itemsForSale/ItemsForSale'
 import Services from './academicServices/AcademicServices'
 import PostAd from './postAd/PostAd'
 import Register from './register/Register'
+import UserProfile from './components/UserProfile'
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/postAd" element={<PostAd />} />
           <Route path="/settings" element={<div></div>} />
-          <Route path="/profile" element={<div></div>} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/posts" element={<div></div>} />
           <Route path="/messages" element={<div></div>} />
           <Route path="*" element={<Page404 />} />
