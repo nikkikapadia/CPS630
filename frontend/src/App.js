@@ -9,6 +9,10 @@ import {
   RouterProvider,
   Routes,
 } from "react-router-dom";
+import PostAd from "./postAd/PostAd";
+import ItemsWanted from "./itemsWanted/ItemsWanted";
+import ItemsForSale from "./itemsForSale/ItemsForSale";
+import AcademicServices from "./academicServices/AcademicServices";
 
 function App() {
   return (
@@ -18,6 +22,10 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/postAd" element={<PostAd />} />
+        <Route path="/itemsWanted" element={<ItemsWanted />} />
+        <Route path="/itemsForSale" element={<ItemsForSale />} />
+        <Route path="/academicServices" element={<AcademicServices />} />
       </Routes>
     </div>
   );

@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { Link } from "react-router-dom";
 
 const validationSchema = yup.object({
   email: yup
@@ -132,12 +133,14 @@ const Login = () => {
             >
               <Typography sx={{ textAlign: "center" }}>
                 Dont have an account?{" "}
-                <Typography
-                  component={"span"}
-                  sx={{ color: "#213555", fontWeight: "bold" }}
-                >
-                  Register
-                </Typography>
+                <Link to={"/register"} style={{ textDecoration: "none" }}>
+                  <Typography
+                    component={"span"}
+                    sx={{ color: "#213555", fontWeight: "bold" }}
+                  >
+                    Register
+                  </Typography>
+                </Link>
               </Typography>
             </Box>
           </form>

@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { Link } from "react-router-dom";
 
 const validationSchema = yup.object({
   fullName: yup.string().required("Full Name is required"),
@@ -190,12 +191,14 @@ const Register = () => {
             >
               <Typography sx={{ textAlign: "center" }}>
                 Already have an account?{" "}
-                <Typography
-                  component={"span"}
-                  sx={{ color: "#213555", fontWeight: "bold" }}
-                >
-                  Login
-                </Typography>
+                <Link to={"/login"} style={{ textDecoration: "none" }}>
+                  <Typography
+                    component={"span"}
+                    sx={{ color: "#213555", fontWeight: "bold" }}
+                  >
+                    Login
+                  </Typography>
+                </Link>
               </Typography>
             </Box>
           </form>

@@ -14,8 +14,9 @@ import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "./tmu-trade-logo.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useNavigation } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
+import { PostAdd } from "@mui/icons-material";
 
 export default function Navigation() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -48,23 +49,39 @@ export default function Navigation() {
   const handleOpenNav = () => {
     setOpenNav(!openNav);
   };
+
+  const navigate = useNavigate();
+
   return (
     <React.Fragment>
       <Box sx={navStyles.navBox}>
         <Box sx={navStyles.logoOptionsBox}>
           <img
             src={logo}
-            style={{ marginRight: "1em" }}
+            style={{ marginRight: "1em", cursor: "pointer" }}
             height="40px"
             alt="logo"
+            onClick={() => navigate("/")}
           />
-          <Button type="text" href="#" sx={navStyles.navButton}>
+          <Button
+            type="text"
+            onClick={() => navigate("/itemsWanted")}
+            sx={navStyles.navButton}
+          >
             Items Wanted
           </Button>
-          <Button type="text" href="#" sx={navStyles.navButton}>
+          <Button
+            onClick={() => navigate("/itemsForSale")}
+            type="text"
+            sx={navStyles.navButton}
+          >
             Items for Sale
           </Button>
-          <Button type="text" href="#" sx={navStyles.navButton}>
+          <Button
+            onClick={() => navigate("/academicServices")}
+            type="text"
+            sx={navStyles.navButton}
+          >
             Academic Services
           </Button>
         </Box>
@@ -148,6 +165,12 @@ export default function Navigation() {
             <ArticleIcon fontSize="small" />
           </ListItemIcon>
           My Posts
+        </MenuItem>
+        <MenuItem onClick={() => navigate("/postAd")}>
+          <ListItemIcon>
+            <PostAdd fontSize="small" />
+          </ListItemIcon>
+          Post Ad
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClose}>
