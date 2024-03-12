@@ -8,20 +8,21 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
+import SendIcon from "@mui/icons-material/Send";
 import Tooltip from "@mui/material/Tooltip";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "./tmu-trade-logo.svg";
-import { Link, useNavigate, useNavigation } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
-import { PostAdd } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 export default function Navigation() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openNav, setOpenNav] = React.useState(false);
   const open = Boolean(anchorEl);
+
+  const navigate = useNavigate();
 
   const [width, setWidth] = React.useState(window.innerWidth);
   // following code chunk makes sure the menu isn't open when resized to mobile screen
@@ -49,65 +50,40 @@ export default function Navigation() {
   const handleOpenNav = () => {
     setOpenNav(!openNav);
   };
-
-  const navigate = useNavigate();
-
   return (
     <React.Fragment>
-      <Box sx={navStyles.navBox}>
-        <Box sx={navStyles.logoOptionsBox}>
-          <img
-            src={logo}
-            style={{ marginRight: "1em", cursor: "pointer" }}
-            height="40px"
-            alt="logo"
-            onClick={() => navigate("/")}
-          />
-          <Button
-            type="text"
-            onClick={() => navigate("/itemsWanted")}
-            sx={navStyles.navButton}
-          >
-            Items Wanted
-          </Button>
-          <Button
-            onClick={() => navigate("/itemsForSale")}
-            type="text"
-            sx={navStyles.navButton}
-          >
-            Items for Sale
-          </Button>
-          <Button
-            onClick={() => navigate("/academicServices")}
-            type="text"
-            sx={navStyles.navButton}
-          >
-            Academic Services
-          </Button>
-        </Box>
-        <Box sx={navStyles.accountBox}>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/register"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Register
-              </Typography>
-            </Link>
-          </Button>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/login"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Login
-              </Typography>
-            </Link>
-          </Button>
-
-          <Tooltip title="Account settings">
+      <div className="navBox">
+        <div className="logoOptionsBox">
+          <div className="logoIcon">
+            <img
+              src={logo}
+              style={{ marginRight: "1em", cursor: "pointer" }}
+              height="40px"
+              alt="logo"
+              onClick={() => navigate("/")}
+            />
+            <div className="menuIcon">
+              <IconButton onClick={handleOpenNav}>
+                <MenuIcon sx={navStyles.navButton} />
+              </IconButton>
+            </div>
+          </div>
+          {/* Classes for when nav bar is open/collapsed in mobile */}
+          <div className={openNav ? "optionsBox" : "hideOptions"}>
+            <Button type="text" href="/wanted" sx={navStyles.navButton}>
+              Items Wanted
+            </Button>
+            <Button type="text" href="/sale" sx={navStyles.navButton}>
+              Items for Sale
+            </Button>
+            <Button type="text" href="/services" sx={navStyles.navButton}>
+              Academic Services
+            </Button>
+          </div>
+        </div>
+        {/* Classes for when nav bar is open/collapsed in mobile */}
+        <div className={openNav ? "accountBox" : "hideAccount"}>
+          <Tooltip title="Account">
             <IconButton
               onClick={handleClick}
               size="small"
@@ -119,8 +95,8 @@ export default function Navigation() {
               <Avatar sx={{ width: 32, height: 32 }}></Avatar>
             </IconButton>
           </Tooltip>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {/* Profile Menu Dropdown */}
       <Menu
@@ -166,11 +142,11 @@ export default function Navigation() {
           </ListItemIcon>
           My Posts
         </MenuItem>
-        <MenuItem onClick={() => navigate("/postAd")}>
+        <MenuItem onClick={handleClose}>
           <ListItemIcon>
-            <PostAdd fontSize="small" />
+            <SendIcon fontSize="small" />
           </ListItemIcon>
-          Post Ad
+          Messages
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClose}>
@@ -197,35 +173,7 @@ export default function Navigation() {
 }
 
 const navStyles = {
-  navBox: {
-    display: "flex",
-    alignItems: "center",
-    textAlign: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#213555",
-    // sticky
-    top: 0,
-    width: "100%",
-    overflow: "hidden",
-  },
-  logoOptionsBox: {
-    padding: "1em",
-    display: "flex",
-    alignItems: "center",
-    textAlign: "center",
-    gap: "1em",
-  },
-  accountBox: {
-    display: "flex",
-    alignItems: "center",
-    textAlign: "center",
-    padding: "1em",
-  },
   navButton: {
-    color: "#E5D283",
-  },
-  link: {
-    textDecoration: "none",
     color: "#E5D283",
   },
 };

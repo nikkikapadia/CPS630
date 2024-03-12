@@ -1,32 +1,27 @@
 import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navigation from "./nav";
 import { HomePage } from "./home/Home";
-import Register from "./register/Register";
-import Login from "./login/Login";
-import {
-  createBrowserRouter,
-  Route,
-  RouterProvider,
-  Routes,
-} from "react-router-dom";
-import PostAd from "./postAd/PostAd";
-import ItemsWanted from "./itemsWanted/ItemsWanted";
-import ItemsForSale from "./itemsForSale/ItemsForSale";
-import AcademicServices from "./academicServices/AcademicServices";
+import Page404 from "./404/404";
 
 function App() {
   return (
     <div className="App">
-      <Navigation />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/postAd" element={<PostAd />} />
-        <Route path="/itemsWanted" element={<ItemsWanted />} />
-        <Route path="/itemsForSale" element={<ItemsForSale />} />
-        <Route path="/academicServices" element={<AcademicServices />} />
-      </Routes>
+      <BrowserRouter>
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          {/* replace these when the pages are made */}
+          <Route path="/wanted" element={<div></div>} />
+          <Route path="/sale" element={<div></div>} />
+          <Route path="/services" element={<div></div>} />
+          <Route path="/settings" element={<div></div>} />
+          <Route path="/profile" element={<div></div>} />
+          <Route path="/posts" element={<div></div>} />
+          <Route path="/messages" element={<div></div>} />
+          <Route path="*" element={<Page404 />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
