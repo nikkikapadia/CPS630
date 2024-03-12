@@ -15,7 +15,9 @@ import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "./tmu-trade-logo.svg";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { PostAdd } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
 export default function Navigation() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -83,6 +85,26 @@ export default function Navigation() {
         </div>
         {/* Classes for when nav bar is open/collapsed in mobile */}
         <div className={openNav ? "accountBox" : "hideAccount"}>
+        <Button type="text" sx={navStyles.navButton}>
+            <Link to={"/register"} style={navStyles.link}>
+              <Typography
+                fontSize={"16px"}
+                sx={{ textTransform: "capitalize" }}
+              >
+                Register
+              </Typography>
+            </Link>
+          </Button>
+          <Button type="text" sx={navStyles.navButton}>
+            <Link to={"/login"} style={navStyles.link}>
+              <Typography
+                fontSize={"16px"}
+                sx={{ textTransform: "capitalize" }}
+              >
+                Login
+              </Typography>
+            </Link>
+          </Button>
           <Tooltip title="Account">
             <IconButton
               onClick={handleClick}
@@ -148,6 +170,12 @@ export default function Navigation() {
           </ListItemIcon>
           Messages
         </MenuItem>
+        <MenuItem onClick={() => navigate('/postAd')}>
+          <ListItemIcon>
+            <PostAdd fontSize="small" />
+          </ListItemIcon>
+          Post Ad
+        </MenuItem>
         <Divider />
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
@@ -174,6 +202,10 @@ export default function Navigation() {
 
 const navStyles = {
   navButton: {
+    color: "#E5D283",
+  },
+  link: {
+    textDecoration: "none",
     color: "#E5D283",
   },
 };
