@@ -16,6 +16,10 @@ import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
+import { firebaseStorage } from "../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { v4 } from 'uuid';
+
 const validationSchema = yup.object({
   adTitle: yup
     .string()
@@ -47,8 +51,38 @@ const PostAd = () => {
       location: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values, "Submiited Values");
+    onSubmit: async (values, { resetForm }) => {
+        console.log(values, "Submiited Values");
+
+        // TODO: AFTER LOGIN / USER AUTHENTICATION IS FINISHED
+
+        // make POST request with empty photos array ---> returns id created for post
+
+
+        // Upload photos to folder with same id name or create one
+        const uploadPhotosToFirebase = () => {
+            return new Promise((resolve, reject) => {
+                let urls = [];
+                if (values.photos.length !== 0) {
+                    for (let photo of values.photos) {
+                        const name = photo.name + v4();
+                        const imageRef = ref(firebaseStorage, `itemPhotos/${name}`);
+                        uploadBytes(imageRef, photo).then(() => {
+                            getDownloadURL(ref(firebaseStorage, `itemPhotos/${name}`)).then(url => urls.push(url))
+                        });
+                    }
+                }
+                resolve(urls);
+            });
+        }
+        const urls = await uploadPhotosToFirebase();
+        alert('Image(s) uploaded');
+        console.log(urls);
+
+        // now make PATCH request with updated URLs
+
+        // clear fields
+        resetForm();
     },
   });
 
