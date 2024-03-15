@@ -127,6 +127,7 @@ function PostModal({ open, onClose, post }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
+        {/* when in edit mode it shows edit form otherwise it just displays information */}
         <Box sx={style}>
           {!edit ? (
             <>
@@ -249,6 +250,7 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
     location: yup.string().required("Location is required"),
   });
 
+  // initial values are values that are there already
   const formik = useFormik({
     initialValues: {
       adTitle: postInfo.name,
@@ -260,6 +262,7 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      // need to implement database updates here
       console.log(values, "Submiited Values");
       setPostInfo({
         ...postInfo,

@@ -128,6 +128,7 @@ function UserModal({ open, onClose, user }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
+        {/* when in edit mode it shows edit form otherwise it just displays information */}
         <Box sx={style}>
           {!edit ? (
             <>
@@ -227,6 +228,7 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
 }
 
 function EditForm({ userInfo, setUserInfo, setEdit }) {
+  // admin cannot edit passwords so it's not part of the form
   const validationSchema = yup.object({
     fullName: yup.string().required("Full Name is required"),
     email: yup
@@ -244,6 +246,7 @@ function EditForm({ userInfo, setUserInfo, setEdit }) {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      // put db updates here
       console.log(values, "Submiited Values");
       setUserInfo({
         ...userInfo,
