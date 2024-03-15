@@ -14,6 +14,11 @@ import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { auth } from '../firebase-config';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const validationSchema = yup.object({
   email: yup
@@ -27,6 +32,10 @@ const validationSchema = yup.object({
 });
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); // 'success' or 'error'
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -34,7 +43,22 @@ const Login = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values, "Submiited Values");
+      signInWithEmailAndPassword(auth, values.email, values.password)
+        .then((userCredential) => {
+          console.log(userCredential.user, "User Logged In Successfully"); // Sign-in successful
+          setSnackbarMessage('Login successful!');
+          setSnackbarSeverity('success');
+          setOpenSnackbar(true);
+          setTimeout(() => navigate('/'), 2000); // Redirect after showing success message
+        })
+        .catch((error) => {
+          // Sign-in failure
+          console.error("Error signing in: ", error.message);
+          alert(`Error signing in: ${error.message}`);
+          setSnackbarMessage(`Error signing in: ${error.message}`);
+          setSnackbarSeverity('error');
+          setOpenSnackbar(true);
+        });
     },
   });
 
@@ -143,6 +167,12 @@ const Login = () => {
           </form>
         </CardContent>
       </Card>
+
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+      <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        {snackbarMessage}
+      </Alert>
+    </Snackbar>
     </Box>
   );
 };
