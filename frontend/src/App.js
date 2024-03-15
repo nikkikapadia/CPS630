@@ -14,13 +14,17 @@ import AllPosts from "./allPosts/AllPosts";
 import Users from "./users/Users";
 
 function App() {
+  // set state as true to see admin dashboard
   const [admin] = useState(true);
 
   return (
     <div className="App">
       <Navigation admin={admin} />
       <Routes>
-        <Route path="/" element={<HomePage admin={admin} />} />
+        <Route
+          path="/"
+          element={admin ? <AllPosts /> : <HomePage admin={admin} />}
+        />
         {/* replace these when the pages are made */}
         <Route path="/wanted" element={<ItemsWanted />} />
         <Route path="/login" element={<Login />} />
