@@ -19,7 +19,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { PostAdd } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 
-export default function Navigation() {
+export default function Navigation({ admin }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openNav, setOpenNav] = React.useState(false);
   const open = Boolean(anchorEl);
@@ -72,20 +72,33 @@ export default function Navigation() {
           </div>
           {/* Classes for when nav bar is open/collapsed in mobile */}
           <div className={openNav ? "optionsBox" : "hideOptions"}>
-            <Button type="text" href="/wanted" sx={navStyles.navButton}>
-              Items Wanted
-            </Button>
-            <Button type="text" href="/sale" sx={navStyles.navButton}>
-              Items for Sale
-            </Button>
-            <Button type="text" href="/services" sx={navStyles.navButton}>
-              Academic Services
-            </Button>
+            {admin ? (
+              <>
+                <Button type="text" href="/posts" sx={navStyles.navButton}>
+                  All Posts
+                </Button>
+                <Button type="text" href="/users" sx={navStyles.navButton}>
+                  Users
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button type="text" href="/wanted" sx={navStyles.navButton}>
+                  Items Wanted
+                </Button>
+                <Button type="text" href="/sale" sx={navStyles.navButton}>
+                  Items for Sale
+                </Button>
+                <Button type="text" href="/services" sx={navStyles.navButton}>
+                  Academic Services
+                </Button>
+              </>
+            )}
           </div>
         </div>
         {/* Classes for when nav bar is open/collapsed in mobile */}
         <div className={openNav ? "accountBox" : "hideAccount"}>
-        <Button type="text" sx={navStyles.navButton}>
+          <Button type="text" sx={navStyles.navButton}>
             <Link to={"/register"} style={navStyles.link}>
               <Typography
                 fontSize={"16px"}
@@ -170,7 +183,7 @@ export default function Navigation() {
           </ListItemIcon>
           Messages
         </MenuItem>
-        <MenuItem onClick={() => navigate('/postAd')}>
+        <MenuItem onClick={() => navigate("/postAd")}>
           <ListItemIcon>
             <PostAdd fontSize="small" />
           </ListItemIcon>
