@@ -14,22 +14,16 @@ const academicServicesSchema = new mongoose.Schema({
         required: true,
     },
     location: {
-        city: {
-            type: String,
-            required: false,
-        },
-        postalCode: {
-            type: String,
-            required: false,
-        },
+        type: String,
+        required: true,
     },
     tags: [{
         type: String
     }],
-    photo: {
+    photos: [{
         type: String,
         required: false,
-    },
+    }],
     price: {
         type: Number,
         required: true,
@@ -37,7 +31,11 @@ const academicServicesSchema = new mongoose.Schema({
     postedBy: {
         type: String,
         required: true,
-    }
+    },
+    author: {
+        type: String,
+        required: true,
+    },
 });
 
 module.exports = mongoose.model('AcademicServices', academicServicesSchema, 'Academic Services');
