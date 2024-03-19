@@ -54,7 +54,7 @@ export default function Navigation() {
   };
   return (
     <React.Fragment>
-      <div className="navBox">
+      <div className="navBox" style={{ minHeight: "8vh", maxHeight: "8vh" }}>
         <div className="logoOptionsBox">
           <div className="logoIcon">
             <img
@@ -85,7 +85,7 @@ export default function Navigation() {
         </div>
         {/* Classes for when nav bar is open/collapsed in mobile */}
         <div className={openNav ? "accountBox" : "hideAccount"}>
-        <Button type="text" sx={navStyles.navButton}>
+          <Button type="text" sx={navStyles.navButton}>
             <Link to={"/register"} style={navStyles.link}>
               <Typography
                 fontSize={"16px"}
@@ -164,13 +164,13 @@ export default function Navigation() {
           </ListItemIcon>
           My Posts
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => navigate("/messages")}>
           <ListItemIcon>
             <SendIcon fontSize="small" />
           </ListItemIcon>
           Messages
         </MenuItem>
-        <MenuItem onClick={() => navigate('/postAd')}>
+        <MenuItem onClick={() => navigate("/postAd")}>
           <ListItemIcon>
             <PostAdd fontSize="small" />
           </ListItemIcon>
