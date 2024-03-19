@@ -7,8 +7,10 @@ import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { itemsForSale, itemsWanted, academicServices } from "./mockData";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 function HomeSearch() {
   const [searchValue, setSearchValue] = React.useState("");
@@ -20,13 +22,13 @@ function HomeSearch() {
   );
 }
 
-export function HomePage() {
+export function HomePage({ admin }) {
   return (
     <>
       <HomeSearch />
-      <Row title={"Items Wanted"} data={itemsWanted} />
-      <Row title={"Items For Sale"} data={itemsForSale} />
-      <Row title={"Academic Services"} data={academicServices} />
+      <Row title={"Items Wanted"} data={itemsWanted} admin={admin} />
+      <Row title={"Items For Sale"} data={itemsForSale} admin={admin} />
+      <Row title={"Academic Services"} data={academicServices} admin={admin} />
     </>
   );
 }
@@ -55,7 +57,7 @@ function SearchBar({ value, handleChange }) {
   );
 }
 
-function Row({ title, data }) {
+function Row({ title, data, admin }) {
   return (
     <Box sx={homeStyles.row}>
       <h2 style={homeStyles.header}>{title}</h2>
@@ -67,6 +69,7 @@ function Row({ title, data }) {
               description={posting.description}
               price={posting.price}
               img={posting.picture}
+              admin={admin}
             />
           );
         })}
@@ -75,7 +78,10 @@ function Row({ title, data }) {
   );
 }
 
-function ActionAreaCard({ title, description, price, img }) {
+function ActionAreaCard({ title, description, price, img, admin }) {
+  // edit these when we have pages to go to
+  const handleDeleteClick = () => {};
+  const handleEditClick = () => {};
   // gonna change all if this but the general layout is important
   return (
     <Card sx={{ width: 300, flex: "0 0 auto" }}>
@@ -100,7 +106,27 @@ function ActionAreaCard({ title, description, price, img }) {
               {description}
             </Typography>
           </div>
-          <Typography variant="h5">{price}</Typography>
+          <div style={homeStyles.priceRow}>
+            <Typography variant="h5">{price}</Typography>
+            {admin && (
+              <>
+                <Button
+                  aria-label="Delete"
+                  sx={{ color: "#213555" }}
+                  onClick={handleDeleteClick}
+                >
+                  <DeleteIcon color="inheret" />
+                </Button>
+                <Button
+                  aria-label="Edit"
+                  sx={{ color: "#213555" }}
+                  onClick={handleEditClick}
+                >
+                  <EditIcon />
+                </Button>
+              </>
+            )}
+          </div>
         </CardContent>
       </CardActionArea>
     </Card>
@@ -154,5 +180,11 @@ const homeStyles = {
     alignItems: "flex-start",
     height: "100%",
     fontFamily: "Inter",
+  },
+
+  priceRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 };

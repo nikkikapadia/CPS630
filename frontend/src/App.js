@@ -9,14 +9,23 @@ import ItemsForSale from "./itemsForSale/ItemsForSale";
 import Services from "./academicServices/AcademicServices";
 import PostAd from "./postAd/PostAd";
 import Register from "./register/Register";
+import { useState } from "react";
+import AllPosts from "./allPosts/AllPosts";
+import Users from "./users/Users";
 import Messages from "./messages/Messages";
 
 function App() {
+  // set state as true to see admin dashboard
+  const [admin] = useState(false);
+
   return (
     <div className="App">
-      <Navigation />
+      <Navigation admin={admin} />
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={admin ? <AllPosts /> : <HomePage admin={admin} />}
+        />
         {/* replace these when the pages are made */}
         <Route path="/wanted" element={<ItemsWanted />} />
         <Route path="/login" element={<Login />} />
@@ -26,9 +35,11 @@ function App() {
         <Route path="/postAd" element={<PostAd />} />
         <Route path="/settings" element={<div></div>} />
         <Route path="/profile" element={<div></div>} />
-        <Route path="/posts" element={<div></div>} />
+        <Route path="/myposts" element={<div></div>} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/:chatId" element={<Messages />} />
+        {admin && <Route path="/posts" element={<AllPosts />} />}
+        {admin && <Route path="/users" element={<Users />} />}
         <Route path="*" element={<Page404 />} />
       </Routes>
     </div>
