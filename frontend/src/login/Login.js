@@ -46,6 +46,11 @@ const Login = () => {
       signInWithEmailAndPassword(auth, values.email, values.password)
         .then((userCredential) => {
           console.log(userCredential.user, "User Logged In Successfully"); // Sign-in successful
+
+          // Store auth status and token in sessionStorage
+          sessionStorage.setItem('isLoggedIn', 'true');
+          sessionStorage.setItem('authToken', userCredential.user.accessToken);
+
           setSnackbarMessage('Login successful!');
           setSnackbarSeverity('success');
           setOpenSnackbar(true);

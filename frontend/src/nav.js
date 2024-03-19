@@ -12,17 +12,33 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
 import logo from "./tmu-trade-logo.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Typography } from "@mui/material";
 
 export default function Navigation() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const[isLoggedIn, setIsLoggedin] = React.useState(false);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // Check if user is logged in
+    const authStatus = sessionStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedin(authStatus);
+  }, [])
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.clear(); // clear session storage
+    setIsLoggedin(false); // update loggedIn state to false
+    setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+    handleClose(); // close menu if
   };
   return (
     <React.Fragment>
@@ -44,43 +60,46 @@ export default function Navigation() {
             Academic Services
           </Button>
         </Box>
-        <Box sx={navStyles.accountBox}>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/register"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Register
-              </Typography>
-            </Link>
-          </Button>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/login"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Login
-              </Typography>
-            </Link>
-          </Button>
 
-          <Tooltip title="Account settings">
-            <IconButton
-              onClick={handleClick}
-              size="small"
-              sx={{ ml: 2 }}
-              aria-controls={open ? "account-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-            >
-              <Avatar sx={{ width: 32, height: 32 }}></Avatar>
-            </IconButton>
-          </Tooltip>
-        </Box>
+        {!isLoggedIn ? (
+          <Box sx={navStyles.accountBox}>
+            {/* Register and Login options */}
+            <Button type="text" sx={navStyles.navButton}>
+              <Link to={"/register"} style={navStyles.link}>
+                <Typography fontSize={"16px"} sx={{ textTransform: "capitalize" }}>
+                  Register
+                </Typography>
+              </Link>
+            </Button>
+            <Button type="text" sx={navStyles.navButton}>
+              <Link to={"/login"} style={navStyles.link}>
+                <Typography fontSize={"16px"} sx={{ textTransform: "capitalize" }}>
+                  Login
+                </Typography>
+              </Link>
+            </Button>
+          </Box>
+        ) : (
+          <Box sx={navStyles.accountBox}>
+            {/* When logged in, show avatar and menu */}
+            <Tooltip title="Account settings">
+              <IconButton
+                onClick={handleClick}
+                size="small"
+                sx={{ ml: 2 }}
+                aria-controls={open ? "account-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+              >
+                <Avatar sx={{ width: 32, height: 32 }}></Avatar>
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
       </Box>
-      <Menu
+
+      {isLoggedIn && (
+        <Menu
         anchorEl={anchorEl}
         id="account-menu"
         open={open}
@@ -134,16 +153,17 @@ export default function Navigation() {
           </ListItemIcon>
           Settings
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
           Logout
         </MenuItem>
       </Menu>
+      )}
     </React.Fragment>
   );
-}
+}       
 
 const navStyles = {
   navBox: {

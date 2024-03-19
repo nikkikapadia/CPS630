@@ -55,6 +55,11 @@ const Register = () => {
         createUserWithEmailAndPassword(auth, values.email, values.password)
           .then((userCredential) => {
             console.log(userCredential.user, "User Created Successfully")
+
+            // Set 'isLoggedIn' to true and store 'authToken'
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('authToken', userCredential.user.accessToken);
+
             setSnackbarMessage('Registration successful! You are now logged in.');
             setOpenSnackbar(true); // Show success Snackbar
             setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
