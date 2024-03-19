@@ -16,7 +16,7 @@ import Messages from "./messages/Messages";
 
 function App() {
   // set state as true to see admin dashboard
-  const [admin] = useState(true);
+  const [admin] = useState(false);
 
   return (
     <div className="App">
