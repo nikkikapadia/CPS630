@@ -128,7 +128,7 @@ const Messages = () => {
                     mb={0.25}
                   />
                   <Typography variant="caption" color={"grey.600"} ml={1.5}>
-                    Available on Mobile
+                    Online
                   </Typography>
                 </Box>
               </Box>

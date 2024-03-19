@@ -18,6 +18,18 @@ export const chats = [
     recieverName: "Me",
     last_message: `Thank you, I’ll reach out to you shortly. Thanks for the quick response!`,
   },
+  {
+    id: 4,
+    senderName: "James",
+    recieverName: "Me",
+    last_message: `Fantastic, I'll give you a call tomorrow. Thanks for being so accommodating!`,
+  },
+  {
+    id: 5,
+    senderName: "Michael",
+    recieverName: "Me",
+    last_message: `Thank you so much! I’ll be in touch soon.`,
+  },
 ];
 
 export const chatmessages = {
@@ -210,6 +222,146 @@ finalize the deal if everything checks out.`,
       senderName: "Me",
       recieverName: "Cathy",
       message: `Thank you, I’ll reach out to you shortly. Thanks for the quick response!`,
+    },
+  ],
+  4: [
+    {
+      id: 1,
+      senderName: "Me",
+      recieverName: "James",
+      message: `I saw your ad for photography sessions and was really impressed. I'm interested in booking a session for some professional headshots. Do you have any availability next week?`,
+    },
+    {
+      id: 2,
+      senderName: "James",
+      recieverName: "Me",
+      message: ` Hi there! Yes, I do have some openings next week. Were you thinking of any specific day or time?`,
+    },
+    {
+      id: 3,
+      senderName: "Me",
+      recieverName: "James",
+      message: `I was hoping for Wednesday afternoon if that works for you. It's the only time I'm free nextweek.`,
+    },
+    {
+      id: 4,
+      senderName: "James",
+      recieverName: "Me",
+      message: `Wednesday afternoon is perfect. I have a slot available at 3 PM. Would that time suit you?`,
+    },
+    {
+      id: 5,
+      senderName: "Me",
+      recieverName: "James",
+      message: `That time sounds ideal. Where do you usually do your sessions? Do you have a studio, or
+would we need to pick a location?`,
+    },
+    {
+      id: 6,
+      senderName: "James",
+      recieverName: "Me",
+      message: `I usually work on location to give a unique backdrop to each session. Do you have any
+specific location in mind, or would you like some suggestions based on the style you're going
+for?`,
+    },
+    {
+      id: 7,
+      senderName: "Me",
+      recieverName: "James",
+      message: `I haven't thought much about the location yet. I'd appreciate some suggestions, especially
+places that work well for professional shots.`,
+    },
+    {
+      id: 8,
+      senderName: "James",
+      recieverName: "Me",
+      message: `Certainly, I can suggest a few spots around the city that offer a great setting. How about
+we discuss this over a call? I can also answer any other questions you might have.`,
+    },
+    {
+      id: 9,
+      senderName: "Me",
+      recieverName: "James",
+      message: `A call sounds great. Could you share your number so we can discuss further?`,
+    },
+    {
+      id: 10,
+      senderName: "James",
+      recieverName: "Me",
+      message: `Of course, my number is 289-555-1234. Feel free to call me anytime tomorrow, and we'll
+iron out all the details.`,
+    },
+    {
+      id: 11,
+      senderName: "Me",
+      recieverName: "James",
+      message: `Fantastic, I'll give you a call tomorrow. Thanks for being so accommodating!`,
+    },
+  ],
+  5: [
+    {
+      id: 1,
+      senderName: "Michael",
+      recieverName: "Me",
+      message: `Hi, I'm reaching out about the study desk you listed. Is it still available? And could you tell
+me more about its size and whether it’s easy to transport via subway?`,
+    },
+    {
+      id: 2,
+      senderName: "Me",
+      recieverName: "Michael",
+      message: `Yes, the desk is still available. It's quite compact, which is great for small spaces. It can be
+disassembled for transport, and I'd be happy to provide you with the necessary tools and
+instructions for reassembly`,
+    },
+    {
+      id: 3,
+      senderName: "Michael",
+      recieverName: "Me",
+      message: `That sounds exactly like what I'm looking for. Could you provide the dimensions? I need to
+make sure it will fit in my study area.`,
+    },
+    {
+      id: 4,
+      senderName: "Me",
+      recieverName: "Michael",
+      message: `Absolutely, the desk is 48 inches wide, 24 inches deep, and 30 inches tall. I’ll double-check
+those measurements when I get home and let you know if there’s any discrepancy`,
+    },
+    {
+      id: 5,
+      senderName: "Michael",
+      recieverName: "Me",
+      message: `Perfect, those dimensions should work. How soon are you looking to sell it? I’m interested
+but might need a few days to arrange transport.`,
+    },
+    {
+      id: 6,
+      senderName: "Me",
+      recieverName: "Michael",
+      message: `I'm in no rush to sell, so a few days from now works fine for me. Let’s plan for a pickup
+that’s convenient for you. Would you like to exchange numbers to coordinate the pickup details?
+`,
+    },
+    {
+      id: 7,
+      senderName: "Michael",
+      recieverName: "Me",
+      message: `Yes, that would be great. My number is 905-555-6789. Can I text you to confirm the day
+and time?`,
+    },
+    {
+      id: 8,
+      senderName: "Me",
+      recieverName: "Michael",
+      message: `That works for me. I'll look forward to your text, and we can set everything up. Thank you
+for your interest in the desk!`,
+    },
+    {
+      id: 9,
+      senderName: "Michael",
+      recieverName: "Me",
+      message: ` Thank you so much! I’ll be in touch soon.`,
     },
   ],
 };
