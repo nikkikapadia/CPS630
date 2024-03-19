@@ -54,7 +54,7 @@ export default function Navigation({ admin }) {
   };
   return (
     <React.Fragment>
-      <div className="navBox">
+      <div className="navBox" style={{ minHeight: "8vh", maxHeight: "8vh" }}>
         <div className="logoOptionsBox">
           <div className="logoIcon">
             <img
@@ -177,7 +177,7 @@ export default function Navigation({ admin }) {
           </ListItemIcon>
           My Posts
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => navigate("/messages")}>
           <ListItemIcon>
             <SendIcon fontSize="small" />
           </ListItemIcon>

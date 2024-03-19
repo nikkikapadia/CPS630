@@ -12,6 +12,7 @@ import Register from "./register/Register";
 import { useState } from "react";
 import AllPosts from "./allPosts/AllPosts";
 import Users from "./users/Users";
+import Messages from "./messages/Messages";
 
 function App() {
   // set state as true to see admin dashboard
@@ -35,7 +36,8 @@ function App() {
         <Route path="/settings" element={<div></div>} />
         <Route path="/profile" element={<div></div>} />
         <Route path="/myposts" element={<div></div>} />
-        <Route path="/messages" element={<div></div>} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/messages/:chatId" element={<Messages />} />
         {admin && <Route path="/posts" element={<AllPosts />} />}
         {admin && <Route path="/users" element={<Users />} />}
         <Route path="*" element={<Page404 />} />
