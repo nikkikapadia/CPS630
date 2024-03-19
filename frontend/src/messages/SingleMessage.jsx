@@ -24,10 +24,6 @@ const SingleMessage = ({ message }) => {
         <Box display={"flex"} alignItems={"center"} gap={2}>
           <Typography variant={"body2"} fontWeight={"600"} fontSize={"14px"}>
             {message?.senderName}{" "}
-            <Typography component={"span"} fontSize={"12px"} color={"grey.500"}>
-              {" "}
-              (He/Him)
-            </Typography>
           </Typography>
           <Box
             sx={{

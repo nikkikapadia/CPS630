@@ -31,7 +31,7 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
         borderLeft: selectedChat == chat.id ? "3px solid #213555" : "none",
       }}
     >
-      <Avatar>MR</Avatar>
+      <Avatar> {chat.senderName?.slice(0, 1)}</Avatar>
       <Box width={"225px"}>
         <Box
           display={"flex"}
