@@ -6,7 +6,7 @@ const middleware = require('./middleware');
 
 const unless = (paths, middleware) => {
     return function(req, res, next) {
-        if (paths.some(path => path == req.path))
+        if (paths.some(path => path.test(req.path) == true))
             return next();
         else
             return middleware(req, res, next);
@@ -14,11 +14,9 @@ const unless = (paths, middleware) => {
 };
 
 app.use(express.json());
-app.use(unless(['/api/users/new', 
-                '/api/ads/:category', 
-                '/api/ads/:category/:id',
-                '/api/ads/:category/:author'
-], middleware.decodeToken));
+app.use(unless([/^\/api\/users\/new$/g, /^\/api\/ads\/get\//g], middleware.decodeToken));
+
+app.set('case sensitive routing', true);
 
 const User = require('./models/UserModel');
 const ItemWanted = require('./models/ItemWantedModel');
@@ -37,7 +35,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 // GET all users
-app.get('/api/users', async (req, res) => {
+app.get('/api/users/get', async (req, res) => {
     // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select('isAdmin');
     const isAdmin = result.isAdmin;
@@ -56,7 +54,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // GET user by id
-app.get('/api/users/:id'), async(req, res) => {
+app.get('/api/users/get/:id'), async(req, res) => {
     try {
         const user = await User.find({ _id: req.params.id });
         res.status(200).json(user);
@@ -67,7 +65,7 @@ app.get('/api/users/:id'), async(req, res) => {
 }
 
 // GET user by email
-app.get('/api/users/:email'), async(req, res) => {
+app.get('/api/users/get/:email'), async(req, res) => {
     try {
         const user = await User.find({ email: req.params.email });
         res.status(200).json(user);
@@ -78,7 +76,7 @@ app.get('/api/users/:email'), async(req, res) => {
 }
 
 // GET user by username
-app.get('/api/users/:username'), async(req, res) => {
+app.get('/api/users/get/:username'), async(req, res) => {
     try {
         const user = await User.find({ username: req.params.username });
         res.status(200).json(user);
@@ -201,7 +199,7 @@ const categoryModelMap = { 'academicServices': AcademicService, 'itemsForSale': 
 
 
 // GET all ads under a category
-app.get('/api/ads/:category', async(req, res) => {
+app.get('/api/ads/get/:category', async(req, res) => {
     if (!validCategory(req.params.category))
         return res.status(400).json({error: "Invalid ad category. Category must be 'academicService', 'itemsForSale', or 'itemsWanted'."});
 
@@ -216,7 +214,7 @@ app.get('/api/ads/:category', async(req, res) => {
 });
 
 // GET ad by category and id
-app.get('/api/ads/:category/:id', async(req, res) => {
+app.get('/api/ads/get/:category/:id', async(req, res) => {
     if (!validCategory(req.params.category))
         return res.status(400).json({error: "Invalid ad category. Category must be 'academicService', 'itemsForSale', or 'itemsWanted'."});
 
@@ -231,7 +229,7 @@ app.get('/api/ads/:category/:id', async(req, res) => {
 });
 
 // GET ads by category and author
-app.get('/api/ads/:category/:author', async(req, res) => {
+app.get('/api/ads/get/:category/:author', async(req, res) => {
     if (!validCategory(req.params.category))
         return res.status(400).json({error: "Invalid ad category. Category must be 'academicService', 'itemsForSale', or 'itemsWanted'."});
 
