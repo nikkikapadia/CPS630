@@ -14,7 +14,11 @@ import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { Link } from "react-router-dom";
+import { auth } from '../firebase-config';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const validationSchema = yup.object({
   fullName: yup.string().required("Full Name is required"),
@@ -33,6 +37,10 @@ const validationSchema = yup.object({
 });
 
 const Register = () => {
+  const navigate = useNavigate();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
   const formik = useFormik({
     initialValues: {
       fullName: "",
@@ -43,11 +51,41 @@ const Register = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values, "Submiited Values");
+      if (values.isAgreed) {
+        createUserWithEmailAndPassword(auth, values.email, values.password)
+          .then((userCredential) => {
+            console.log(userCredential.user, "User Created Successfully")
+
+            // Set 'isLoggedIn' to true and store 'authToken'
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('authToken', userCredential.user.accessToken);
+
+            setSnackbarMessage('Registration successful! You are now logged in.');
+            setOpenSnackbar(true); // Show success Snackbar
+            setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error(errorCode, errorMessage);
+            //UI changes here to reflect error
+          });
+      } else {
+        console.log("User did not agree to terms");
+        
+      }
     },
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
 
   return (
     <Box width={"100%"}>
@@ -178,6 +216,7 @@ const Register = () => {
               }}
               variant="contained"
               type="submit"
+              disabled={!formik.values.isAgreed}
             >
               Register
             </Button>
@@ -191,20 +230,26 @@ const Register = () => {
             >
               <Typography sx={{ textAlign: "center" }}>
                 Already have an account?{" "}
-                <Link to={"/login"} style={{ textDecoration: "none" }}>
-                  <Typography
-                    component={"span"}
-                    sx={{ color: "#213555", fontWeight: "bold" }}
-                  >
-                    Login
-                  </Typography>
-                </Link>
+                <Typography
+                  component={"span"}
+                  sx={{ color: "#213555", fontWeight: "bold" }}
+                >
+                  Login
+                </Typography>
               </Typography>
             </Box>
           </form>
         </CardContent>
       </Card>
+
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
+
+    
   );
 };
 
