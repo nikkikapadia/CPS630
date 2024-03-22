@@ -19,6 +19,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { Link } from "react-router-dom";
 
 const validationSchema = yup.object({
   email: yup
@@ -64,6 +65,7 @@ const Login = () => {
           setSnackbarSeverity('error');
           setOpenSnackbar(true);
         });
+      console.log(values, "Submiited Values");
     },
   });
 
@@ -161,12 +163,14 @@ const Login = () => {
             >
               <Typography sx={{ textAlign: "center" }}>
                 Dont have an account?{" "}
-                <Typography
-                  component={"span"}
-                  sx={{ color: "#213555", fontWeight: "bold" }}
-                >
-                  Register
-                </Typography>
+                <Link to={"/register"} style={{ textDecoration: "none" }}>
+                  <Typography
+                    component={"span"}
+                    sx={{ color: "#213555", fontWeight: "bold" }}
+                  >
+                    Register
+                  </Typography>
+                </Link>
               </Typography>
             </Box>
           </form>

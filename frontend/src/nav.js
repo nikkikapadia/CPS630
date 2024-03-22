@@ -230,7 +230,7 @@ export default function Navigation({ admin }) {
           </ListItemIcon>
           Settings
         </MenuItem>
-        <MenuItem onClick={handleLogout}>
+        <MenuItem onClick={() => {handleClose(); handleLogout();}}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
