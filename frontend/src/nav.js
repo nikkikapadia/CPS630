@@ -1,4 +1,5 @@
 import * as React from "react";
+import Box from "@mui/material/Box";
 import "./nav.css";
 import Avatar from "@mui/material/Avatar";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -18,13 +19,21 @@ import logo from "./tmu-trade-logo.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { PostAdd } from "@mui/icons-material";
 import { Typography } from "@mui/material";
+import PersonAdd from "@mui/icons-material/PersonAdd";
 
 export default function Navigation({ admin }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openNav, setOpenNav] = React.useState(false);
+  const[isLoggedIn, setIsLoggedin] = React.useState(false);
   const open = Boolean(anchorEl);
 
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // Check if user is logged in
+    const authStatus = sessionStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedin(authStatus);
+  }, [])
 
   const [width, setWidth] = React.useState(window.innerWidth);
   // following code chunk makes sure the menu isn't open when resized to mobile screen
@@ -52,6 +61,14 @@ export default function Navigation({ admin }) {
   const handleOpenNav = () => {
     setOpenNav(!openNav);
   };
+
+  const handleLogout = () => {
+    sessionStorage.clear(); // clear session storage
+    setIsLoggedin(false); // update loggedIn state to false
+    setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+    handleClose(); // close menu if
+  };
+
   return (
     <React.Fragment>
       <div className="navBox" style={{ minHeight: "8vh", maxHeight: "8vh" }}>
@@ -98,27 +115,31 @@ export default function Navigation({ admin }) {
         </div>
         {/* Classes for when nav bar is open/collapsed in mobile */}
         <div className={openNav ? "accountBox" : "hideAccount"}>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/register"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Register
-              </Typography>
-            </Link>
-          </Button>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/login"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Login
-              </Typography>
-            </Link>
-          </Button>
-          <Tooltip title="Account">
+        {!isLoggedIn ? (
+          <>
+            <Button type="text" sx={navStyles.navButton}>
+                <Link to={"/register"} style={navStyles.link}>
+                <Typography
+                    fontSize={"16px"}
+                    sx={{ textTransform: "capitalize" }}
+                >
+                    Register
+                </Typography>
+                </Link>
+            </Button>
+            <Button type="text" sx={navStyles.navButton}>
+                <Link to={"/login"} style={navStyles.link}>
+                <Typography
+                    fontSize={"16px"}
+                    sx={{ textTransform: "capitalize" }}
+                >
+                    Login
+                </Typography>
+                </Link>
+            </Button>
+          </>
+          ) : (
+          <Tooltip title="Account Settings">
             <IconButton
               onClick={handleClick}
               size="small"
@@ -130,10 +151,13 @@ export default function Navigation({ admin }) {
               <Avatar sx={{ width: 32, height: 32 }}></Avatar>
             </IconButton>
           </Tooltip>
+        )}
         </div>
       </div>
 
+      
       {/* Profile Menu Dropdown */}
+      {isLoggedIn && (
       <Menu
         anchorEl={anchorEl}
         id="account-menu"
@@ -172,6 +196,10 @@ export default function Navigation({ admin }) {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem onClick={handleClose}>
+          <Avatar /> Profile
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Avatar /> My account
           <ListItemIcon>
             <ArticleIcon fontSize="small" />
           </ListItemIcon>
@@ -202,18 +230,43 @@ export default function Navigation({ admin }) {
           </ListItemIcon>
           Settings
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => {handleClose(); handleLogout();}}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
           Logout
         </MenuItem>
       </Menu>
+      )}
     </React.Fragment>
   );
-}
+}       
 
 const navStyles = {
+  navBox: {
+    display: "flex",
+    alignItems: "center",
+    textAlign: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#213555",
+    // sticky
+    top: 0,
+    width: "100%",
+    overflow: "hidden",
+  },
+  logoOptionsBox: {
+    padding: "1em",
+    display: "flex",
+    alignItems: "center",
+    textAlign: "center",
+    gap: "1em",
+  },
+  accountBox: {
+    display: "flex",
+    alignItems: "center",
+    textAlign: "center",
+    padding: "1em",
+  },
   navButton: {
     color: "#E5D283",
   },
