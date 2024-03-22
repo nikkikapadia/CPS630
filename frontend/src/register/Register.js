@@ -19,6 +19,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { Link } from "react-router-dom";
 
 const validationSchema = yup.object({
   fullName: yup.string().required("Full Name is required"),
@@ -75,6 +76,7 @@ const Register = () => {
         console.log("User did not agree to terms");
         
       }
+      console.log(values, "Submiited Values");
     },
   });
 
@@ -230,12 +232,14 @@ const Register = () => {
             >
               <Typography sx={{ textAlign: "center" }}>
                 Already have an account?{" "}
-                <Typography
-                  component={"span"}
-                  sx={{ color: "#213555", fontWeight: "bold" }}
-                >
-                  Login
-                </Typography>
+                <Link to={"/login"} style={{ textDecoration: "none" }}>
+                  <Typography
+                    component={"span"}
+                    sx={{ color: "#213555", fontWeight: "bold" }}
+                  >
+                    Login
+                  </Typography>
+                </Link>
               </Typography>
             </Box>
           </form>
@@ -248,8 +252,6 @@ const Register = () => {
         </Alert>
       </Snackbar>
     </Box>
-
-    
   );
 };
 
