@@ -1,8 +1,18 @@
+import React, { useState } from "react";
 import { Box, Divider, Typography } from "@mui/material";
 import ListingItem from "../components/ListingItem";
 import { dummyDataForItemsWanted } from "./ItemsWantedDummyData";
+import ViewPostingModal from "../components/ViewPostingModal";
 
 export default function ItemsWanted() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPost, setModalPost] = useState({});
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setModalPost({});
+  };
+
   return (
     <Box sx={{ width: "95%", mx: "auto", pb: "20px" }}>
       <Typography
@@ -20,9 +30,27 @@ export default function ItemsWanted() {
       <Divider sx={{ my: "30px" }} />
       <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         {dummyDataForItemsWanted.map((item, ind) => {
-          return <ListingItem key={ind} {...item} />;
+          const updatedPosting = {
+            ...item,
+            category: "Items Wanted",
+          };
+          return (
+            <ListingItem
+              key={ind}
+              onClick={() => {
+                setModalOpen(true);
+                setModalPost(updatedPosting);
+              }}
+              {...updatedPosting}
+            />
+          );
         })}
       </Box>
+      <ViewPostingModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        post={modalPost}
+      />
     </Box>
   );
 }

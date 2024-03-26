@@ -11,6 +11,7 @@ import { Box, Button } from "@mui/material";
 import { itemsForSale, itemsWanted, academicServices } from "./mockData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import ViewPostingModal from "../components/ViewPostingModal";
 
 function HomeSearch() {
   const [searchValue, setSearchValue] = React.useState("");
@@ -23,12 +24,43 @@ function HomeSearch() {
 }
 
 export function HomePage({ admin }) {
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalPost, setModalPost] = React.useState({});
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setModalPost({});
+  };
+
   return (
     <>
       <HomeSearch />
-      <Row title={"Items Wanted"} data={itemsWanted} admin={admin} />
-      <Row title={"Items For Sale"} data={itemsForSale} admin={admin} />
-      <Row title={"Academic Services"} data={academicServices} admin={admin} />
+      <Row
+        title={"Items Wanted"}
+        data={itemsWanted}
+        admin={admin}
+        setModalOpen={setModalOpen}
+        setModalPost={setModalPost}
+      />
+      <Row
+        title={"Items For Sale"}
+        data={itemsForSale}
+        admin={admin}
+        setModalOpen={setModalOpen}
+        setModalPost={setModalPost}
+      />
+      <Row
+        title={"Academic Services"}
+        data={academicServices}
+        admin={admin}
+        setModalOpen={setModalOpen}
+        setModalPost={setModalPost}
+      />
+      <ViewPostingModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        post={modalPost}
+      />
     </>
   );
 }
@@ -57,12 +89,17 @@ function SearchBar({ value, handleChange }) {
   );
 }
 
-function Row({ title, data, admin }) {
+function Row({ title, data, admin, setModalOpen, setModalPost }) {
   return (
     <Box sx={homeStyles.row}>
       <h2 style={homeStyles.header}>{title}</h2>
       <Box sx={homeStyles.cardRow}>
         {data.map((posting) => {
+          const updatedPosting = {
+            ...posting,
+            category: title,
+            postDate: Date.now(),
+          };
           return (
             <ActionAreaCard
               title={posting.name}
@@ -70,6 +107,10 @@ function Row({ title, data, admin }) {
               price={posting.price}
               img={posting.picture}
               admin={admin}
+              onClick={() => {
+                setModalOpen(true);
+                setModalPost(updatedPosting);
+              }}
             />
           );
         })}
@@ -78,14 +119,14 @@ function Row({ title, data, admin }) {
   );
 }
 
-function ActionAreaCard({ title, description, price, img, admin }) {
+function ActionAreaCard({ title, description, price, img, admin, onClick }) {
   // edit these when we have pages to go to
   const handleDeleteClick = () => {};
   const handleEditClick = () => {};
   // gonna change all if this but the general layout is important
   return (
     <Card sx={{ width: 300, flex: "0 0 auto" }}>
-      <CardActionArea sx={homeStyles.cardClickable}>
+      <CardActionArea sx={homeStyles.cardClickable} onClick={onClick}>
         <CardMedia
           component="img"
           height="140"
