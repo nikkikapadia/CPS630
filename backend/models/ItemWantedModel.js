@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const itemWantedSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: true,
     },
@@ -18,24 +18,21 @@ const itemWantedSchema = new mongoose.Schema({
         required: true,
     },
     tags: [{
-        type: String
+        type: String,
+        required: false,
     }],
     photos: [{
         type: String,
-        required: false,
+        required: true,
     }],
     price: {
         type: Number,
         required: true,
     },
-    postedBy: {
-        type: String,
-        required: true,
-    },
     author: {
         type: String,
         required: true,
-    },
+    }
 });
 
 module.exports = mongoose.model('ItemWanted', itemWantedSchema, 'Items Wanted');

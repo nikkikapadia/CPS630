@@ -10,7 +10,7 @@ import {
   Checkbox,
   IconButton,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -21,8 +21,16 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Link } from "react-router-dom";
 
+import { UserContext } from '../App';
+
 const validationSchema = yup.object({
-  fullName: yup.string().required("Full Name is required"),
+  fullName: yup
+    .string()
+    .required("Full Name is required"),
+  username: yup
+    .string()
+    .min(8, "Username should be of minimum 8 characters length")
+    .required("Username is required"),
   email: yup
     .string()
     .email("Enter a valid email")
@@ -38,12 +46,15 @@ const validationSchema = yup.object({
 });
 
 const Register = () => {
+  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); // 'success' or 'error'
 
   const formik = useFormik({
     initialValues: {
+      username: "",
       fullName: "",
       email: "",
       password: "",
@@ -54,23 +65,62 @@ const Register = () => {
     onSubmit: (values) => {
       if (values.isAgreed) {
         createUserWithEmailAndPassword(auth, values.email, values.password)
-          .then((userCredential) => {
+          .then(async (userCredential) => {
             console.log(userCredential.user, "User Created Successfully")
+
+            const token = userCredential.user.accessToken;
 
             // Set 'isLoggedIn' to true and store 'authToken'
             sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('authToken', userCredential.user.accessToken);
+            sessionStorage.setItem('authToken', token);
+            sessionStorage.setItem('email', values.email);
+            sessionStorage.setItem('fullName', values.fullName);
+            sessionStorage.setItem('isAdmin', 'false');
+            sessionStorage.setItem('username', values.username);
+            
+
+            const userInfo = await fetch(`http://localhost:5000/api/users/new`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    'username': values.username,
+                    'email': values.email,
+                    'fullName': values.fullName
+                })
+            })
+            .then(res => {
+                return res.json()
+            })
+            .then(data => {
+                return data;
+            });
+
+            sessionStorage.setItem('_id', userInfo._id);
+
+            setUser({
+                isLoggedIn: true,
+                username: userInfo.username,
+                email: userInfo.email,
+                fullName: userInfo.fullName,
+                isAdmin: userInfo.isAdmin,
+                _id: userInfo._id
+            });
 
             setSnackbarMessage('Registration successful! You are now logged in.');
             setOpenSnackbar(true); // Show success Snackbar
-            setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
-
+            navigate('/');
           })
           .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.error(errorCode, errorMessage);
-            //UI changes here to reflect error
+            // Register failure
+            console.error("Error registering: ", error.message);
+            alert(`Error registering: ${error.message}`);
+            setSnackbarMessage(`Error registering: ${error.message}`);
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
           });
       } else {
         console.log("User did not agree to terms");
@@ -81,6 +131,7 @@ const Register = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') {
@@ -146,6 +197,19 @@ const Register = () => {
               </FormLabel>
             </Box>
             <TextField
+              label="Username"
+              id="username"
+              type="username"
+              name="username"
+              fullWidth
+              variant="outlined"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.username && Boolean(formik.errors.username)}
+              helperText={formik.touched.username && formik.errors.username}
+            />
+            <TextField
               label="Email"
               id="email"
               type="email"
@@ -185,7 +249,7 @@ const Register = () => {
             <TextField
               label="Confirm Password"
               id="confirmPassword"
-              type="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
               fullWidth
               variant="outlined"
@@ -199,6 +263,17 @@ const Register = () => {
               helperText={
                 formik.touched.confirmPassword && formik.errors.confirmPassword
               }
+              InputProps={{
+                endAdornment: (
+                  <IconButton>
+                    {showConfirmPassword ? (
+                      <VisibilityOff onClick={() => setShowConfirmPassword(false)} />
+                    ) : (
+                      <Visibility onClick={() => setShowConfirmPassword(true)} />
+                    )}
+                  </IconButton>
+                ),
+              }}
             />
             <FormControlLabel
               sx={{ gap: "2px" }}
@@ -246,8 +321,8 @@ const Register = () => {
         </CardContent>
       </Card>
 
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

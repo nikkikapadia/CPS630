@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import "./Home.css";
 import "@fontsource/inter";
 import Typography from "@mui/material/Typography";
@@ -12,6 +12,8 @@ import { itemsForSale, itemsWanted, academicServices } from "./mockData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
+import { UserContext } from '../App';
+
 function HomeSearch() {
   const [searchValue, setSearchValue] = React.useState("");
   return (
@@ -23,6 +25,13 @@ function HomeSearch() {
 }
 
 export function HomePage({ admin }) {
+  const { user, setUser } = useContext(UserContext);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+  console.log('homepage', user);
+
   return (
     <>
       <HomeSearch />
