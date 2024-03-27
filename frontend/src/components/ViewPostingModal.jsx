@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Box,
@@ -12,9 +12,9 @@ import {
   FormLabel,
   Select,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
@@ -50,20 +50,21 @@ function ViewPostingModal({ open, onClose, post }) {
                 <Typography id="modal-modal-title" variant="h4" component="h2">
                   {postInfo.name}
                 </Typography>
-                <div>
-                  <Button
-                    aria-label="Edit"
-                    sx={{ color: "#213555" }}
-                    onClick={handleEditClick}
-                  >
-                    <EditIcon />
-                  </Button>
+                <div style={{ display: "grid" }}>
                   <Button
                     aria-label="Close"
                     sx={{ color: "#213555" }}
                     onClick={handleClose}
                   >
                     <CloseIcon color="inheret" />
+                  </Button>
+                  {/* only show if it is the user's post */}
+                  <Button
+                    aria-label="Edit"
+                    sx={{ color: "#213555" }}
+                    onClick={handleEditClick}
+                  >
+                    <EditIcon />
                   </Button>
                 </div>
               </div>
@@ -78,7 +79,19 @@ function ViewPostingModal({ open, onClose, post }) {
               <Typography sx={{ mt: 2 }}>
                 Location: {postInfo.location}
               </Typography>
-              <Typography sx={{ mt: 2 }}>Price: {postInfo.price}</Typography>
+              <Typography sx={{ mt: 2, mb: 10 }}>
+                Price: ${postInfo.price}
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{ backgroundColor: "#213555", mr: 2 }}
+                href={"/messages"}
+              >
+                Chat
+              </Button>
+              <Button variant="contained" sx={{ backgroundColor: "#213555" }}>
+                Purchase
+              </Button>
             </>
           ) : (
             <EditForm
@@ -89,7 +102,6 @@ function ViewPostingModal({ open, onClose, post }) {
           )}
         </Box>
       </Modal>
-
     </>
   );
 }
@@ -97,7 +109,7 @@ function ViewPostingModal({ open, onClose, post }) {
 export default ViewPostingModal;
 
 function EditForm({ postInfo, setPostInfo, setEdit }) {
-    console.log(postInfo);
+  console.log(postInfo);
   const validationSchema = yup.object({
     adTitle: yup
       .string()
@@ -307,4 +319,7 @@ const style = {
   p: 4,
   maxHeight: "80%",
   overflow: "scroll",
+  "@media (max-width: 770px)": {
+    width: "80%",
+  },
 };

@@ -148,7 +148,7 @@ function ActionAreaCard({ title, description, price, img, admin, onClick }) {
             </Typography>
           </div>
           <div style={homeStyles.priceRow}>
-            <Typography variant="h5">{price}</Typography>
+            <Typography variant="h5">${price}</Typography>
             {admin && (
               <>
                 <Button
