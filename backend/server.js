@@ -81,7 +81,7 @@ app.get('/api/users/get', async (req, res) => {
         return res.status(400).json({error: 'User not authorized to make this request'});
 
     try {
-        const users = await User.find();
+        const users = await User.find().sort({ username: 'asc' });
         res.status(200).json(users);
     }
     catch(error) {
@@ -208,7 +208,7 @@ app.get('/api/ads/get/:category', async(req, res) => {
 
     const AdModel = categoryModelMap[req.params.category];
     try {
-        const ads = await AdModel.find();
+        const ads = await AdModel.find().sort({ postDate: 'asc', title: 'asc'});
         res.status(200).json(ads);
     }
     catch(error) {
@@ -238,7 +238,7 @@ app.get('/api/ads/get/:category/author/:author', async(req, res) => {
 
     const AdModel = categoryModelMap[req.params.category];
     try {
-        const ads = await AdModel.find({ author: req.params.author });
+        const ads = await AdModel.find({ author: req.params.author }).sort({ postDate: 'asc', title: 'asc'});
         res.status(200).json(ads);
     }
     catch(error) {
@@ -318,15 +318,115 @@ app.delete('/api/ads/delete/:category/id/:id', async(req, res) => {
     }
 });
 
+// GET all chats with usernames of user1 and user2 (does not matter which order they are input)
+app.get('/api/chats/get/:user1/:user2', async(req, res) => {
+    try {
+        const chat = await Chat.findOne({
+            $or: [
+                {
+                    $and: [
+                        { user1 : req.params.user1 },
+                        { user2: req.params.user2 }
+                    ]
+                },
+                {
+                    $and: [
+                        { user1: req.params.user2 },
+                        { user2: req.params.user1 }
+                    ]
+                }
+            ]
+        }).select(['messages']);
+        res.status(200).json(chat.messages);
+    }
+    catch(error) {
+        res.status(400).json({error: error.message});
+    }
+});
 
-/* 
-TO DO:
-- (Maybe) Pagination for ad GET requests: https://plainenglish.io/blog/simple-pagination-with-node-js-mongoose-and-express
-- Return more precise error codes https://www.restapitutorial.com/httpstatuscodes.html
+// GET all people user has a chat with (returns both usernames)
+app.get('/api/chats/get/:username', async(req, res) => {
+    try {
+        const chats = await Chat.find({
+            $or: [
+                { user1 : req.params.username },
+                { user2: req.params.username } 
+            ]
+        }).select(['user1', 'user2']);
+        res.status(200).json(chats);
+    }
+    catch(error) {
+        res.status(400).json({error: error.message});
+    }
+});
 
-- Order get posts by date
-- Update database with values from dummy data
-*/
+// POST (create) a new chat
+app.post('/api/chats/new/', async(req, res) => {
+    try {
+        const chat = await Chat.create(req.body);
+        res.status(200).json(chat);
+    }
+    catch(error) {
+        res.status(400).json({error: error.message});
+    }
+});
 
+// PATCH (update) a chat with a new message
+app.patch('/api/chats/newmessage/:user1/:user2', async(req, res) => {
+    const message = req.body.messages[0];
+    try {
+        const chat = await Chat.findOneAndUpdate({
+            $or: [
+                {
+                    $and: [
+                        { user1 : req.params.user1 },
+                        { user2: req.params.user2 }
+                    ]
+                },
+                {
+                    $and: [
+                        { user1: req.params.user2 },
+                        { user2: req.params.user1 }
+                    ]
+                }
+            ]
+        }, {
+            $push: {
+                messages: message
+            }
+        }, 
+        { new: true });
+        res.status(200).json(message);
+    }
+    catch(error) {
+        res.status(400).json({error: error.message});
+    }
+});
+
+// DELETE a chat with (usernames) user1 and user2 (interchangable)
+app.delete('/api/chats/delete/:user1/:user2', async(req, res) => {
+    try {
+        const chat = await Chat.deleteOne({
+            $or: [
+                {
+                    $and: [
+                        { user1 : req.params.user1 },
+                        { user2: req.params.user2 }
+                    ]
+                },
+                {
+                    $and: [
+                        { user1: req.params.user2 },
+                        { user2: req.params.user1 }
+                    ]
+                }
+            ]
+        });
+        res.status(200).json(chat);
+    }
+    catch(error) {
+        res.status(400).json({error: error.message});
+    }
+});
 
 
