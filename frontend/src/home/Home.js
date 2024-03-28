@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import "./Home.css";
 import "@fontsource/inter";
 import Typography from "@mui/material/Typography";
@@ -11,6 +11,8 @@ import { Box, Button } from "@mui/material";
 import { itemsForSale, itemsWanted, academicServices } from "./mockData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+
+import { UserContext } from "../App";
 import ViewPostingModal from "../components/ViewPostingModal";
 
 function HomeSearch() {
@@ -24,6 +26,13 @@ function HomeSearch() {
 }
 
 export function HomePage({ admin }) {
+  const { user, setUser } = useContext(UserContext);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+  console.log("homepage", user);
+
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalPost, setModalPost] = React.useState({});
 

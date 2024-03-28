@@ -91,23 +91,58 @@ export default function Navigation({ admin }) {
           <div className={openNav ? "optionsBox" : "hideOptions"}>
             {admin ? (
               <>
-                <Button type="text" href="/posts" sx={navStyles.navButton}>
-                  All Posts
+                <Button type="text" sx={navStyles.navButton}>
+                  <Link to={"/posts"} style={navStyles.link}>
+                    <Typography
+                      fontSize={"16px"}
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                    All Posts
+                    </Typography>
+                  </Link>
                 </Button>
-                <Button type="text" href="/users" sx={navStyles.navButton}>
-                  Users
+                <Button type="text" sx={navStyles.navButton}>
+                  <Link to={"/users"} style={navStyles.link}>
+                    <Typography
+                      fontSize={"16px"}
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                    Users
+                    </Typography>
+                  </Link>
                 </Button>
               </>
             ) : (
               <>
-                <Button type="text" href="/wanted" sx={navStyles.navButton}>
-                  Items Wanted
+                <Button type="text" sx={navStyles.navButton}>
+                  <Link to={"/wanted"} style={navStyles.link}>
+                    <Typography
+                      fontSize={"16px"}
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                    Items Wanted
+                    </Typography>
+                  </Link>
                 </Button>
-                <Button type="text" href="/sale" sx={navStyles.navButton}>
-                  Items for Sale
+                <Button type="text" sx={navStyles.navButton}>
+                  <Link to={"/sale"} style={navStyles.link}>
+                    <Typography
+                      fontSize={"16px"}
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                    Items For Sale
+                    </Typography>
+                  </Link>
                 </Button>
-                <Button type="text" href="/services" sx={navStyles.navButton}>
-                  Academic Services
+                <Button type="text" sx={navStyles.navButton}>
+                  <Link to={"/services"} style={navStyles.link}>
+                    <Typography
+                      fontSize={"16px"}
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                    Academic Services
+                    </Typography>
+                  </Link>
                 </Button>
               </>
             )}

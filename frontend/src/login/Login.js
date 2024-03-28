@@ -10,7 +10,7 @@ import {
   Checkbox,
   IconButton,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -20,6 +20,8 @@ import { useNavigate } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Link } from "react-router-dom";
+
+import { UserContext } from '../App';
 
 const validationSchema = yup.object({
   email: yup
@@ -33,6 +35,12 @@ const validationSchema = yup.object({
 });
 
 const Login = () => {
+  const { user, setUser } = useContext(UserContext);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user])
+
   const navigate = useNavigate();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -45,17 +53,48 @@ const Login = () => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       signInWithEmailAndPassword(auth, values.email, values.password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
           console.log(userCredential.user, "User Logged In Successfully"); // Sign-in successful
+
+          const token = userCredential.user.accessToken;
 
           // Store auth status and token in sessionStorage
           sessionStorage.setItem('isLoggedIn', 'true');
-          sessionStorage.setItem('authToken', userCredential.user.accessToken);
+          sessionStorage.setItem('authToken', token);
+
+          const userInfo = await fetch(`http://localhost:5000/api/users/get/email/${values.email}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+            }
+          })
+          .then(res => {
+            return res.json()
+          })
+          .then(data => {
+            return data;
+          });
+
+          sessionStorage.setItem('email', values.email);
+          sessionStorage.setItem('fullName', userInfo[0].fullName);
+          sessionStorage.setItem('isAdmin', userInfo[0].isAdmin.toString());
+          sessionStorage.setItem('_id', userInfo[0]._id);
+
+          setUser({
+            isLoggedIn: true,
+            username: userInfo[0].username,
+            email: userInfo[0].email,
+            fullName: userInfo[0].fullName,
+            isAdmin: userInfo[0].isAdmin,
+            _id: userInfo[0]._id
+          });
 
           setSnackbarMessage('Login successful!');
           setSnackbarSeverity('success');
           setOpenSnackbar(true);
-          setTimeout(() => navigate('/'), 2000); // Redirect after showing success message
+          navigate('/'); // Redirect after showing success message
         })
         .catch((error) => {
           // Sign-in failure

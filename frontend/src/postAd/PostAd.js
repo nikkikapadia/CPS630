@@ -13,12 +13,15 @@ import {
   FormHelperText,
 } from "@mui/material";
 import React from "react";
+import { useContext } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
 import { firebaseStorage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from 'uuid';
+
+import { UserContext } from '../App';
 
 const validationSchema = yup.object({
   adTitle: yup
@@ -41,6 +44,8 @@ const validationSchema = yup.object({
 });
 
 const PostAd = () => {
+  const { user, setUser } = useContext(UserContext);
+
   const formik = useFormik({
     initialValues: {
       adTitle: "",
@@ -54,32 +59,80 @@ const PostAd = () => {
     onSubmit: async (values, { resetForm }) => {
         console.log(values, "Submiited Values");
 
-        // TODO: AFTER LOGIN / USER AUTHENTICATION IS FINISHED
+        // Upload photos to folder with same id name or create one
+        const uploadPhotosToFirebase = async (folderName) => {
+            let urls = [];
+            if (values.photos.length !== 0) {
+                for (const photo of values.photos) {
+                    const name = photo.name + v4();
+                    const path = `photos/${folderName}/${name}`;
+                    const imageRef = ref(firebaseStorage, path);
+                    let url = await uploadBytes(imageRef, photo)
+                    .then(() => {
+                        return getDownloadURL(ref(firebaseStorage, path))
+                    })
+                    .then(url => {
+                        return url;
+                    });
+                    urls.push(url); 
+                }
+            }
+            return urls;
+        }
 
         // make POST request with empty photos array ---> returns id created for post
+        const token = sessionStorage.getItem('authToken');
+        
+        let result = await fetch(`http://localhost:5000/api/ads/new/${values.category}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                title: values.adTitle,
+                description: values.description,
+                postDate: new Date(),
+                author: user.username,
+                photos: [],
+                price: values.price, 
+                location: values.location
+            })
+        })
+        .then(res => {
+            return res.json()
+        })
+        .then(data => {
+            return data;
+        });
+        console.log(result);
 
+        const adId = result._id;
+        const urls = await uploadPhotosToFirebase(adId);
 
-        // Upload photos to folder with same id name or create one
-        const uploadPhotosToFirebase = () => {
-            return new Promise((resolve, reject) => {
-                let urls = [];
-                if (values.photos.length !== 0) {
-                    for (let photo of values.photos) {
-                        const name = photo.name + v4();
-                        const imageRef = ref(firebaseStorage, `itemPhotos/${name}`);
-                        uploadBytes(imageRef, photo).then(() => {
-                            getDownloadURL(ref(firebaseStorage, `itemPhotos/${name}`)).then(url => urls.push(url))
-                        });
-                    }
-                }
-                resolve(urls);
-            });
-        }
-        const urls = await uploadPhotosToFirebase();
-        alert('Image(s) uploaded');
+        console.log('Image(s) uploaded');
         console.log(urls);
-
+        
         // now make PATCH request with updated URLs
+        result = await fetch(`http://localhost:5000/api/ads/update/${values.category}/id/${adId}`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                photos: urls
+            })
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(data => {
+            return data;
+        });
+        console.log(JSON.stringify({photos: urls}));
 
         // clear fields
         resetForm();
@@ -155,11 +208,9 @@ const PostAd = () => {
                 label="Category"
                 // onChange={handleChange}
               >
-                <MenuItem value={"ItemsWanted"}>Items Wanted</MenuItem>
-                <MenuItem value={"ItemsForSale"}>Items For Sale</MenuItem>
-                <MenuItem value={"AcademicServices"}>
-                  Academic Services
-                </MenuItem>
+                <MenuItem value={"itemsWanted"}>Items Wanted</MenuItem>
+                <MenuItem value={"itemsForSale"}>Items For Sale</MenuItem>
+                <MenuItem value={"academicServices"}>Academic Services</MenuItem>
               </Select>
               {formik.touched.category && formik.errors.category ? (
                 <FormHelperText sx={{ ml: 0, mt: 1, color: "crimson " }}>
