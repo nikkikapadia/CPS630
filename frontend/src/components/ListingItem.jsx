@@ -1,14 +1,16 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Typography } from "@mui/material";
 
 export default function ListingItem({
-  adTitle,
   location,
   price,
   photos,
   description,
+  onClick,
+  name
 }) {
   return (
-    <Card sx={{ width: "100%", borderRadius: "10px" }}>
+    <Card sx={{ width: "100%", borderRadius: "10px"}}>
+      <CardActionArea onClick={onClick}>
       <CardContent
         sx={{
           display: "flex",
@@ -60,7 +62,7 @@ export default function ListingItem({
               ml: 0,
             }}
           >
-            {adTitle}
+            {name}
           </Typography>
           <Typography
             sx={{
@@ -86,6 +88,7 @@ export default function ListingItem({
           </Typography>
         </Box>
       </CardContent>
+      </ CardActionArea >
     </Card>
   );
 }
