@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./nav.css";
-import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArticleIcon from "@mui/icons-material/Article";
@@ -12,7 +11,6 @@ import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
 import MenuIcon from "@mui/icons-material/Menu";
 import Tooltip from "@mui/material/Tooltip";
-import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
@@ -25,15 +23,9 @@ export default function Navigation({ admin }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openNav, setOpenNav] = React.useState(false);
   const open = Boolean(anchorEl);
-  const[isLoggedIn, setIsLoggedin] = React.useState(false);
+  const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
 
   const navigate = useNavigate();
-
-  React.useEffect(() => {
-    // Check if user is logged in
-    const authStatus = sessionStorage.getItem('isLoggedIn') === 'true';
-    setIsLoggedin(authStatus);
-  }, [])
 
   const [width, setWidth] = React.useState(window.innerWidth);
   // following code chunk makes sure the menu isn't open when resized to mobile screen
@@ -59,8 +51,7 @@ export default function Navigation({ admin }) {
 
   const handleLogout = () => {
     sessionStorage.clear(); // clear session storage
-    setIsLoggedin(false); // update loggedIn state to false
-    setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+    setTimeout(() => navigate("/"), 3000); // Redirect after 3 seconds
     handleClose(); // close menu if
   };
 
@@ -97,7 +88,7 @@ export default function Navigation({ admin }) {
                       fontSize={"16px"}
                       sx={{ textTransform: "capitalize" }}
                     >
-                    All Posts
+                      All Posts
                     </Typography>
                   </Link>
                 </Button>
@@ -107,7 +98,7 @@ export default function Navigation({ admin }) {
                       fontSize={"16px"}
                       sx={{ textTransform: "capitalize" }}
                     >
-                    Users
+                      Users
                     </Typography>
                   </Link>
                 </Button>
@@ -120,7 +111,7 @@ export default function Navigation({ admin }) {
                       fontSize={"16px"}
                       sx={{ textTransform: "capitalize" }}
                     >
-                    Items Wanted
+                      Items Wanted
                     </Typography>
                   </Link>
                 </Button>
@@ -130,7 +121,7 @@ export default function Navigation({ admin }) {
                       fontSize={"16px"}
                       sx={{ textTransform: "capitalize" }}
                     >
-                    Items For Sale
+                      Items For Sale
                     </Typography>
                   </Link>
                 </Button>
@@ -140,7 +131,7 @@ export default function Navigation({ admin }) {
                       fontSize={"16px"}
                       sx={{ textTransform: "capitalize" }}
                     >
-                    Academic Services
+                      Academic Services
                     </Typography>
                   </Link>
                 </Button>
@@ -150,129 +141,129 @@ export default function Navigation({ admin }) {
         </div>
         {/* Classes for when nav bar is open/collapsed in mobile */}
         <div className={openNav ? "accountBox" : "hideAccount"}>
-          {!isLoggedIn ? (
-          <>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/register"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Register
-              </Typography>
-            </Link>
-          </Button>
-          <Button type="text" sx={navStyles.navButton}>
-            <Link to={"/login"} style={navStyles.link}>
-              <Typography
-                fontSize={"16px"}
-                sx={{ textTransform: "capitalize" }}
-              >
-                Login
-              </Typography>
-            </Link>
-          </Button>
-          </>
+          {!loggedIn ? (
+            <>
+              <Button type="text" sx={navStyles.navButton}>
+                <Link to={"/register"} style={navStyles.link}>
+                  <Typography
+                    fontSize={"16px"}
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    Register
+                  </Typography>
+                </Link>
+              </Button>
+              <Button type="text" sx={navStyles.navButton}>
+                <Link to={"/login"} style={navStyles.link}>
+                  <Typography
+                    fontSize={"16px"}
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    Login
+                  </Typography>
+                </Link>
+              </Button>
+            </>
           ) : (
-          <Tooltip title="Account">
-            <IconButton
-              onClick={handleClick}
-              size="small"
-              sx={{ ml: 2 }}
-              aria-controls={open ? "account-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-            >
-              <Avatar sx={{ width: 32, height: 32 }}></Avatar>
-            </IconButton>
-          </Tooltip>
+            <Tooltip title="Account">
+              <IconButton
+                onClick={handleClick}
+                size="small"
+                sx={{ ml: 2 }}
+                aria-controls={open ? "account-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+              >
+                <Avatar sx={{ width: 32, height: 32 }}></Avatar>
+              </IconButton>
+            </Tooltip>
           )}
         </div>
       </div>
 
       {/* Profile Menu Dropdown */}
-      {isLoggedIn && (
-      <Menu
-        anchorEl={anchorEl}
-        id="account-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            backgroundColor: "#F0F0F0",
-            color: "#213555",
-            overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-            mt: 1.5,
-            "& .MuiAvatar-root": {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1,
+      {loggedIn && (
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={open}
+          onClose={handleClose}
+          onClick={handleClose}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              backgroundColor: "#F0F0F0",
+              color: "#213555",
+              overflow: "visible",
+              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              mt: 1.5,
+              "& .MuiAvatar-root": {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              "&::before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: "background.paper",
+                transform: "translateY(-50%) rotate(45deg)",
+                zIndex: 0,
+              },
             },
-            "&::before": {
-              content: '""',
-              display: "block",
-              position: "absolute",
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: "background.paper",
-              transform: "translateY(-50%) rotate(45deg)",
-              zIndex: 0,
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Profile
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Avatar /> My account
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <ArticleIcon fontSize="small" />
-          </ListItemIcon>
-          My Posts
-        </MenuItem>
-        <MenuItem onClick={() => navigate("/messages")}>
-          <ListItemIcon>
-            <SendIcon fontSize="small" />
-          </ListItemIcon>
-          Messages
-        </MenuItem>
-        <MenuItem onClick={() => navigate("/postAd")}>
-          <ListItemIcon>
-            <PostAdd fontSize="small" />
-          </ListItemIcon>
-          Post Ad
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <AccountCircleIcon />
-          </ListItemIcon>
-          Profile
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Settings
-        </MenuItem>
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Logout
-        </MenuItem>
-      </Menu>
+          }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        >
+          <MenuItem onClick={handleClose}>
+            <Avatar /> Profile
+          </MenuItem>
+          <MenuItem onClick={handleClose}>
+            <Avatar /> My account
+          </MenuItem>
+          <MenuItem>
+            <ListItemIcon>
+              <ArticleIcon fontSize="small" />
+            </ListItemIcon>
+            My Posts
+          </MenuItem>
+          <MenuItem onClick={() => navigate("/messages")}>
+            <ListItemIcon>
+              <SendIcon fontSize="small" />
+            </ListItemIcon>
+            Messages
+          </MenuItem>
+          <MenuItem onClick={() => navigate("/postAd")}>
+            <ListItemIcon>
+              <PostAdd fontSize="small" />
+            </ListItemIcon>
+            Post Ad
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleClose}>
+            <ListItemIcon>
+              <AccountCircleIcon />
+            </ListItemIcon>
+            Profile
+          </MenuItem>
+          <MenuItem onClick={handleClose}>
+            <ListItemIcon>
+              <Settings fontSize="small" />
+            </ListItemIcon>
+            Settings
+          </MenuItem>
+          <MenuItem onClick={handleLogout}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            Logout
+          </MenuItem>
+        </Menu>
       )}
     </React.Fragment>
   );
