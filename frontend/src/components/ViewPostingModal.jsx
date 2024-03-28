@@ -11,8 +11,8 @@ import {
   FormHelperText,
   FormLabel,
   Select,
+  Chip,
 } from "@mui/material";
-// import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { useFormik } from "formik";
@@ -47,9 +47,21 @@ function ViewPostingModal({ open, onClose, post }) {
           {!edit ? (
             <>
               <div className="title-buttons-group">
-                <Typography id="modal-modal-title" variant="h4" component="h2">
-                  {postInfo.name}
-                </Typography>
+                <div style={{ marginBottom: 8 }}>
+                  <Typography
+                    id="modal-modal-title"
+                    variant="h4"
+                    component="h2"
+                  >
+                    {postInfo.name}
+                  </Typography>
+                  <Typography sx={{ color: "#cccccc" }}>
+                    Posted By: {postInfo.author}
+                  </Typography>
+                  <Typography sx={{ color: "#cccccc" }}>
+                    {postInfo.postDate}
+                  </Typography>
+                </div>
                 <div style={{ display: "grid" }}>
                   <Button
                     aria-label="Close"
@@ -68,19 +80,36 @@ function ViewPostingModal({ open, onClose, post }) {
                   </Button>
                 </div>
               </div>
-              <img
-                src={postInfo.picture}
-                alt={postInfo.name}
-                style={{ maxWidth: 400, width: "100%" }}
-              ></img>
+
+              {postInfo.tags &&
+                postInfo.tags.map((tag) => {
+                  return <Chip label={tag} sx={{ mr: 1 }} />;
+                })}
+              <Box sx={imageRow}>
+                {postInfo.photos &&
+                  postInfo.photos.map((photo, ind) => {
+                    return (
+                      <img
+                        src={photo}
+                        alt={`${postInfo.name}-${ind}`}
+                        key={ind}
+                        style={{
+                          maxWidth: 400,
+                          maxHeight: 300,
+                          display: "block",
+                        }}
+                      ></img>
+                    );
+                  })}
+              </Box>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Description: {postInfo.description}
+                <strong>Description:</strong> {postInfo.description}
               </Typography>
               <Typography sx={{ mt: 2 }}>
-                Location: {postInfo.location}
+                <strong>Location:</strong> {postInfo.location}
               </Typography>
               <Typography sx={{ mt: 2, mb: 10 }}>
-                Price: ${postInfo.price}
+                <strong>Price:</strong> ${postInfo.price}
               </Typography>
               <Button
                 variant="contained"
@@ -322,4 +351,11 @@ const style = {
   "@media (max-width: 770px)": {
     width: "80%",
   },
+};
+
+const imageRow = {
+  display: "flex",
+  flexWrap: "nowrap",
+  overflowX: "auto",
+  gap: "1em",
 };

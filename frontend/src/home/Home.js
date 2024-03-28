@@ -98,14 +98,13 @@ function Row({ title, data, admin, setModalOpen, setModalPost }) {
           const updatedPosting = {
             ...posting,
             category: title,
-            postDate: Date.now(),
           };
           return (
             <ActionAreaCard
               title={posting.name}
               description={posting.description}
               price={posting.price}
-              img={posting.picture}
+              img={posting.photos[0]}
               admin={admin}
               onClick={() => {
                 setModalOpen(true);
