@@ -13,15 +13,18 @@ import {
   FormHelperText,
 } from "@mui/material";
 import React from "react";
-import { useContext } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useNavigate, Link } from "react-router-dom";
 
 import { firebaseStorage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from 'uuid';
 
-import { UserContext } from '../App';
+import { UserContext } from '../contexts/UserContext';
+import { useContext } from "react";
+
+//import { UserContext } from '../App';
 
 const validationSchema = yup.object({
   adTitle: yup
@@ -94,7 +97,7 @@ const PostAd = () => {
                 title: values.adTitle,
                 description: values.description,
                 postDate: new Date(),
-                author: user.username,
+                author: sessionStorage.getItem("username"),
                 photos: [],
                 price: values.price, 
                 location: values.location

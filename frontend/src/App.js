@@ -14,27 +14,11 @@ import AllPosts from "./allPosts/AllPosts";
 import Users from "./users/Users";
 import Messages from "./messages/Messages";
 
-export const UserContext = createContext({
-    user: {
-        isLoggedIn: false,
-        username: '',
-        email: '',
-        fullName: '',
-        isAdmin: false,
-        _id: '',
-    },
-    setUser: () => {}
-});
+import { UserContext } from './contexts/UserContext';
+import { useContext } from "react";
 
 function App() {
-    const [user, setUser] = useState({
-        isLoggedIn: false,
-        username: '',
-        email: '',
-        fullName: '',
-        isAdmin: false,
-        _id: '',
-    });
+    const { user, setUser } = useContext(UserContext);
 
     return (
         <div className="App">
@@ -51,7 +35,7 @@ function App() {
                     <Route path="/register" element={user.isLoggedIn ? <HomePage admin={user.isAdmin} /> : <Register />} />
                     <Route path="/sale" element={<ItemsForSale />} />
                     <Route path="/services" element={<Services />} />
-                    <Route path="/postAd" element={!user.isLoggedIn ? <Login /> : <PostAd />} />
+                    <Route path="/postAd" element={user.isLoggedIn ?  <PostAd /> : <Login />} />
                     <Route path="/settings" element={<div></div>} />
                     <Route path="/profile" element={<div></div>} />
                     <Route path="/myposts" element={<div></div>} />

@@ -21,7 +21,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Link } from "react-router-dom";
 
-import { UserContext } from '../App';
+import { UserContext } from '../contexts/UserContext';
 
 const validationSchema = yup.object({
   fullName: yup
@@ -47,7 +47,9 @@ const validationSchema = yup.object({
 
 const Register = () => {
   const { user, setUser } = useContext(UserContext);
+
   const navigate = useNavigate();
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('error'); // 'success' or 'error'
@@ -107,7 +109,8 @@ const Register = () => {
                 email: userInfo.email,
                 fullName: userInfo.fullName,
                 isAdmin: userInfo.isAdmin,
-                _id: userInfo._id
+                _id: userInfo._id,
+                authToken: token
             });
 
             setSnackbarMessage('Registration successful! You are now logged in.');
@@ -170,8 +173,7 @@ const Register = () => {
             <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
               Register
             </Typography>
-            <Box sx={{ width: "100%" }}>
-              <TextField
+            <TextField
                 label="Full Name"
                 id="fullName"
                 name="fullName"
@@ -181,34 +183,35 @@ const Register = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={
-                  formik.touched.fullName && Boolean(formik.errors.fullName)
+                    formik.touched.fullName && Boolean(formik.errors.fullName)
                 }
                 helperText={formik.touched.fullName && formik.errors.fullName}
-              />
-              <FormLabel
-                sx={{
-                  mt: "8px",
-                  textAlign: "left",
-                  fontSize: "14px",
-                  display: "block",
-                }}
-              >
-                Your Name will be displayed on your public profile
-              </FormLabel>
-            </Box>
-            <TextField
-              label="Username"
-              id="username"
-              type="username"
-              name="username"
-              fullWidth
-              variant="outlined"
-              value={formik.values.username}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.username && Boolean(formik.errors.username)}
-              helperText={formik.touched.username && formik.errors.username}
             />
+            <Box sx={{ width: "100%" }}>
+                <TextField
+                    label="Username"
+                    id="username"
+                    type="username"
+                    name="username"
+                    fullWidth
+                    variant="outlined"
+                    value={formik.values.username}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.username && Boolean(formik.errors.username)}
+                    helperText={formik.touched.username && formik.errors.username}
+                />
+                <FormLabel
+                    sx={{
+                        mt: "8px",
+                        textAlign: "left",
+                        fontSize: "14px",
+                        display: "block",
+                    }}
+                    >
+                    This name will be displayed to other users
+                </FormLabel>
+            </Box>
             <TextField
               label="Email"
               id="email"
