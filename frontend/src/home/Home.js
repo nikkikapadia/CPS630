@@ -8,11 +8,8 @@ import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { Box, Button } from "@mui/material";
-// import { itemsForSale, itemsWanted, academicServices } from "./mockData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-// import { auth } from "../firebase-config";
-// import { getIdToken } from "firebase/auth";
 
 import { UserContext } from "../App";
 import ViewPostingModal from "../components/ViewPostingModal";
@@ -34,8 +31,6 @@ export function HomePage({ admin }) {
   const [saleData, setSaleData] = React.useState([]);
   const [servicesData, setServicesData] = React.useState([]);
 
-  const token = sessionStorage.getItem("authToken");
-
   const apiRoot = "http://localhost:5001/api";
 
   useEffect(() => {
@@ -45,15 +40,10 @@ export function HomePage({ admin }) {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => {
-          return res.json();
-        })
-        .then((data) => {
-          !data.error && setWantedData(data);
-        })
+        .then((res) => res.json())
+        .then((data) => !data.error && setWantedData(data))
         .catch((error) => {
           console.error("Error fetching wanted data:", error);
         });
@@ -63,15 +53,10 @@ export function HomePage({ admin }) {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => {
-          return res.json();
-        })
-        .then((data) => {
-          !data.error && setSaleData(data);
-        })
+        .then((res) => res.json())
+        .then((data) => !data.error && setSaleData(data))
         .catch((error) => {
           console.error("Error fetching wanted data:", error);
         });
@@ -81,27 +66,22 @@ export function HomePage({ admin }) {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => {
-          return res.json();
-        })
-        .then((data) => {
-          !data.error && setServicesData(data);
-        })
+        .then((res) => res.json())
+        .then((data) => !data.error && setServicesData(data))
         .catch((error) => {
           console.error("Error fetching wanted data:", error);
         });
     }
 
     fetchData();
-  }, [token]);
+  }, []);
 
-  // useEffect(() => {
-  //   console.log(user);
-  // }, [user]);
-  // console.log("homepage", user);
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+  console.log("homepage", user);
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalPost, setModalPost] = React.useState({});
