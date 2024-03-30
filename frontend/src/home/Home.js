@@ -8,9 +8,11 @@ import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { Box, Button } from "@mui/material";
-import { itemsForSale, itemsWanted, academicServices } from "./mockData";
+// import { itemsForSale, itemsWanted, academicServices } from "./mockData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+// import { auth } from "../firebase-config";
+// import { getIdToken } from "firebase/auth";
 
 import { UserContext } from "../App";
 import ViewPostingModal from "../components/ViewPostingModal";
@@ -28,10 +30,78 @@ function HomeSearch() {
 export function HomePage({ admin }) {
   const { user, setUser } = useContext(UserContext);
 
+  const [wantedData, setWantedData] = React.useState([]);
+  const [saleData, setSaleData] = React.useState([]);
+  const [servicesData, setServicesData] = React.useState([]);
+
+  const token = sessionStorage.getItem("authToken");
+
+  const apiRoot = "http://localhost:5001/api";
+
   useEffect(() => {
-    console.log(user);
-  }, [user]);
-  console.log("homepage", user);
+    async function fetchData() {
+      await fetch(`${apiRoot}/ads/get/itemsWanted`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          !data.error && setWantedData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching wanted data:", error);
+        });
+
+      await fetch(`${apiRoot}/ads/get/itemsForSale`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          !data.error && setSaleData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching wanted data:", error);
+        });
+
+      await fetch(`${apiRoot}/ads/get/academicServices`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          !data.error && setServicesData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching wanted data:", error);
+        });
+    }
+
+    fetchData();
+  }, [token]);
+
+  // useEffect(() => {
+  //   console.log(user);
+  // }, [user]);
+  // console.log("homepage", user);
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalPost, setModalPost] = React.useState({});
@@ -46,21 +116,21 @@ export function HomePage({ admin }) {
       <HomeSearch />
       <Row
         title={"Items Wanted"}
-        data={itemsWanted}
+        data={wantedData}
         admin={admin}
         setModalOpen={setModalOpen}
         setModalPost={setModalPost}
       />
       <Row
         title={"Items For Sale"}
-        data={itemsForSale}
+        data={saleData}
         admin={admin}
         setModalOpen={setModalOpen}
         setModalPost={setModalPost}
       />
       <Row
         title={"Academic Services"}
-        data={academicServices}
+        data={servicesData}
         admin={admin}
         setModalOpen={setModalOpen}
         setModalPost={setModalPost}
@@ -110,7 +180,7 @@ function Row({ title, data, admin, setModalOpen, setModalPost }) {
           };
           return (
             <ActionAreaCard
-              title={posting.name}
+              title={posting.title}
               description={posting.description}
               price={posting.price}
               img={posting.photos[0]}
@@ -139,7 +209,7 @@ function ActionAreaCard({ title, description, price, img, admin, onClick }) {
           component="img"
           height="140"
           image={img ? img : require("../images/default.png")}
-          alt="green iguana"
+          alt={title}
         />
         <CardContent sx={homeStyles.cardContent}>
           <div>
@@ -156,7 +226,7 @@ function ActionAreaCard({ title, description, price, img, admin, onClick }) {
             </Typography>
           </div>
           <div style={homeStyles.priceRow}>
-            <Typography variant="h5">${price}</Typography>
+            <Typography variant="h5">${Number(price).toFixed(2)}</Typography>
             {admin && (
               <>
                 <Button

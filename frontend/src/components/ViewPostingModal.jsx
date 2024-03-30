@@ -53,7 +53,7 @@ function ViewPostingModal({ open, onClose, post }) {
                     variant="h4"
                     component="h2"
                   >
-                    {postInfo.name}
+                    {postInfo.title}
                   </Typography>
                   <Typography sx={{ color: "#cccccc" }}>
                     Posted By: {postInfo.author}
@@ -91,7 +91,7 @@ function ViewPostingModal({ open, onClose, post }) {
                     return (
                       <img
                         src={photo}
-                        alt={`${postInfo.name}-${ind}`}
+                        alt={`${postInfo.title}-${ind + 1}`}
                         key={ind}
                         style={{
                           maxWidth: 400,

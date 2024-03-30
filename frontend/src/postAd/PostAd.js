@@ -19,9 +19,9 @@ import * as yup from "yup";
 
 import { firebaseStorage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { v4 } from 'uuid';
+import { v4 } from "uuid";
 
-import { UserContext } from '../App';
+import { UserContext } from "../App";
 
 const validationSchema = yup.object({
   adTitle: yup
@@ -57,85 +57,91 @@ const PostAd = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
-        console.log(values, "Submiited Values");
+      console.log(values, "Submiited Values");
 
-        // Upload photos to folder with same id name or create one
-        const uploadPhotosToFirebase = async (folderName) => {
-            let urls = [];
-            if (values.photos.length !== 0) {
-                for (const photo of values.photos) {
-                    const name = photo.name + v4();
-                    const path = `photos/${folderName}/${name}`;
-                    const imageRef = ref(firebaseStorage, path);
-                    let url = await uploadBytes(imageRef, photo)
-                    .then(() => {
-                        return getDownloadURL(ref(firebaseStorage, path))
-                    })
-                    .then(url => {
-                        return url;
-                    });
-                    urls.push(url); 
-                }
-            }
-            return urls;
+      // Upload photos to folder with same id name or create one
+      const uploadPhotosToFirebase = async (folderName) => {
+        let urls = [];
+        if (values.photos.length !== 0) {
+          for (const photo of values.photos) {
+            const name = photo.name + v4();
+            const path = `photos/${folderName}/${name}`;
+            const imageRef = ref(firebaseStorage, path);
+            let url = await uploadBytes(imageRef, photo)
+              .then(() => {
+                return getDownloadURL(ref(firebaseStorage, path));
+              })
+              .then((url) => {
+                return url;
+              });
+            urls.push(url);
+          }
         }
+        return urls;
+      };
 
-        // make POST request with empty photos array ---> returns id created for post
-        const token = sessionStorage.getItem('authToken');
-        
-        let result = await fetch(`http://localhost:5000/api/ads/new/${values.category}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                title: values.adTitle,
-                description: values.description,
-                postDate: new Date(),
-                author: user.username,
-                photos: [],
-                price: values.price, 
-                location: values.location
-            })
+      // make POST request with empty photos array ---> returns id created for post
+      const token = sessionStorage.getItem("authToken");
+
+      let result = await fetch(
+        `http://localhost:5001/api/ads/new/${values.category}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: values.adTitle,
+            description: values.description,
+            postDate: new Date(),
+            author: user.username,
+            photos: [],
+            price: values.price,
+            location: values.location,
+          }),
+        }
+      )
+        .then((res) => {
+          return res.json();
         })
-        .then(res => {
-            return res.json()
-        })
-        .then(data => {
-            return data;
+        .then((data) => {
+          return data;
         });
-        console.log(result);
+      console.log(result);
 
-        const adId = result._id;
-        const urls = await uploadPhotosToFirebase(adId);
+      const adId = result._id;
+      const urls = await uploadPhotosToFirebase(adId);
 
-        console.log('Image(s) uploaded');
-        console.log(urls);
-        
-        // now make PATCH request with updated URLs
-        result = await fetch(`http://localhost:5000/api/ads/update/${values.category}/id/${adId}`, {
-            method: 'PATCH',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                photos: urls
-            })
+      console.log("Image(s) uploaded");
+      console.log(urls);
+
+      // now make PATCH request with updated URLs
+      result = await fetch(
+        `http://localhost:5001/api/ads/update/${values.category}/id/${adId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            photos: urls,
+          }),
+        }
+      )
+        .then((res) => {
+          return res.json();
         })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            return data;
+        .then((data) => {
+          return data;
         });
-        console.log(JSON.stringify({photos: urls}));
+      console.log(JSON.stringify({ photos: urls }));
 
-        // clear fields
-        resetForm();
+      // clear fields
+      resetForm();
     },
   });
 
@@ -210,7 +216,9 @@ const PostAd = () => {
               >
                 <MenuItem value={"itemsWanted"}>Items Wanted</MenuItem>
                 <MenuItem value={"itemsForSale"}>Items For Sale</MenuItem>
-                <MenuItem value={"academicServices"}>Academic Services</MenuItem>
+                <MenuItem value={"academicServices"}>
+                  Academic Services
+                </MenuItem>
               </Select>
               {formik.touched.category && formik.errors.category ? (
                 <FormHelperText sx={{ ml: 0, mt: 1, color: "crimson " }}>
