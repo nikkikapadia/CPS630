@@ -22,6 +22,8 @@ function ViewPostingModal({ open, onClose, post }) {
   const [edit, setEdit] = useState(false);
   const [postInfo, setPostInfo] = useState(post);
 
+  const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+
   useEffect(() => {
     setPostInfo(post);
   }, [post]);
@@ -113,12 +115,17 @@ function ViewPostingModal({ open, onClose, post }) {
               </Typography>
               <Button
                 variant="contained"
+                disabled={!isLoggedIn}
                 sx={{ backgroundColor: "#213555", mr: 2 }}
                 href={"/messages"}
               >
                 Chat
               </Button>
-              <Button variant="contained" sx={{ backgroundColor: "#213555" }}>
+              <Button
+                variant="contained"
+                sx={{ backgroundColor: "#213555" }}
+                disabled={!isLoggedIn}
+              >
                 Purchase
               </Button>
             </>
