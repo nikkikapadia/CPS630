@@ -12,7 +12,7 @@ import { itemsForSale, itemsWanted, academicServices } from "./mockData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
-import { UserContext } from "../App";
+import { UserContext } from "../contexts/UserContext";
 import ViewPostingModal from "../components/ViewPostingModal";
 import { SearchBar, categories } from "../components/SearchBar";
 
@@ -28,11 +28,6 @@ import { SearchBar, categories } from "../components/SearchBar";
 
 export function HomePage({ admin }) {
   const { user, setUser } = useContext(UserContext);
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-  console.log("homepage", user);
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalPost, setModalPost] = React.useState({});
