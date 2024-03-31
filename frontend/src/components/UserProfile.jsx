@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Card, CardContent, Typography, TextField, Button } from "@mui/material";
+import EditAdModal from './EditAdModal';
+import 
+
 
 const UserProfile = () => {
-  const [userInfo, setUserInfo] = useState({ name: 'John Smith', email: 'john@smith.com' });
-  const [ads, setAds] = useState([
-    { id: 1, title: 'Ad 1', description: 'Description for Ad 1' },
-    { id: 2, title: 'Ad 2', description: 'Description for Ad 2' },
-  ]);
+  const [userInfo, setUserInfo] = useState({ name: '', email: '' });
+  const [ads, setAds] = useState([]);
+  const 
 
-    // Simulate fetching user info and ads
     useEffect(() => {
-        // Fetch data from backend here
+        // Fetch user info
+        const fetchUserInfo = await fetch('/api/users/me', {
+          method: 'GET',
+          headers
+        })
     }, []);
     
     const handleUpdateUserInfo = (e) => {
@@ -20,7 +24,7 @@ const UserProfile = () => {
 
     // function to add an advertisement
     const handleAddAd = () => {
-      };
+    };
     
     // function to remove an ad
     const handleDeleteAd = (adId) => {
