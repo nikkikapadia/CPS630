@@ -12,6 +12,7 @@ import {
   FormLabel,
   Select,
   Chip,
+  Autocomplete,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
@@ -61,10 +62,10 @@ function ViewPostingModal({ open, onClose, post }) {
                     Posted By: {postInfo.author}
                   </Typography>
                   <Typography sx={{ color: "#cccccc" }}>
-                    {postInfo.postDate}
+                    {new Date(postInfo.postDate).toLocaleString()}
                   </Typography>
                 </div>
-                <div style={{ display: "grid" }}>
+                <div style={{ display: "grid", alignItems: "start" }}>
                   <Button
                     aria-label="Close"
                     sx={{ color: "#213555" }}
@@ -73,19 +74,21 @@ function ViewPostingModal({ open, onClose, post }) {
                     <CloseIcon color="inheret" />
                   </Button>
                   {/* only show if it is the user's post */}
-                  <Button
-                    aria-label="Edit"
-                    sx={{ color: "#213555" }}
-                    onClick={handleEditClick}
-                  >
-                    <EditIcon />
-                  </Button>
+                  {sessionStorage.getItem("username") === postInfo.author && (
+                    <Button
+                      aria-label="Edit"
+                      sx={{ color: "#213555" }}
+                      onClick={handleEditClick}
+                    >
+                      <EditIcon />
+                    </Button>
+                  )}
                 </div>
               </div>
 
               {postInfo.tags &&
                 postInfo.tags.map((tag) => {
-                  return <Chip label={tag} sx={{ mr: 1 }} />;
+                  return <Chip label={tag} sx={{ mr: 1, mb: 1 }} />;
                 })}
               <Box sx={imageRow}>
                 {postInfo.photos &&
@@ -145,7 +148,6 @@ function ViewPostingModal({ open, onClose, post }) {
 export default ViewPostingModal;
 
 function EditForm({ postInfo, setPostInfo, setEdit }) {
-  console.log(postInfo);
   const validationSchema = yup.object({
     adTitle: yup
       .string()
@@ -164,17 +166,19 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
       ),
     price: yup.number().required("Price is required"),
     location: yup.string().required("Location is required"),
+    tags: yup.array(),
   });
 
   // initial values are values that are there already
   const formik = useFormik({
     initialValues: {
-      adTitle: postInfo.name,
+      adTitle: postInfo.title,
       category: postInfo.category.replaceAll(" ", ""),
       description: postInfo.description,
       price: Number(postInfo.price),
-      photos: [],
+      photos: postInfo.photos,
       location: postInfo.location,
+      tags: postInfo.tags,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -182,12 +186,13 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
       console.log(values, "Submiited Values");
       setPostInfo({
         ...postInfo,
-        name: values.adTitle,
+        title: values.adTitle,
         price: values.price,
         description: values.description,
-        picture: values.photos,
+        photos: values.photos,
         category: values.category,
         location: values.location,
+        tags: values.tags,
       });
       setEdit(false);
     },
@@ -323,6 +328,28 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
         onBlur={formik.handleBlur}
         error={formik.touched.location && Boolean(formik.errors.location)}
         helperText={formik.touched.location && formik.errors.location}
+      />
+
+      <Autocomplete
+        multiple
+        label="Tags"
+        id="tags"
+        variant="outlined"
+        options={[]}
+        defaultValue={[]}
+        freeSolo
+        fullWidth
+        value={formik.values.tags}
+        onChange={(e, value) => formik.setFieldValue("tags", value)}
+        onBlur={formik.handleBlur}
+        error={formik.touched.tags && Boolean(formik.errors.tags)}
+        helperText={formik.touched.tags && formik.errors.tags}
+        renderTags={(value, getTagProps) =>
+          value.map((option, index) => (
+            <Chip variant="filled" label={option} {...getTagProps({ index })} />
+          ))
+        }
+        renderInput={(params) => <TextField {...params} label="Tags" />}
       />
 
       <Button
