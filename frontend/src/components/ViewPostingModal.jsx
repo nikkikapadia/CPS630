@@ -18,12 +18,18 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { firebaseStorage } from "../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { v4 } from "uuid";
+
+import { UserContext } from "../contexts/UserContext";
+import { useContext } from "react";
 
 function ViewPostingModal({ open, onClose, post }) {
   const [edit, setEdit] = useState(false);
   const [postInfo, setPostInfo] = useState(post);
 
-  const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     setPostInfo(post);
@@ -74,7 +80,7 @@ function ViewPostingModal({ open, onClose, post }) {
                     <CloseIcon color="inheret" />
                   </Button>
                   {/* only show if it is the user's post */}
-                  {sessionStorage.getItem("username") === postInfo.author && (
+                  {user.username === postInfo.author && (
                     <Button
                       aria-label="Edit"
                       sx={{ color: "#213555" }}
@@ -87,8 +93,8 @@ function ViewPostingModal({ open, onClose, post }) {
               </div>
 
               {postInfo.tags &&
-                postInfo.tags.map((tag) => {
-                  return <Chip label={tag} sx={{ mr: 1, mb: 1 }} />;
+                postInfo.tags.map((tag, index) => {
+                  return <Chip label={tag} key={index} sx={{ mr: 1, mb: 1 }} />;
                 })}
               <Box sx={imageRow}>
                 {postInfo.photos &&
@@ -118,7 +124,7 @@ function ViewPostingModal({ open, onClose, post }) {
               </Typography>
               <Button
                 variant="contained"
-                disabled={!isLoggedIn}
+                disabled={!user.isLoggedIn}
                 sx={{ backgroundColor: "#213555", mr: 2 }}
                 href={"/messages"}
               >
@@ -127,7 +133,7 @@ function ViewPostingModal({ open, onClose, post }) {
               <Button
                 variant="contained"
                 sx={{ backgroundColor: "#213555" }}
-                disabled={!isLoggedIn}
+                disabled={!user.isLoggedIn}
               >
                 Purchase
               </Button>
@@ -137,6 +143,7 @@ function ViewPostingModal({ open, onClose, post }) {
               postInfo={postInfo}
               setPostInfo={setPostInfo}
               setEdit={setEdit}
+              user={user}
             />
           )}
         </Box>
@@ -147,7 +154,13 @@ function ViewPostingModal({ open, onClose, post }) {
 
 export default ViewPostingModal;
 
-function EditForm({ postInfo, setPostInfo, setEdit }) {
+function EditForm({ postInfo, setPostInfo, setEdit, user }) {
+  const categoryMap = {
+    ItemsForSale: "itemsForSale",
+    ItemsWanted: "itemsWanted",
+    AcademicServices: "academicService",
+  };
+
   const validationSchema = yup.object({
     adTitle: yup
       .string()
@@ -173,7 +186,7 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
   const formik = useFormik({
     initialValues: {
       adTitle: postInfo.title,
-      category: postInfo.category.replaceAll(" ", ""),
+      category: categoryMap[postInfo.category.replaceAll(" ", "")],
       description: postInfo.description,
       price: Number(postInfo.price),
       photos: postInfo.photos,
@@ -181,7 +194,80 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
       tags: postInfo.tags,
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+      const apiRoute = "http://localhost:5001/api";
+      const samePhotos =
+        values.photos.toString() === postInfo.photos.toString();
+
+      // Upload photos to folder with same id name or create one
+      const uploadPhotosToFirebase = async (folderName) => {
+        let urls = [];
+        if (values.photos.length !== 0) {
+          for (const photo of values.photos) {
+            const name = photo.name + v4();
+            const path = `photos/${folderName}/${name}`;
+            const imageRef = ref(firebaseStorage, path);
+            let url = await uploadBytes(imageRef, photo)
+              .then(() => {
+                return getDownloadURL(ref(firebaseStorage, path));
+              })
+              .then((url) => {
+                return url;
+              });
+            urls.push(url);
+          }
+        }
+        return urls;
+      };
+
+      const token = user.authToken;
+
+      let urls = postInfo.photos;
+      if (
+        categoryMap[postInfo.category.replaceAll(" ", "")] !== values.category
+      ) {
+        await newPostAndDelete(
+          apiRoute,
+          values,
+          token,
+          uploadPhotosToFirebase,
+          postInfo,
+          samePhotos,
+          categoryMap,
+          user.username
+        );
+      } else {
+        urls = samePhotos
+          ? postInfo.photos
+          : await uploadPhotosToFirebase(postInfo._id);
+        // make PATCH request with updated fields
+        await fetch(
+          `${apiRoute}/ads/update/${values.category}/id/${postInfo._id}`,
+          {
+            method: "PATCH",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              title: values.adTitle,
+              description: values.description,
+              photos: urls,
+              price: values.price,
+              location: values.location,
+              tags: values.tags,
+            }),
+          }
+        )
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            return data;
+          });
+      }
+
       // need to implement database updates here
       console.log(values, "Submiited Values");
       setPostInfo({
@@ -189,11 +275,12 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
         title: values.adTitle,
         price: values.price,
         description: values.description,
-        photos: values.photos,
+        photos: urls,
         category: values.category,
         location: values.location,
         tags: values.tags,
       });
+
       setEdit(false);
     },
   });
@@ -248,9 +335,9 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
           sx={{ textAlign: "left" }}
           label="Category"
         >
-          <MenuItem value={"ItemsWanted"}>Items Wanted</MenuItem>
-          <MenuItem value={"ItemsForSale"}>Items For Sale</MenuItem>
-          <MenuItem value={"AcademicServices"}>Academic Services</MenuItem>
+          <MenuItem value={"itemsWanted"}>Items Wanted</MenuItem>
+          <MenuItem value={"itemsForSale"}>Items For Sale</MenuItem>
+          <MenuItem value={"academicServices"}>Academic Services</MenuItem>
         </Select>
         {formik.touched.category && formik.errors.category ? (
           <FormHelperText sx={{ ml: 0, mt: 1, color: "crimson " }}>
@@ -368,6 +455,99 @@ function EditForm({ postInfo, setPostInfo, setEdit }) {
       </Button>
     </form>
   );
+}
+
+async function newPostAndDelete(
+  apiRoute,
+  values,
+  token,
+  uploadPhotosToFirebase,
+  postInfo,
+  samePhotos,
+  categoryMap,
+  username
+) {
+  // make POST request with empty photos array ---> returns id created for post
+  let result = await fetch(`${apiRoute}/ads/new/${values.category}`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      title: values.adTitle,
+      description: values.description,
+      postDate: new Date(),
+      author: username,
+      photos: samePhotos ? values.photos : [],
+      price: values.price,
+      location: values.location,
+      tags: values.tags,
+    }),
+  })
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      return data;
+    });
+  console.log(result);
+
+  if (!samePhotos) {
+    const adId = result._id;
+    const urls = await uploadPhotosToFirebase(adId);
+
+    console.log("Image(s) uploaded");
+    console.log(urls);
+
+    // now make PATCH request with updated URLs
+    result = await fetch(
+      `${apiRoute}/ads/update/${values.category}/id/${adId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          photos: urls,
+        }),
+      }
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        return data;
+      });
+    console.log(JSON.stringify({ photos: urls }));
+  }
+
+  // Delete ad in other category
+  result = await fetch(
+    `${apiRoute}/ads/delete/${
+      categoryMap[postInfo.category.replaceAll(" ", "")]
+    }/id/${postInfo._id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    }
+  )
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      return data;
+    });
+
+  // reload page to show change on page
+  window.location.reload();
 }
 
 const style = {
