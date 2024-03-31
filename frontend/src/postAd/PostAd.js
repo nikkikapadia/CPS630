@@ -11,6 +11,8 @@ import {
   Select,
   MenuItem,
   FormHelperText,
+  Autocomplete,
+  Chip,
 } from "@mui/material";
 import React from "react";
 import { useFormik } from "formik";
@@ -44,6 +46,7 @@ const validationSchema = yup.object({
     ),
   price: yup.number().required("Price is required"),
   location: yup.string().required("Location is required"),
+  tags: yup.array(),
 });
 
 const PostAd = () => {
@@ -57,6 +60,7 @@ const PostAd = () => {
       price: 0,
       photos: [],
       location: "",
+      tags: [],
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -103,6 +107,7 @@ const PostAd = () => {
             photos: [],
             price: values.price,
             location: values.location,
+            tags: values.tags,
           }),
         }
       )
@@ -262,9 +267,6 @@ const PostAd = () => {
               error={formik.touched.price && Boolean(formik.errors.price)}
               helperText={formik.touched.price && formik.errors.price}
             />
-            {/* 
-            <FormControl>
-              <FormControlLabel>Photos</FormControlLabel> */}
 
             <FormControl
               fullWidth
@@ -296,7 +298,6 @@ const PostAd = () => {
                 <FormHelperText>{formik.errors.photos}</FormHelperText>
               ) : null}
             </FormControl>
-            {/* </FormControl> */}
 
             <TextField
               label="Location"
@@ -310,6 +311,32 @@ const PostAd = () => {
               onBlur={formik.handleBlur}
               error={formik.touched.location && Boolean(formik.errors.location)}
               helperText={formik.touched.location && formik.errors.location}
+            />
+
+            <Autocomplete
+              multiple
+              label="Tags"
+              id="tags"
+              variant="outlined"
+              options={[]}
+              defaultValue={[]}
+              freeSolo
+              fullWidth
+              value={formik.values.tags}
+              onChange={(e, value) => formik.setFieldValue("tags", value)}
+              onBlur={formik.handleBlur}
+              error={formik.touched.tags && Boolean(formik.errors.tags)}
+              helperText={formik.touched.tags && formik.errors.tags}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    variant="filled"
+                    label={option}
+                    {...getTagProps({ index })}
+                  />
+                ))
+              }
+              renderInput={(params) => <TextField {...params} label="Tags" />}
             />
 
             <Button
