@@ -9,33 +9,16 @@ import ItemsForSale from "./itemsForSale/ItemsForSale";
 import Services from "./academicServices/AcademicServices";
 import PostAd from "./postAd/PostAd";
 import Register from "./register/Register";
-import { useState, createContext } from "react";
 import AllPosts from "./allPosts/AllPosts";
 import Users from "./users/Users";
 import Messages from "./messages/Messages";
 import { auth } from "./firebase-config";
 
-export const UserContext = createContext({
-  user: {
-    isLoggedIn: false,
-    username: "",
-    email: "",
-    fullName: "",
-    isAdmin: false,
-    _id: "",
-  },
-  setUser: () => {},
-});
+import { UserContext } from "./contexts/UserContext";
+import { useContext } from "react";
 
 function App() {
-  const [user, setUser] = useState({
-    isLoggedIn: false,
-    username: "",
-    email: "",
-    fullName: "",
-    isAdmin: false,
-    _id: "",
-  });
+  const { user, setUser } = useContext(UserContext);
 
   // since the auth token changes every hour but the session variable doesn't
   auth.onIdTokenChanged(async (token) => {
@@ -71,7 +54,7 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route
             path="/postAd"
-            element={!user.isLoggedIn ? <Login /> : <PostAd />}
+            element={user.isLoggedIn ? <PostAd /> : <Login />}
           />
           <Route path="/settings" element={<div></div>} />
           <Route path="/profile" element={<div></div>} />

@@ -34,7 +34,7 @@ export default function ListingItem({
             }}
           >
             <img
-              src={"/default-image.jpg"}
+              src={photos?.length > 0 ? photos?.[0] : "/default-image.jpg"}
               alt="default"
               style={{
                 width: "176px",
@@ -79,7 +79,7 @@ export default function ListingItem({
                 mt: "6px",
               }}
             >
-              {location}
+              {location ?? "No Location Specified"}
             </Typography>
             <Typography
               sx={{

@@ -21,7 +21,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
 
-import { UserContext } from "../App";
+import { UserContext } from "../contexts/UserContext";
 
 const validationSchema = yup.object({
   email: yup
@@ -37,11 +37,13 @@ const validationSchema = yup.object({
 const Login = () => {
   const { user, setUser } = useContext(UserContext);
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
   const navigate = useNavigate();
+  /*
+  const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+  if (loggedIn)
+    navigate('/');
+  */
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("error"); // 'success' or 'error'
@@ -84,6 +86,7 @@ const Login = () => {
           sessionStorage.setItem("fullName", userInfo[0].fullName);
           sessionStorage.setItem("isAdmin", userInfo[0].isAdmin.toString());
           sessionStorage.setItem("_id", userInfo[0]._id);
+          sessionStorage.setItem("username", userInfo[0].username);
 
           setUser({
             isLoggedIn: true,
@@ -92,6 +95,7 @@ const Login = () => {
             fullName: userInfo[0].fullName,
             isAdmin: userInfo[0].isAdmin,
             _id: userInfo[0]._id,
+            authToken: token,
           });
 
           setSnackbarMessage("Login successful!");

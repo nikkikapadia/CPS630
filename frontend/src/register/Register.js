@@ -21,7 +21,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
 
-import { UserContext } from "../App";
+import { UserContext } from "../contexts/UserContext";
 
 const validationSchema = yup.object({
   fullName: yup.string().required("Full Name is required"),
@@ -45,7 +45,9 @@ const validationSchema = yup.object({
 
 const Register = () => {
   const { user, setUser } = useContext(UserContext);
+
   const navigate = useNavigate();
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("error"); // 'success' or 'error'
@@ -108,6 +110,7 @@ const Register = () => {
               fullName: userInfo.fullName,
               isAdmin: userInfo.isAdmin,
               _id: userInfo._id,
+              authToken: token,
             });
 
             setSnackbarMessage(
@@ -171,20 +174,33 @@ const Register = () => {
             <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
               Register
             </Typography>
+            <TextField
+              label="Full Name"
+              id="fullName"
+              name="fullName"
+              fullWidth
+              variant="outlined"
+              value={formik.values.fullName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+              helperText={formik.touched.fullName && formik.errors.fullName}
+            />
             <Box sx={{ width: "100%" }}>
               <TextField
-                label="Full Name"
-                id="fullName"
-                name="fullName"
+                label="Username"
+                id="username"
+                type="username"
+                name="username"
                 fullWidth
                 variant="outlined"
-                value={formik.values.fullName}
+                value={formik.values.username}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={
-                  formik.touched.fullName && Boolean(formik.errors.fullName)
+                  formik.touched.username && Boolean(formik.errors.username)
                 }
-                helperText={formik.touched.fullName && formik.errors.fullName}
+                helperText={formik.touched.username && formik.errors.username}
               />
               <FormLabel
                 sx={{
@@ -194,22 +210,9 @@ const Register = () => {
                   display: "block",
                 }}
               >
-                Your Name will be displayed on your public profile
+                This name will be displayed to other users
               </FormLabel>
             </Box>
-            <TextField
-              label="Username"
-              id="username"
-              type="username"
-              name="username"
-              fullWidth
-              variant="outlined"
-              value={formik.values.username}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.username && Boolean(formik.errors.username)}
-              helperText={formik.touched.username && formik.errors.username}
-            />
             <TextField
               label="Email"
               id="email"

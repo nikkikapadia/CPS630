@@ -19,19 +19,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { PostAdd } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 
+import { UserContext } from "./contexts/UserContext";
+import { useContext } from "react";
+
 export default function Navigation({ admin }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openNav, setOpenNav] = React.useState(false);
   const open = Boolean(anchorEl);
-  const [isLoggedIn, setIsLoggedin] = React.useState(false);
-
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    // Check if user is logged in
-    const authStatus = sessionStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedin(authStatus);
-  }, []);
+  const { user, setUser } = useContext(UserContext);
 
   const [width, setWidth] = React.useState(window.innerWidth);
   // following code chunk makes sure the menu isn't open when resized to mobile screen
@@ -56,9 +53,17 @@ export default function Navigation({ admin }) {
   };
 
   const handleLogout = () => {
+    setUser({
+      isLoggedIn: false,
+      username: "",
+      email: "",
+      fullName: "",
+      isAdmin: "",
+      _id: "",
+      authToken: "",
+    });
     sessionStorage.clear(); // clear session storage
-    setIsLoggedin(false); // update loggedIn state to false
-    setTimeout(() => navigate("/"), 3000); // Redirect after 3 seconds
+    navigate("/"); // Redirect after 3 seconds
     handleClose(); // close menu if
   };
 
@@ -148,7 +153,7 @@ export default function Navigation({ admin }) {
         </div>
         {/* Classes for when nav bar is open/collapsed in mobile */}
         <div className={openNav ? "accountBox" : "hideAccount"}>
-          {!isLoggedIn ? (
+          {!user.isLoggedIn ? (
             <>
               <Button type="text" sx={navStyles.navButton}>
                 <Link to={"/register"} style={navStyles.link}>
@@ -189,7 +194,7 @@ export default function Navigation({ admin }) {
       </div>
 
       {/* Profile Menu Dropdown */}
-      {isLoggedIn && (
+      {user.isLoggedIn && (
         <Menu
           anchorEl={anchorEl}
           id="account-menu"

@@ -11,18 +11,19 @@ import { Box, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
-import { UserContext } from "../App";
+import { UserContext } from "../contexts/UserContext";
 import ViewPostingModal from "../components/ViewPostingModal";
+import { SearchBar, categories } from "../components/SearchBar";
 
-function HomeSearch() {
-  const [searchValue, setSearchValue] = React.useState("");
-  return (
-    <div style={homeStyles.gradient}>
-      <h1>Search Here!</h1>
-      <SearchBar value={searchValue} handleChange={setSearchValue} />
-    </div>
-  );
-}
+// function HomeSearch() {
+//   const [searchValue, setSearchValue] = React.useState("");
+//   return (
+//     <div style={homeStyles.gradient}>
+//       <h1>Search Here!</h1>
+//       <SearchBar value={searchValue} handleChange={setSearchValue} />
+//     </div>
+//   );
+// }
 
 export function HomePage({ admin }) {
   const { user, setUser } = useContext(UserContext);
@@ -78,11 +79,6 @@ export function HomePage({ admin }) {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-  console.log("homepage", user);
-
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalPost, setModalPost] = React.useState({});
 
@@ -91,9 +87,18 @@ export function HomePage({ admin }) {
     setModalPost({});
   };
 
+  const [searchValue, setSearchValue] = React.useState("");
+  const [selectedCategory, setSelectedCategory] = React.useState(categories[0]);
+
   return (
     <>
-      <HomeSearch />
+      <SearchBar
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
+      {/* <HomeSearch /> */}
       <Row
         title={"Items Wanted"}
         data={wantedData}
@@ -124,29 +129,29 @@ export function HomePage({ admin }) {
   );
 }
 
-function SearchBar({ value, handleChange }) {
-  const onChange = useCallback(
-    (event) => handleChange(event.target.value),
-    [handleChange]
-  );
+// function SearchBar({ value, handleChange }) {
+//   const onChange = useCallback(
+//     (event) => handleChange(event.target.value),
+//     [handleChange]
+//   );
 
-  return (
-    <div className="search">
-      <input
-        type="text"
-        placeholder="Search"
-        value={value}
-        onChange={onChange}
-        className="search-input"
-      />
-      <img
-        src={require("../images/search.png")}
-        className="search-logo"
-        alt="search"
-      />
-    </div>
-  );
-}
+//   return (
+//     <div className="search">
+//       <input
+//         type="text"
+//         placeholder="Search"
+//         value={value}
+//         onChange={onChange}
+//         className="search-input"
+//       />
+//       <img
+//         src={require("../images/search.png")}
+//         className="search-logo"
+//         alt="search"
+//       />
+//     </div>
+//   );
+// }
 
 function Row({ title, data, admin, setModalOpen, setModalPost }) {
   return (

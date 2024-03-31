@@ -484,3 +484,35 @@ app.delete("/api/chats/delete/:user1/:user2", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
+// Create search functionality for the ads based on different categories
+
+app.get("/api/ads/search", async (req, res) => {
+  const category = req.query.category;
+  const searchQuery = req.query.search;
+
+  console.log(category, searchQuery, "form backend repsonse yeah");
+
+  if (!validCategory(category))
+    return res.status(400).json({
+      error:
+        "Invalid ad category. Category must be 'academicService', 'itemsForSale', or 'itemsWanted'.",
+    });
+
+  const AdModel = categoryModelMap[category];
+
+  try {
+    const ads = await AdModel.find({
+      $or: [
+        { title: { $regex: searchQuery, $options: "i" } },
+        { description: { $regex: searchQuery, $options: "i" } },
+        { location: { $regex: searchQuery, $options: "i" } },
+        { tags: { $regex: searchQuery, $options: "i" } },
+      ],
+    });
+    res.status(200).json(ads);
+  } catch (error) {
+    console.log(error, "error");
+    res.status(400).json({ error: error.message });
+  }
+});
