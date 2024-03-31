@@ -1,6 +1,6 @@
 export const itemsWanted = [
   {
-    name: "Casio XJSDJH Calculator",
+    title: "Casio XJSDJH Calculator",
     price: "12.00",
     description: "Slightly used, all buttons functioning, may need new battery",
     author: "John Smith",
@@ -12,7 +12,7 @@ export const itemsWanted = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "Calculus Textbook 4th Ed.",
+    title: "Calculus Textbook 4th Ed.",
     price: "80.00",
     description: "Binding must be intact",
     photos: [
@@ -21,7 +21,7 @@ export const itemsWanted = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "iClicker",
+    title: "iClicker",
     price: "20.00",
     description: "",
     photos: [
@@ -31,7 +31,7 @@ export const itemsWanted = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "iClicker",
+    title: "iClicker",
     price: "20.00",
     description: "",
     photos: [
@@ -40,7 +40,7 @@ export const itemsWanted = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "Laptop Stickers",
+    title: "Laptop Stickers",
     price: "5.00",
     description: "Travel stickers",
     photos: [
@@ -52,7 +52,7 @@ export const itemsWanted = [
 
 export const itemsForSale = [
   {
-    name: "Casio Calculator",
+    title: "Casio Calculator",
     price: "12.00",
     description: "Slightly used, all buttons functioning, may need new battery",
     photos: [
@@ -61,7 +61,7 @@ export const itemsForSale = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "Calculus Textbook 4th Ed.",
+    title: "Calculus Textbook 4th Ed.",
     price: "70.00",
     description: "Binding is slightly broken",
     photos: [
@@ -70,14 +70,14 @@ export const itemsForSale = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "iClicker",
+    title: "iClicker",
     price: "14.00",
     description: "",
     photos: [],
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "iClicker+",
+    title: "iClicker+",
     price: "20.00",
     description: "",
     photos: [
@@ -86,7 +86,7 @@ export const itemsForSale = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "TMU Pens",
+    title: "TMU Pens",
     price: "5.00",
     description: "Bought accidentally from campus store and never used",
     photos: ["https://campusstore.torontomu.ca/images/product/large/27172.jpg"],
@@ -96,7 +96,7 @@ export const itemsForSale = [
 
 export const academicServices = [
   {
-    name: "Taxes Support",
+    title: "Taxes Support",
     price: "Free",
     description:
       "We can help submit your taxes as a student. Make an appointment with us!",
@@ -106,7 +106,7 @@ export const academicServices = [
     postDate: new Date().toLocaleString(),
   },
   {
-    name: "Writing Help at SLC",
+    title: "Writing Help at SLC",
     price: "Free",
     description: "We can look at your papers and guide you",
     photos: [

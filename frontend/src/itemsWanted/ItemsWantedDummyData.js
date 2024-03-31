@@ -1,6 +1,6 @@
 export const dummyDataForItemsWanted = [
   {
-    name: "Looking for Graphing Calculator",
+    title: "Looking for Graphing Calculator",
     description:
       "In need of a TI-84 or similar graphing calculator. Must be in good working condition.",
     price: "25",
@@ -10,7 +10,7 @@ export const dummyDataForItemsWanted = [
     author: "John Smith",
   },
   {
-    name: "Wanted: Road Bike for Commuting",
+    title: "Wanted: Road Bike for Commuting",
     description:
       "In search of a reliable road bike suitable for daily commuting. Preferably with gears and in ready-to-ride condition.",
     price: "200",
@@ -19,7 +19,7 @@ export const dummyDataForItemsWanted = [
     author: "John Smith",
   },
   {
-    name: "Looking for a Study Desk",
+    title: "Looking for a Study Desk",
     description:
       "* Looking for a compact study desk suitable for a small apartment. Should be sturdy with minimal wear.",
     price: "100",
@@ -28,7 +28,7 @@ export const dummyDataForItemsWanted = [
     author: "John Smith",
   },
   {
-    name: "Need Mini Fridge",
+    title: "Need Mini Fridge",
     description:
       "In search of a compact refrigerator in good working condition for my dorm room. Size and brand are flexible but must be quiet and energy-efficient.",
     price: "150",
@@ -37,7 +37,7 @@ export const dummyDataForItemsWanted = [
     author: "John Smith",
   },
   {
-    name: "Seeking Photography Equipment",
+    title: "Seeking Photography Equipment",
     description:
       "photographer looking for cameras, lenses, tripods, and lighting equipment suitable for beginners",
     price: "250",

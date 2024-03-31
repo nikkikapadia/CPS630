@@ -1,6 +1,6 @@
 export const dummyDataForItemsForSale = [
   {
-    name: "Brand New Nespresso Espresso Machine",
+    title: "Brand New Nespresso Espresso Machine",
     description:
       "Selling an unopened, brand new espresso machine. Perfect for coffee enthusiasts. Compact size for any kitchen.",
     price: "150",
@@ -10,7 +10,7 @@ export const dummyDataForItemsForSale = [
     author: "John Smith",
   },
   {
-    name: "Nike Hoodie",
+    title: "Nike Hoodie",
     description:
       "Gently used Nike hoodie, men size large. Black color, no stains or tears.",
     price: "40",
@@ -19,7 +19,7 @@ export const dummyDataForItemsForSale = [
     author: "John Smith",
   },
   {
-    name: "MacBook Air M1 13” 2020",
+    title: "MacBook Air M1 13” 2020",
     description:
       "Offering my MacBook Air M1 2020, 13-inch with 8GB RAM and 256GB SSD. Barely used, battery cycle under 50. Perfect for students and professionals. Comes with a free sleeve and original charger..",
     price: "600",
@@ -29,7 +29,7 @@ export const dummyDataForItemsForSale = [
     author: "John Smith",
   },
   {
-    name: "PS4 Console Bundle with Games",
+    title: "PS4 Console Bundle with Games",
     description:
       "PS4 in excellent condition for sale, 1TB storage. Comes with 2 controllers, charging dock, and 5 games (FIFA 21, God of War, Spider-Man, The Last of Us Part II, Horizon Zero Dawn). All original cables included.",
     price: "200",
@@ -38,7 +38,7 @@ export const dummyDataForItemsForSale = [
     author: "John Smith",
   },
   {
-    name: "Sony WH-1000XM4 Noise-Cancelling Headphones",
+    title: "Sony WH-1000XM4 Noise-Cancelling Headphones",
     description:
       "Sony WH-1000XM4 noise-cancelling headphones, barely used. Comes with original packaging. Perfect for studying in noisy environments.",
     price: "300",

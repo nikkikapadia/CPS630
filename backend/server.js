@@ -8,19 +8,19 @@ const app = express();
 
 const unless = (paths, middleware) => {
   return function (req, res, next) {
-    if (paths.some((path) => path.test(req.path) == true)) return next();
+    if (paths.some((path) => path.test(req.path) === true)) return next();
     else return middleware(req, res, next);
   };
 };
 
 app.use(express.json());
 app.use(cors());
-// app.use(
-//   unless(
-//     [/^\/api\/users\/new$/g, /^\/api\/ads\/get\//g],
-//     middleware.decodeToken
-//   )
-// );
+app.use(
+  unless(
+    [/^\/api\/users\/new$/g, /^\/api\/ads\/get\/.*/g],
+    middleware.decodeToken
+  )
+);
 
 app.set("case sensitive routing", true);
 
