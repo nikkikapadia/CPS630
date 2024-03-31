@@ -54,7 +54,7 @@ app.get('/api/users/get', async (req, res) => {
 });
 
 // GET user by id
-app.get('/api/users/get/:id'), async(req, res) => {
+app.get('/api/users/get/:id', async(req, res) => {
     try {
         const user = await User.find({ _id: req.params.id });
         res.status(200).json(user);
@@ -62,10 +62,10 @@ app.get('/api/users/get/:id'), async(req, res) => {
     catch(error) {
         res.status(400).json({error: error.message});
     }
-}
+});
 
 // GET user by email
-app.get('/api/users/get/:email'), async(req, res) => {
+app.get('/api/users/get/:email', async(req, res) => {
     try {
         const user = await User.find({ email: req.params.email });
         res.status(200).json(user);
@@ -73,10 +73,10 @@ app.get('/api/users/get/:email'), async(req, res) => {
     catch(error) {
         res.status(400).json({error: error.message});
     }
-}
+});
 
 // GET user by username
-app.get('/api/users/get/:username'), async(req, res) => {
+app.get('/api/users/get/:username', async(req, res) => {
     try {
         const user = await User.find({ username: req.params.username });
         res.status(200).json(user);
@@ -84,7 +84,18 @@ app.get('/api/users/get/:username'), async(req, res) => {
     catch(error) {
         res.status(400).json({error: error.message});
     }
-}
+});
+
+// Get currently logged-in user
+app.get('/api/users/me', async(req, res) => {
+    try {
+        const user = await User.findById(req.RequestingUser._id);
+        if (!user) return res.status(404).send('User not found');
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({message : error.message});
+    }
+});
 
 // POST (create) a new user
 app.post('/api/users/new', async(req, res) => {
@@ -145,6 +156,16 @@ app.patch('/api/users/update/:email', async(req, res) => {
     }
     catch(error) {
         res.status(400).json({error: error.message});
+    }
+});
+
+// Update currently logged-in user
+app.patch('/api/users/update/me', async (req, res) => {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, { new: true});
+        res.status(200).json(updatedUser)
+    } catch (error) {
+        res.status(500).json({message: error.message});
     }
 });
 
@@ -243,6 +264,26 @@ app.get('/api/ads/get/:category/:author', async(req, res) => {
     }
 });
 
+// GET ads by current user
+app.get('/api/ads/user/:userId', async (req, res) => {
+    try {
+        // fetch both wanted and for sale items by the user
+        const wantedItems = await ItemWanted.find({ postedBy: req.params.userId});
+        const forSaleItems = await ItemForSale.find({ postedBy: req.params.userId });
+
+        // Combine the results
+        const ads = {
+            wantedItems,
+            forSaleItems
+        };
+
+        res.status(200).json(ads);
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Error fetching user ads'});
+    }
+});
+
 // POST (create) a new ad under a category
 app.post('/api/ads/new/:category', async(req, res) => {
     if (!validCategory(req.params.category))
@@ -285,6 +326,7 @@ app.patch('/api/ads/update/:category/:id', async(req, res) => {
         res.status(400).json({error: error.message});
     }
 });
+
 
 // DELETE an ad by under a category by id
 app.delete('/api/ads/delete/:category/:id', async(req, res) => {
