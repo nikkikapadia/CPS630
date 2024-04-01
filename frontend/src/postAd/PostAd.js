@@ -24,7 +24,10 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 
 import { UserContext } from "../contexts/UserContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+
+import SearchLocationInput from "../GooglePlacesApi";
+import MapComponent from "../Map";
 
 //import { UserContext } from "../App";
 
@@ -51,6 +54,11 @@ const validationSchema = yup.object({
 
 const PostAd = () => {
   const { user, setUser } = useContext(UserContext);
+
+  const [selectedLocation, setSelectedLocation] = useState({
+    lat: 43.6532,
+    lng: -79.3470,
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -313,6 +321,7 @@ const PostAd = () => {
               helperText={formik.touched.location && formik.errors.location}
             />
 
+            <Box sx={{ width: "100%" }}>
             <Autocomplete
               multiple
               label="Tags"
@@ -338,6 +347,22 @@ const PostAd = () => {
               }
               renderInput={(params) => <TextField {...params} label="Tags" />}
             />
+            <FormLabel
+                sx={{
+                    mt: "8px",
+                    textAlign: "left",
+                    fontSize: "14px",
+                    display: "block",
+                }}
+                >
+                Press enter to input each tag
+            </FormLabel>
+            </Box>
+
+            <div style={{ height: "100vh", width: "100%" }}>
+                <SearchLocationInput setSelectedLocation={setSelectedLocation} />
+                <MapComponent selectedLocation={selectedLocation} />
+            </div>
 
             <Button
               fullWidth
