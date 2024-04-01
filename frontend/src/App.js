@@ -22,7 +22,7 @@ function App() {
 
   // since the auth token changes every hour but the session variable doesn't
   auth.onIdTokenChanged(async (token) => {
-    sessionStorage.setItem("authToken", await token.getIdToken());
+    setUser({ ...user, authToken: await token.getIdToken() });
   });
 
   return (

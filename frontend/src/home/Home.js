@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import "./Home.css";
 import "@fontsource/inter";
 import Typography from "@mui/material/Typography";
@@ -31,6 +31,9 @@ export function HomePage({ admin }) {
   const [wantedData, setWantedData] = React.useState([]);
   const [saleData, setSaleData] = React.useState([]);
   const [servicesData, setServicesData] = React.useState([]);
+
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalPost, setModalPost] = React.useState({});
 
   const apiRoot = "http://localhost:5001/api";
 
@@ -77,10 +80,7 @@ export function HomePage({ admin }) {
     }
 
     fetchData();
-  }, []);
-
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [modalPost, setModalPost] = React.useState({});
+  }, [modalPost]);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -161,7 +161,7 @@ function Row({ title, data, admin, setModalOpen, setModalPost }) {
         {data.map((posting) => {
           const updatedPosting = {
             ...posting,
-            category: title,
+            category: title.replaceAll(" ", ""),
           };
           return (
             <ActionAreaCard
