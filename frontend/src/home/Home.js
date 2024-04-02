@@ -42,7 +42,7 @@ export function HomePage({ admin }) {
       await fetch(`${apiRoot}/ads/get/itemsWanted`, {
         method: "GET",
         headers: {
-          Accept: "application/json",
+          "Accept": "application/json",
           "Content-Type": "application/json",
         },
       })
@@ -55,7 +55,7 @@ export function HomePage({ admin }) {
       await fetch(`${apiRoot}/ads/get/itemsForSale`, {
         method: "GET",
         headers: {
-          Accept: "application/json",
+          "Accept": "application/json",
           "Content-Type": "application/json",
         },
       })
@@ -68,7 +68,7 @@ export function HomePage({ admin }) {
       await fetch(`${apiRoot}/ads/get/academicServices`, {
         method: "GET",
         headers: {
-          Accept: "application/json",
+          "Accept": "application/json",
           "Content-Type": "application/json",
         },
       })

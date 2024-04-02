@@ -14,8 +14,18 @@ const itemForSaleSchema = new mongoose.Schema({
         required: true,
     },
     location: {
-        type: String,
-        required: true,
+        description: {
+            type: String,
+            required: true,
+        },
+        lat: {
+            type: Number,
+            required: true,
+        },
+        lng: {
+            type: Number,
+            required: true
+        }
     },
     tags: [{
         type: String,
