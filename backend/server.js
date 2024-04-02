@@ -103,9 +103,19 @@ app.get('/api/users/me', async(req, res) => {
 
 // POST (create) a new user
 app.post('/api/users/new', async(req, res) => {
-    const { username, email, fullName } = req.body;
+    const { username, email, fullName, firebaseUID } = req.body;
+
+    if (!firebaseUID) {
+        return res.status(400).json({error: "Firebase UID is required"});
+    }
+
     try {
-        const user = await User.create({ username: username, email: email, fullName: fullName });
+        const user = await User.create({ 
+            username: username, 
+            email: email, 
+            fullName: fullName, 
+            firebaseUID: firebaseUID 
+        });
         res.status(200).json(user);
     }
     catch(error) {
@@ -269,7 +279,7 @@ app.get('/api/ads/get/:category/author/:author', async(req, res) => {
 });
 
 // GET ads by current user
-app.get('/api/ads/user/:userId', async (req, res) => {
+app.get('/api/ads/user/:userId', middleware.decodeToken, async (req, res) => {
     try {
         // fetch both wanted and for sale items by the user
         const wantedItems = await ItemWanted.find({ postedBy: req.params.userId});
