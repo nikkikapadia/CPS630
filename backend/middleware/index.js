@@ -6,8 +6,10 @@ class Middleware {
             return res.status(400).json({error: 'Bad request. Require authorization token.'});
 
         const token = req.headers.authorization.split(' ')[1];
+
         try {
             const decodedValue = await admin.auth().verifyIdToken(token);
+            console.log(decodedValue);
             if (decodedValue) {
                 req.requestingUser = decodedValue;
                 next();

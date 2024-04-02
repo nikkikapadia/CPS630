@@ -3,7 +3,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const middleware = require('./middleware');
 const cors = require('cors');
-
 const app = express();
 
 const unless = (paths, middleware) => {
@@ -15,8 +14,17 @@ const unless = (paths, middleware) => {
     };
 };
 
-app.use(express.json());
-app.use(cors());
+// CORS Configuration
+const corsOptions = {
+    origin: 'http://localhost:3000', // This should be the URL of your frontend application.
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    allowedHeaders: 'Content-Type, Authorization', // Explicitly allowing Authorization header
+    credentials: true, // This allows the server to send cookies / Authorization headers in CORS
+  };
+
+app.use(cors(corsOptions));
 app.use(unless([/^\/api\/users\/new$/g, /^\/api\/ads\/get\//g], middleware.decodeToken));
 
 app.set('case sensitive routing', true);
@@ -88,16 +96,24 @@ app.get('/api/users/get', async (req, res) => {
         res.status(400).json({error: error.message});
     }
 });
-});
 
 // Get currently logged-in user
-app.get('/api/users/me', async(req, res) => {
+app.get('/api/users/me', middleware.decodeToken, async(req, res) => {
+    // try {
+    //     const user = await User.findById(req.requestingUser._id);
+    //     if (!user) return res.status(404).send('User not found');
+    //     res.status(200).json(user);
+    // } catch (error) {
+    //     res.status(500).json({message : error.message});
+    // }
+
     try {
-        const user = await User.findById(req.RequestingUser._id);
+
+        const user = await User.find({ username: req.params.username }); // Adjust based on your user model and the UID property
         if (!user) return res.status(404).send('User not found');
         res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({message : error.message});
+    } catch {
+        
     }
 });
 
@@ -173,7 +189,7 @@ app.patch('/api/users/update/email/:email', async(req, res) => {
     }
 });
 
-// Update currently logged-in user
+// PATCH (Update) currently logged-in user
 app.patch('/api/users/update/me', async (req, res) => {
     try {
         const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, { new: true});
@@ -279,11 +295,11 @@ app.get('/api/ads/get/:category/author/:author', async(req, res) => {
 });
 
 // GET ads by current user
-app.get('/api/ads/user/:userId', middleware.decodeToken, async (req, res) => {
+app.get('/api/ads/author/:author', middleware.decodeToken, async (req, res) => {
     try {
         // fetch both wanted and for sale items by the user
-        const wantedItems = await ItemWanted.find({ postedBy: req.params.userId});
-        const forSaleItems = await ItemForSale.find({ postedBy: req.params.userId });
+        const wantedItems = await ItemWanted.find({ postedBy: req.params.author});
+        const forSaleItems = await ItemForSale.find({ postedBy: req.params.author });
 
         // Combine the results
         const ads = {

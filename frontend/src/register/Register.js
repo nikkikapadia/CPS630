@@ -14,13 +14,13 @@ import React, { useState, useContext } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { auth } from '../firebase-config';
+//import { auth } from '../firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Link } from "react-router-dom";
-
+import { auth } from '../firebase'
 import { UserContext } from '../contexts/UserContext';
 
 const validationSchema = yup.object({

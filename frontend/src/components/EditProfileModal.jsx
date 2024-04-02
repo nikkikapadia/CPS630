@@ -1,23 +1,20 @@
-// EditAdModal.jsx
 import React, { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 
-
-function EditAdModal({ open, onClose, adInfo, onSave }) {
-  const [editedAd, setEditedAd] = useState(adInfo);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(editedAd); // Pass the edited ad back to UserProfile
-    onClose(); // Close the modal
-  };
+function EditProfileModal({ open, onClose, userInfo, onSave }) {
+  const [editedUserInfo, setEditedUserInfo] = useState(userInfo);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditedAd({ ...editedAd, [name]: value });
+    setEditedUserInfo(prev => ({ ...prev, [name]: value }));
   };
 
-  // Define modal styles here
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(editedUserInfo);
+    onClose();
+  };
+
   const style = {
     position: 'absolute',
     top: '50%',
@@ -33,25 +30,24 @@ function EditAdModal({ open, onClose, adInfo, onSave }) {
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={style} component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
-        <Typography variant="h6" marginBottom={2}>Edit Ad</Typography>
+        <Typography variant="h6" marginBottom={2}>Edit Profile</Typography>
         <TextField
-          name="title"
-          label="Title"
-          value={editedAd.title}
+          name="name"
+          label="Name"
+          value={editedUserInfo.name}
           onChange={handleChange}
           fullWidth
           margin="normal"
         />
         <TextField
-          name="description"
-          label="Description"
-          value={editedAd.description}
+          name="email"
+          label="Email"
+          value={editedUserInfo.email}
           onChange={handleChange}
           fullWidth
           margin="normal"
-          multiline
-          rows={4}
         />
+        {/* Add other fields as necessary */}
         <Button type="submit" variant="contained" sx={{ mt: 2 }}>
           Save Changes
         </Button>
@@ -60,5 +56,4 @@ function EditAdModal({ open, onClose, adInfo, onSave }) {
   );
 }
 
-export default EditAdModal;
-
+export default EditProfileModal;

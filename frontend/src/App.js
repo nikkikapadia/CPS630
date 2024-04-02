@@ -38,7 +38,7 @@ function App() {
                     <Route path="/services" element={<Services />} />
                     <Route path="/postAd" element={user.isLoggedIn ?  <PostAd /> : <Login />} />
                     <Route path="/settings" element={<div></div>} />
-                    <Route path="/profile" element={<div></div>} />
+                    <Route path="/profile" element={<UserProfile />} />
                     <Route path="/myposts" element={<div></div>} />
                     <Route path="/messages" element={<Messages />} />
                     <Route path="/messages/:chatId" element={<Messages />} />
