@@ -18,6 +18,12 @@ const userSchema = new mongoose.Schema({
     fullName: {
         type: String,
         required: true,
+    },
+    firebaseUID: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true,
     }
 }, { versionKey: false });
 
