@@ -16,6 +16,8 @@ export default function ItemsWanted() {
     setModalPost({});
   };
 
+  const [wantedData, setWantedData] = useState([]);
+
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(categories[2]);
 
@@ -27,6 +29,25 @@ export default function ItemsWanted() {
   const { data, loading, fetchData } = useFetchData(
     `ads/search?category=${selectedCategory.value}&search=${search}`
   );
+
+  useEffect(() => {
+    async function fetchData() {
+      await fetch(`http://localhost:5001/api/ads/get/itemsWanted`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => setWantedData(data))
+        .catch((error) => {
+          console.error("Error fetching wanted data:", error);
+        });
+    }
+
+    fetchData();
+  }, [modalPost]);
 
   useEffect(() => {
     if (!search) return;
@@ -69,7 +90,7 @@ export default function ItemsWanted() {
                 textAlign: "left",
               }}
             >
-              {data && search && `Finded ${data.length}`} Items Wanted Near You
+              {data && search && `Found ${data.length}`} Items Wanted Near You
             </Typography>
             <Divider sx={{ my: "30px" }} />
             <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -105,7 +126,7 @@ export default function ItemsWanted() {
                 </Box>
               ) : (
                 <>
-                  {dummyDataForItemsWanted?.map((item, ind) => {
+                  {wantedData?.map((item, ind) => {
                     const updatedPosting = {
                       ...item,
                       category: "Items Wanted",

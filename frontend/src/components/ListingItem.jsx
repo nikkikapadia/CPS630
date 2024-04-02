@@ -79,7 +79,7 @@ export default function ListingItem({
                 mt: "6px",
               }}
             >
-              {location ?? "No Location Specified"}
+              {location.description ?? "No Location Specified"}
             </Typography>
             <Typography
               sx={{
