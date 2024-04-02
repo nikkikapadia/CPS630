@@ -105,7 +105,7 @@ app.get('/api/users/me', async(req, res) => {
 app.post('/api/users/new', async(req, res) => {
     const { username, email, fullName, firebaseUID } = req.body;
 
-    if (!firebaseUID) {
+    if (!firebaseUID) { // firebase check
         return res.status(400).json({error: "Firebase UID is required"});
     }
 

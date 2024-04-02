@@ -70,6 +70,7 @@ const Register = () => {
           .then(async (userCredential) => {
             console.log(userCredential.user, "User Created Successfully")
 
+            const firebaseUID = userCredential.user.uid;
             const token = userCredential.user.accessToken;
 
             // Set 'isLoggedIn' to true and store 'authToken'
@@ -91,7 +92,8 @@ const Register = () => {
                 body: JSON.stringify({
                     'username': values.username,
                     'email': values.email,
-                    'fullName': values.fullName
+                    'fullName': values.fullName,
+                    'firebaseUID': firebaseUID
                 })
             })
             .then(res => {
