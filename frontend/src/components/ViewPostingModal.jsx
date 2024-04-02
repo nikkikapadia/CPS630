@@ -7,9 +7,12 @@ import { UserContext } from "../contexts/UserContext";
 import { useContext } from "react";
 import EditForm from "./EditForm";
 
+import MapComponent from "../Map";
+
 function ViewPostingModal({ open, onClose, post }) {
   const [edit, setEdit] = useState(false);
   const [postInfo, setPostInfo] = useState(post);
+  console.log(post);
 
   const { user, setUser } = useContext(UserContext);
 
@@ -99,8 +102,16 @@ function ViewPostingModal({ open, onClose, post }) {
                 <strong>Description:</strong> {postInfo.description}
               </Typography>
               <Typography sx={{ mt: 2 }}>
-                <strong>Location:</strong> {postInfo.location}
+                <strong>Location:</strong> {/*postInfo.location.description*/}
               </Typography>
+              {/*}
+              <MapComponent 
+                selectedLocation={{
+                  lat: postInfo.location.lat,
+                  lng: postInfo.location.lng
+                }}
+              />
+              */}
               <Typography sx={{ mt: 2, mb: 10 }}>
                 <strong>Price:</strong> ${postInfo.price}
               </Typography>

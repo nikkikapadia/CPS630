@@ -4,7 +4,7 @@ import { GoogleMap, useLoadScript, MarkerF } from "@react-google-maps/api";
 
 const MapComponent = ({ selectedLocation }) => {
     const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
+        googleMapsApiKey: "AIzaSyDNeK_2XCQL6gnYQ7Ej1yuQtIBig5pOJz8"
     });
     const mapRef = React.useRef();
     const onMapLoad = React.useCallback((map) => {
@@ -14,10 +14,10 @@ const MapComponent = ({ selectedLocation }) => {
     if (!isLoaded) return "Maps";
 
     return (
-        <div style={{ marginTop: "50px" }}>
+        <div style={{ marginTop: "20px" }}>
             <GoogleMap
                 mapContainerStyle={{
-                    height: "800px",
+                    height: "300px",
                 }}
                 center={selectedLocation}
                 zoom={13}

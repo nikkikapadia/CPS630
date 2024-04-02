@@ -7,7 +7,7 @@ const initUser = {
     fullName: '',
     isAdmin: false,
     _id: '',
-    autToken: ''
+    authToken: ''
 }
 
 export const UserContext = createContext();

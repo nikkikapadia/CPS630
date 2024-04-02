@@ -21,9 +21,11 @@ function App() {
   const { user, setUser } = useContext(UserContext);
 
   // since the auth token changes every hour but the session variable doesn't
-  auth.onIdTokenChanged(async (token) => {
-    setUser({ ...user, authToken: await token.getIdToken() });
-  });
+  if (user.isLoggedIn) {
+    auth.onIdTokenChanged(async (token) => {
+        setUser({ ...user, authToken: await token.getIdToken() });
+    });
+  }
 
   return (
     <div className="App">
