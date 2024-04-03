@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, CircularProgress, Divider, Typography } from "@mui/material";
 import ListingItem from "../components/ListingItem";
-import { dummyDataForItemsWanted } from "./ItemsWantedDummyData";
 import ViewPostingModal from "../components/ViewPostingModal";
 import { SearchBar, categories } from "../components/SearchBar";
 import useFetchData from "../hooks/useFetchData";
@@ -126,22 +125,36 @@ export default function ItemsWanted() {
                 </Box>
               ) : (
                 <>
-                  {wantedData?.map((item, ind) => {
-                    const updatedPosting = {
-                      ...item,
-                      category: "Items Wanted",
-                    };
-                    return (
-                      <ListingItem
-                        key={ind}
-                        onClick={() => {
-                          setModalOpen(true);
-                          setModalPost(updatedPosting);
-                        }}
-                        {...updatedPosting}
-                      />
-                    );
-                  })}
+                  {wantedData.length !== 0 ? (
+                    wantedData?.map((item, ind) => {
+                      const updatedPosting = {
+                        ...item,
+                        category: "Items For Sale",
+                      };
+                      return (
+                        <ListingItem
+                          key={ind}
+                          onClick={() => {
+                            setModalOpen(true);
+                            setModalPost(updatedPosting);
+                          }}
+                          {...updatedPosting}
+                        />
+                      );
+                    })
+                  ) : (
+                    <Typography
+                      variant="p"
+                      sx={{
+                        fontWeight: "600",
+                        color: "#222222",
+                        mt: "30px",
+                        textAlign: "centre",
+                      }}
+                    >
+                      No Items Wanted Near You
+                    </Typography>
+                  )}
                 </>
               )}
             </Box>

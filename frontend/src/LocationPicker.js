@@ -53,7 +53,7 @@ export default function LocationPicker({ value, setValue, formik }) {
   React.useEffect(() => {
     let active = true;
 
-    if (!autocompleteService.current && window.google.maps.places) {
+    if (!autocompleteService.current && window.google?.maps.places) {
       autocompleteService.current =
         new window.google.maps.places.AutocompleteService();
     }
