@@ -20,6 +20,7 @@ import { PostAdd } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 
 import { UserContext } from "./contexts/UserContext";
+import { SnackbarContext } from "./contexts/SnackbarContext";
 import { useContext } from "react";
 
 export default function Navigation({ admin }) {
@@ -29,6 +30,8 @@ export default function Navigation({ admin }) {
   const navigate = useNavigate();
 
   const { user, setUser } = useContext(UserContext);
+  const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
+    useContext(SnackbarContext);
 
   const [width, setWidth] = React.useState(window.innerWidth);
   // following code chunk makes sure the menu isn't open when resized to mobile screen
@@ -65,6 +68,9 @@ export default function Navigation({ admin }) {
     sessionStorage.clear(); // clear session storage
     navigate("/"); // Redirect after 3 seconds
     handleClose(); // close menu if
+    setShowSnackbar(true);
+    setSnackbarMessage("Successfully logged out");
+    setSnackbarSeverity("success");
   };
 
   // handle opening of nav bar in mobile

@@ -22,6 +22,7 @@ import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
 
 import { UserContext } from "../contexts/UserContext";
+import { SnackbarContext } from "../contexts/SnackbarContext";
 
 const validationSchema = yup.object({
   email: yup
@@ -37,17 +38,17 @@ const validationSchema = yup.object({
 
 const Login = () => {
   const { user, setUser } = useContext(UserContext);
+  const {
+    showSnackbar,
+    setShowSnackbar,
+    setSnackbarMessage,
+    snackbarMessage,
+    snackbarSeverity,
+    setSnackbarSeverity,
+  } = useContext(SnackbarContext);
 
   const navigate = useNavigate();
-  /*
-  const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
-  if (loggedIn)
-    navigate('/');
-  */
 
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("error"); // 'success' or 'error'
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -101,7 +102,7 @@ const Login = () => {
 
           setSnackbarMessage("Login successful!");
           setSnackbarSeverity("success");
-          setOpenSnackbar(true);
+          setShowSnackbar(true);
           navigate("/"); // Redirect after showing success message
         })
         .catch((error) => {
@@ -110,7 +111,7 @@ const Login = () => {
           alert(`Error signing in: ${error.message}`);
           setSnackbarMessage(`Error signing in: ${error.message}`);
           setSnackbarSeverity("error");
-          setOpenSnackbar(true);
+          setShowSnackbar(true);
         });
       console.log(values, "Submiited Values");
     },
@@ -225,12 +226,18 @@ const Login = () => {
       </Card>
 
       <Snackbar
-        open={openSnackbar}
+        open={showSnackbar}
         autoHideDuration={6000}
-        onClose={() => setOpenSnackbar(false)}
+        onClose={() => {
+          setShowSnackbar(false);
+          setSnackbarMessage("");
+        }}
       >
         <Alert
-          onClose={() => setOpenSnackbar(false)}
+          onClose={() => {
+            setShowSnackbar(false);
+            setSnackbarMessage("");
+          }}
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
         >
