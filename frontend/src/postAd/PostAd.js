@@ -89,7 +89,7 @@ const PostAd = () => {
                 if (values.photos.length !== 0) {
                     for (const photo of values.photos) {
                         const name = photo.name + v4();
-                        const path = `photos / ${folderName} / ${name}`;
+                        const path = `photos/${folderName}/${name}`;
                         const imageRef = ref(firebaseStorage, path);
                         let url = await uploadBytes(imageRef, photo)
                             .then(() => {
