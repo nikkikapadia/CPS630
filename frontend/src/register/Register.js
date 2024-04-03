@@ -32,6 +32,7 @@ const validationSchema = yup.object({
   email: yup
     .string()
     .email("Enter a valid email")
+    .matches(/@torontomu\.ca$/, "Email addresses must end with the domain @torontomu.ca.")
     .required("Email is required"),
   password: yup
     .string()
