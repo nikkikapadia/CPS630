@@ -46,13 +46,15 @@ const validationSchema = yup.object({
       (value) => value && value.length > 0
     ),
   price: yup.number().required("Price is required"),
-  //   locationString: yup.object().required("Location is required"),
+  location: yup.object().required("Location is required"),
   tags: yup.array(),
 });
 
 const PostAd = () => {
   const { user, setUser } = useContext(UserContext);
   const [location, setLocation] = React.useState(null);
+
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -61,7 +63,7 @@ const PostAd = () => {
       description: "",
       price: 0,
       photos: [],
-      //   locationString: "",
+      location: location,
       tags: [],
     },
     validationSchema: validationSchema,
@@ -175,6 +177,7 @@ const PostAd = () => {
 
       // clear fields
       resetForm();
+      navigate('/');
     },
   });
 
@@ -362,7 +365,19 @@ const PostAd = () => {
               </FormLabel>
             </Box>
 
-            <LocationPicker value={location} setValue={setLocation} />
+            <FormControl
+                fullWidth
+                error={formik.touched.location && Boolean(formik.errors.location)}
+            >
+                <LocationPicker
+                    value={location}
+                    setValue={setLocation}
+                    formik={formik}
+                />
+                {formik.touched.location && formik.errors.location ? (
+                    <FormHelperText>{formik.errors.location}</FormHelperText>
+                ) : null}
+            </FormControl>
 
             <Button
               fullWidth

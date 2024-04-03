@@ -106,6 +106,8 @@ export default function LocationPicker({ value, setValue, formik }) {
       value={value}
       noOptionsText="No locations"
       onChange={(event, newValue) => {
+        if (formik !== null && formik !== undefined)
+            formik.setFieldValue("location", newValue);
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
       }}
@@ -115,6 +117,7 @@ export default function LocationPicker({ value, setValue, formik }) {
       renderInput={(params) => (
         <TextField {...params} label="Add a location" fullWidth />
       )}
+      onBlur={formik !== null && formik !== undefined ? formik.handleBlur : null}
       renderOption={(props, option) => {
         const matches =
           option.structured_formatting.main_text_matched_substrings || [];

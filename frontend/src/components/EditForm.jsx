@@ -291,7 +291,19 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
         ) : null}
       </FormControl>
 
-      <LocationPicker value={location} setValue={setLocation} />
+      <FormControl
+        fullWidth
+        error={formik.touched.location && Boolean(formik.errors.location)}
+      >
+        <LocationPicker
+            value={location}
+            setValue={setLocation}
+            formik={formik}
+        />
+        {formik.touched.location && formik.errors.location ? (
+            <FormHelperText>{formik.errors.location}</FormHelperText>
+        ) : null}
+      </FormControl>
 
       <Autocomplete
         multiple
