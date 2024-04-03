@@ -103,10 +103,10 @@ function ViewPostingModal({ open, onClose, post }) {
               <Typography sx={{ mt: 2 }}>
                 <strong>Location:</strong> {postInfo.location?.description}
               </Typography>
-              <MapComponent 
+              <MapComponent
                 selectedLocation={{
                   lat: postInfo.location?.lat,
-                  lng: postInfo.location?.lng
+                  lng: postInfo.location?.lng,
                 }}
               />
               <Typography sx={{ mt: 2, mb: 10 }}>
@@ -119,13 +119,6 @@ function ViewPostingModal({ open, onClose, post }) {
                 href={"/messages"}
               >
                 Chat
-              </Button>
-              <Button
-                variant="contained"
-                sx={{ backgroundColor: "#213555" }}
-                disabled={!user.isLoggedIn}
-              >
-                Purchase
               </Button>
             </>
           ) : (
