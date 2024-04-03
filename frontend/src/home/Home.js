@@ -42,7 +42,7 @@ export function HomePage({ admin }) {
       await fetch(`${apiRoot}/ads/get/itemsWanted`, {
         method: "GET",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
           "Content-Type": "application/json",
         },
       })
@@ -55,7 +55,7 @@ export function HomePage({ admin }) {
       await fetch(`${apiRoot}/ads/get/itemsForSale`, {
         method: "GET",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
           "Content-Type": "application/json",
         },
       })
@@ -68,7 +68,7 @@ export function HomePage({ admin }) {
       await fetch(`${apiRoot}/ads/get/academicServices`, {
         method: "GET",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
           "Content-Type": "application/json",
         },
       })
@@ -154,6 +154,11 @@ export function HomePage({ admin }) {
 // }
 
 function Row({ title, data, admin, setModalOpen, setModalPost }) {
+  const categoryMap = {
+    ItemsForSale: "itemsForSale",
+    ItemsWanted: "itemsWanted",
+    AcademicServices: "academicServices",
+  };
   return (
     <Box sx={homeStyles.row}>
       <h2 style={homeStyles.header}>{title}</h2>
@@ -161,7 +166,7 @@ function Row({ title, data, admin, setModalOpen, setModalPost }) {
         {data.map((posting) => {
           const updatedPosting = {
             ...posting,
-            category: title.replaceAll(" ", ""),
+            category: categoryMap[title.replaceAll(" ", "")],
           };
           return (
             <ActionAreaCard

@@ -19,13 +19,10 @@ import * as yup from "yup";
 import { firebaseStorage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
+import LocationPicker from "../LocationPicker";
 
-function EditForm({ postInfo, setPostInfo, setEdit, user }) {
-  const categoryMap = {
-    ItemsForSale: "itemsForSale",
-    ItemsWanted: "itemsWanted",
-    AcademicServices: "academicService",
-  };
+function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
+  const [location, setLocation] = React.useState(postInfo.location);
 
   const validationSchema = yup.object({
     adTitle: yup
@@ -44,7 +41,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
         (value) => value && value.length > 0
       ),
     price: yup.number().required("Price is required"),
-    location: yup.string().required("Location is required"),
+    location: yup.object().required("Location is required"),
     tags: yup.array(),
   });
 
@@ -52,7 +49,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
   const formik = useFormik({
     initialValues: {
       adTitle: postInfo.title,
-      category: categoryMap[postInfo.category.replaceAll(" ", "")],
+      category: postInfo.category,
       description: postInfo.description,
       price: Number(postInfo.price),
       photos: postInfo.photos,
@@ -64,6 +61,21 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
       const apiRoute = "http://localhost:5001/api";
       const samePhotos =
         values.photos.toString() === postInfo.photos.toString();
+
+      const latlng = await fetch(`${apiRoute}/places/${location.place_id}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          console.log(data);
+          return data.result.geometry.location;
+        });
 
       // Upload photos to folder with same id name or create one
       const uploadPhotosToFirebase = async (folderName) => {
@@ -89,9 +101,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
       const token = user.authToken;
 
       let urls = postInfo.photos;
-      if (
-        categoryMap[postInfo.category.replaceAll(" ", "")] !== values.category
-      ) {
+      if (postInfo.category !== values.category) {
         await newPostAndDelete(
           apiRoute,
           values,
@@ -99,8 +109,10 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
           uploadPhotosToFirebase,
           postInfo,
           samePhotos,
-          categoryMap,
-          user.username
+          user.username,
+          location,
+          latlng,
+          onClose
         );
       } else {
         urls = samePhotos
@@ -121,7 +133,12 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
               description: values.description,
               photos: urls,
               price: values.price,
-              location: values.location,
+              location: {
+                description: location.description,
+                place_id: location.place_id,
+                lat: latlng.lat,
+                lng: latlng.lng,
+              },
               tags: values.tags,
             }),
           }
@@ -143,7 +160,12 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
         description: values.description,
         photos: urls,
         category: values.category,
-        location: values.location,
+        location: {
+          description: location.description,
+          place_id: location.place_id,
+          lat: latlng.lat,
+          lng: latlng.lng,
+        },
         tags: values.tags,
       });
 
@@ -269,19 +291,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user }) {
         ) : null}
       </FormControl>
 
-      <TextField
-        label="Location"
-        id="location"
-        type="text"
-        name="location"
-        fullWidth
-        variant="outlined"
-        value={formik.values.location}
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        error={formik.touched.location && Boolean(formik.errors.location)}
-        helperText={formik.touched.location && formik.errors.location}
-      />
+      <LocationPicker value={location} setValue={setLocation} />
 
       <Autocomplete
         multiple
@@ -332,8 +342,10 @@ async function newPostAndDelete(
   uploadPhotosToFirebase,
   postInfo,
   samePhotos,
-  categoryMap,
-  username
+  username,
+  location,
+  latlng,
+  onClose
 ) {
   // make POST request with empty photos array ---> returns id created for post
   let result = await fetch(`${apiRoute}/ads/new/${values.category}`, {
@@ -350,7 +362,12 @@ async function newPostAndDelete(
       author: username,
       photos: samePhotos ? values.photos : [],
       price: values.price,
-      location: values.location,
+      location: {
+        description: location.description,
+        place_id: location.place_id,
+        lat: latlng.lat,
+        lng: latlng.lng,
+      },
       tags: values.tags,
     }),
   })
@@ -395,9 +412,7 @@ async function newPostAndDelete(
 
   // Delete ad in other category
   result = await fetch(
-    `${apiRoute}/ads/delete/${
-      categoryMap[postInfo.category.replaceAll(" ", "")]
-    }/id/${postInfo._id}`,
+    `${apiRoute}/ads/delete/${postInfo.category}/id/${postInfo._id}`,
     {
       method: "DELETE",
       headers: {
@@ -414,6 +429,6 @@ async function newPostAndDelete(
       return data;
     });
 
-  // reload page to show change on page
-  window.location.reload();
+  // close modal
+  onClose();
 }
