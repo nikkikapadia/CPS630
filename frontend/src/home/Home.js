@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback } from "react";
+import { useContext, useEffect } from "react";
 import "./Home.css";
 import "@fontsource/inter";
 import Typography from "@mui/material/Typography";
@@ -8,68 +8,177 @@ import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { Box, Button } from "@mui/material";
-import { itemsForSale, itemsWanted, academicServices } from "./mockData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
-function HomeSearch() {
-  const [searchValue, setSearchValue] = React.useState("");
-  return (
-    <div style={homeStyles.gradient}>
-      <h1>Search Here!</h1>
-      <SearchBar value={searchValue} handleChange={setSearchValue} />
-    </div>
-  );
-}
+import { UserContext } from "../contexts/UserContext";
+import ViewPostingModal from "../components/ViewPostingModal";
+import { SearchBar, categories } from "../components/SearchBar";
+
+// function HomeSearch() {
+//   const [searchValue, setSearchValue] = React.useState("");
+//   return (
+//     <div style={homeStyles.gradient}>
+//       <h1>Search Here!</h1>
+//       <SearchBar value={searchValue} handleChange={setSearchValue} />
+//     </div>
+//   );
+// }
 
 export function HomePage({ admin }) {
+  const { user, setUser } = useContext(UserContext);
+
+  const [wantedData, setWantedData] = React.useState([]);
+  const [saleData, setSaleData] = React.useState([]);
+  const [servicesData, setServicesData] = React.useState([]);
+
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalPost, setModalPost] = React.useState({});
+
+  const apiRoot = "http://localhost:5001/api";
+
+  useEffect(() => {
+    async function fetchData() {
+      await fetch(`${apiRoot}/ads/get/itemsWanted`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => !data.error && setWantedData(data))
+        .catch((error) => {
+          console.error("Error fetching wanted data:", error);
+        });
+
+      await fetch(`${apiRoot}/ads/get/itemsForSale`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => !data.error && setSaleData(data))
+        .catch((error) => {
+          console.error("Error fetching wanted data:", error);
+        });
+
+      await fetch(`${apiRoot}/ads/get/academicServices`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => !data.error && setServicesData(data))
+        .catch((error) => {
+          console.error("Error fetching wanted data:", error);
+        });
+    }
+
+    fetchData();
+  }, [modalPost]);
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setModalPost({});
+  };
+
+  const [searchValue, setSearchValue] = React.useState("");
+  const [selectedCategory, setSelectedCategory] = React.useState(categories[0]);
+
   return (
     <>
-      <HomeSearch />
-      <Row title={"Items Wanted"} data={itemsWanted} admin={admin} />
-      <Row title={"Items For Sale"} data={itemsForSale} admin={admin} />
-      <Row title={"Academic Services"} data={academicServices} admin={admin} />
+      <SearchBar
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
+      {/* <HomeSearch /> */}
+      <Row
+        title={"Items Wanted"}
+        data={wantedData}
+        admin={admin}
+        setModalOpen={setModalOpen}
+        setModalPost={setModalPost}
+      />
+      <Row
+        title={"Items For Sale"}
+        data={saleData}
+        admin={admin}
+        setModalOpen={setModalOpen}
+        setModalPost={setModalPost}
+      />
+      <Row
+        title={"Academic Services"}
+        data={servicesData}
+        admin={admin}
+        setModalOpen={setModalOpen}
+        setModalPost={setModalPost}
+      />
+      <ViewPostingModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        post={modalPost}
+      />
     </>
   );
 }
 
-function SearchBar({ value, handleChange }) {
-  const onChange = useCallback(
-    (event) => handleChange(event.target.value),
-    [handleChange]
-  );
+// function SearchBar({ value, handleChange }) {
+//   const onChange = useCallback(
+//     (event) => handleChange(event.target.value),
+//     [handleChange]
+//   );
 
-  return (
-    <div className="search">
-      <input
-        type="text"
-        placeholder="Search"
-        value={value}
-        onChange={onChange}
-        className="search-input"
-      />
-      <img
-        src={require("../images/search.png")}
-        className="search-logo"
-        alt="search"
-      />
-    </div>
-  );
-}
+//   return (
+//     <div className="search">
+//       <input
+//         type="text"
+//         placeholder="Search"
+//         value={value}
+//         onChange={onChange}
+//         className="search-input"
+//       />
+//       <img
+//         src={require("../images/search.png")}
+//         className="search-logo"
+//         alt="search"
+//       />
+//     </div>
+//   );
+// }
 
-function Row({ title, data, admin }) {
+function Row({ title, data, admin, setModalOpen, setModalPost }) {
+  const categoryMap = {
+    ItemsForSale: "itemsForSale",
+    ItemsWanted: "itemsWanted",
+    AcademicServices: "academicServices",
+  };
   return (
     <Box sx={homeStyles.row}>
       <h2 style={homeStyles.header}>{title}</h2>
       <Box sx={homeStyles.cardRow}>
         {data.map((posting) => {
+          const updatedPosting = {
+            ...posting,
+            category: categoryMap[title.replaceAll(" ", "")],
+          };
           return (
             <ActionAreaCard
-              title={posting.name}
+              title={posting.title}
               description={posting.description}
               price={posting.price}
-              img={posting.picture}
+              img={posting.photos[0]}
               admin={admin}
+              onClick={() => {
+                setModalOpen(true);
+                setModalPost(updatedPosting);
+              }}
             />
           );
         })}
@@ -78,19 +187,19 @@ function Row({ title, data, admin }) {
   );
 }
 
-function ActionAreaCard({ title, description, price, img, admin }) {
+function ActionAreaCard({ title, description, price, img, admin, onClick }) {
   // edit these when we have pages to go to
   const handleDeleteClick = () => {};
   const handleEditClick = () => {};
   // gonna change all if this but the general layout is important
   return (
     <Card sx={{ width: 300, flex: "0 0 auto" }}>
-      <CardActionArea sx={homeStyles.cardClickable}>
+      <CardActionArea sx={homeStyles.cardClickable} onClick={onClick}>
         <CardMedia
           component="img"
           height="140"
           image={img ? img : require("../images/default.png")}
-          alt="green iguana"
+          alt={title}
         />
         <CardContent sx={homeStyles.cardContent}>
           <div>
@@ -107,7 +216,7 @@ function ActionAreaCard({ title, description, price, img, admin }) {
             </Typography>
           </div>
           <div style={homeStyles.priceRow}>
-            <Typography variant="h5">{price}</Typography>
+            <Typography variant="h5">${Number(price).toFixed(2)}</Typography>
             {admin && (
               <>
                 <Button

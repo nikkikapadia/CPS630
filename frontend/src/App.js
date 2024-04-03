@@ -9,39 +9,65 @@ import ItemsForSale from "./itemsForSale/ItemsForSale";
 import Services from "./academicServices/AcademicServices";
 import PostAd from "./postAd/PostAd";
 import Register from "./register/Register";
-import { useState } from "react";
 import AllPosts from "./allPosts/AllPosts";
 import Users from "./users/Users";
 import Messages from "./messages/Messages";
+import { auth } from "./firebase-config";
+
+import { UserContext } from "./contexts/UserContext";
+import { useContext } from "react";
 
 function App() {
-  // set state as true to see admin dashboard
-  const [admin] = useState(false);
+  const { user, setUser } = useContext(UserContext);
+
+  // since the auth token changes every hour but the session variable doesn't
+  if (user.isLoggedIn) {
+    auth.onIdTokenChanged(async (token) => {
+        setUser({ ...user, authToken: await token.getIdToken() });
+    });
+  }
 
   return (
     <div className="App">
-      <Navigation admin={admin} />
-      <Routes>
-        <Route
-          path="/"
-          element={admin ? <AllPosts /> : <HomePage admin={admin} />}
-        />
-        {/* replace these when the pages are made */}
-        <Route path="/wanted" element={<ItemsWanted />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/sale" element={<ItemsForSale />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/postAd" element={<PostAd />} />
-        <Route path="/settings" element={<div></div>} />
-        <Route path="/profile" element={<div></div>} />
-        <Route path="/myposts" element={<div></div>} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/messages/:chatId" element={<Messages />} />
-        {admin && <Route path="/posts" element={<AllPosts />} />}
-        {admin && <Route path="/users" element={<Users />} />}
-        <Route path="*" element={<Page404 />} />
-      </Routes>
+      <UserContext.Provider value={{ user, setUser }}>
+        <Navigation admin={user.isAdmin} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              user.isAdmin ? <AllPosts /> : <HomePage admin={user.isAdmin} />
+            }
+          />
+          {/* replace these when the pages are made */}
+          <Route path="/wanted" element={<ItemsWanted />} />
+          <Route
+            path="/login"
+            element={
+              user.isLoggedIn ? <HomePage admin={user.isAdmin} /> : <Login />
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              user.isLoggedIn ? <HomePage admin={user.isAdmin} /> : <Register />
+            }
+          />
+          <Route path="/sale" element={<ItemsForSale />} />
+          <Route path="/services" element={<Services />} />
+          <Route
+            path="/postAd"
+            element={user.isLoggedIn ? <PostAd /> : <Login />}
+          />
+          <Route path="/settings" element={<div></div>} />
+          <Route path="/profile" element={<div></div>} />
+          <Route path="/myposts" element={<div></div>} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:chatId" element={<Messages />} />
+          {user.isAdmin && <Route path="/posts" element={<AllPosts />} />}
+          {user.isAdmin && <Route path="/users" element={<Users />} />}
+          <Route path="*" element={<Page404 />} />
+        </Routes>
+      </UserContext.Provider>
     </div>
   );
 }

@@ -22,6 +22,7 @@
     align-items: center;
     text-align: center;
     gap: 1em;
+    background-color: #213555;
 }
 
 .accountBox {
