@@ -228,54 +228,51 @@ export default function Navigation({ admin }) {
                 zIndex: 0,
               },
             },
+            "&::before": {
+              content: '""',
+              display: "block",
+              position: "absolute",
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
+              zIndex: 0,
+            },
           }}
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <MenuItem onClick={handleClose}>
-            <Avatar /> Profile
-          </MenuItem>
-          <MenuItem onClick={handleClose}>
-            <Avatar /> My account
-          </MenuItem>
-          <MenuItem>
-            <ListItemIcon>
-              <ArticleIcon fontSize="small" />
-            </ListItemIcon>
-            My Posts
-          </MenuItem>
-          <MenuItem onClick={() => navigate("/messages")}>
-            <ListItemIcon>
-              <SendIcon fontSize="small" />
-            </ListItemIcon>
-            Messages
-          </MenuItem>
-          <MenuItem onClick={() => navigate("/postAd")}>
-            <ListItemIcon>
-              <PostAdd fontSize="small" />
-            </ListItemIcon>
-            Post Ad
-          </MenuItem>
-          <Divider />
-          <MenuItem onClick={handleClose}>
-            <ListItemIcon>
-              <AccountCircleIcon />
-            </ListItemIcon>
-            Profile
-          </MenuItem>
-          <MenuItem onClick={handleClose}>
-            <ListItemIcon>
-              <Settings fontSize="small" />
-            </ListItemIcon>
-            Settings
-          </MenuItem>
-          <MenuItem onClick={handleLogout}>
-            <ListItemIcon>
-              <Logout fontSize="small" />
-            </ListItemIcon>
-            Logout
-          </MenuItem>
-        </Menu>
+        <MenuItem onClick={() => navigate("/profile")}>
+          <Avatar /> My Account
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <ArticleIcon fontSize="small" />
+          </ListItemIcon>
+          My Posts
+        </MenuItem>
+        <MenuItem onClick={() => navigate("/messages")}>
+          <ListItemIcon>
+            <SendIcon fontSize="small" />
+          </ListItemIcon>
+          Messages
+        </MenuItem>
+        <MenuItem onClick={() => navigate("/postAd")}>
+          <ListItemIcon>
+            <PostAdd fontSize="small" />
+          </ListItemIcon>
+          Post Ad
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <Logout fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
       )}
     </React.Fragment>
   );

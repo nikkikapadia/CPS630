@@ -42,26 +42,11 @@ app.get("/api/places/:placeID", async (req, res) => {
     catch (error) {
         res.status(400).json({ error: error.message });
     }
-});
+})
 
 
 // GET user by id
 app.get("/api/users/get/id/:id", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
-    const result = await User.findOne({ email: req.requestingUser.email }).select(
-        ["isAdmin", "username"]
-    );
-    const isAdmin = result.isAdmin;
-    if (isAdmin == null)
-        return res
-            .status(400)
-            .json({ error: "Can not find user in database to validate credentials" });
-    // if user not admin, check if they are getting their own info
-    else if (isAdmin == false && req.params.username != result.username)
-        return res
-            .status(400)
-            .json({ error: "User not admin or not authorized to make this request" });
-
     try {
         const user = await User.find({ _id: req.params.id });
         res.status(200).json(user);
@@ -72,21 +57,6 @@ app.get("/api/users/get/id/:id", async (req, res) => {
 
 // GET user by email
 app.get("/api/users/get/email/:email", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
-    const result = await User.findOne({ email: req.requestingUser.email }).select(
-        ["isAdmin", "username"]
-    );
-    const isAdmin = result.isAdmin;
-    if (isAdmin == null)
-        return res
-            .status(400)
-            .json({ error: "Can not find user in database to validate credentials" });
-    // if user not admin, check if they are getting their own info
-    else if (isAdmin == false && req.params.username != result.username)
-        return res
-            .status(400)
-            .json({ error: "User not admin or not authorized to make this request" });
-
     try {
         const user = await User.find({ email: req.params.email });
         res.status(200).json(user);
@@ -97,21 +67,6 @@ app.get("/api/users/get/email/:email", async (req, res) => {
 
 // GET user by username
 app.get("/api/users/get/username/:username", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
-    const result = await User.findOne({ email: req.requestingUser.email }).select(
-        ["isAdmin", "username"]
-    );
-    const isAdmin = result.isAdmin;
-    if (isAdmin == null)
-        return res
-            .status(400)
-            .json({ error: "Can not find user in database to validate credentials" });
-    // if user not admin, check if they are getting their own info
-    else if (isAdmin == false && req.params.username != result.username)
-        return res
-            .status(400)
-            .json({ error: "User not admin or not authorized to make this request" });
-            
     try {
         const user = await User.find({ username: req.params.username });
         res.status(200).json(user);
@@ -122,7 +77,7 @@ app.get("/api/users/get/username/:username", async (req, res) => {
 
 // GET all users
 app.get("/api/users/get", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
+    // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         "isAdmin"
     );
@@ -161,7 +116,7 @@ app.post("/api/users/new", async (req, res) => {
 
 // PATCH (update) a user by username
 app.patch("/api/users/update/username/:username", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
+    // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -196,7 +151,7 @@ app.patch("/api/users/update/username/:username", async (req, res) => {
 
 // PATCH (update) a user by email
 app.patch("/api/users/update/email/:email", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
+    // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -229,19 +184,9 @@ app.patch("/api/users/update/email/:email", async (req, res) => {
     }
 });
 
-// PATCH (Update) currently logged-in user
-app.patch('/api/users/update/me', async (req, res) => {
-    try {
-        const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, { new: true});
-        res.status(200).json(updatedUser)
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-});
-
 // DELETE a user by username
 app.delete("/api/users/delete/username/:username", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
+    // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -266,7 +211,7 @@ app.delete("/api/users/delete/username/:username", async (req, res) => {
 
 // DELETE a user by email
 app.delete("/api/users/delete/email/:email", async (req, res) => {
-    // verify user is admin (middleware passes requesting user's email based on their token)
+    // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -357,30 +302,6 @@ app.get("/api/ads/get/:category/author/:author", async (req, res) => {
     }
 });
 
-// GET ads by current user
-app.get('/api/ads/get/author/:author', async (req, res) => {
-    try {
-        // fetch both wanted and for sale items by the user
-        const wantedItems = await ItemWanted.find({ postedBy: req.params.author});
-        const forSaleItems = await ItemForSale.find({ postedBy: req.params.author });
-        const academicServices = await AcademicService.find({ postedBy: req.params.author });
-
-        // Combine the results
-        const ads = {
-            wantedItems,
-            forSaleItems,
-            academicServices
-        };
-
-        console.log(ads);
-
-        res.status(200).json(ads);
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({ message: 'Error fetching user ads'});
-    }
-});
-
 // POST (create) a new ad under a category
 app.post("/api/ads/new/:category", async (req, res) => {
     if (!validCategory(req.params.category))
@@ -408,7 +329,7 @@ app.patch("/api/ads/update/:category/id/:id", async (req, res) => {
 
     const AdModel = categoryModelMap[req.params.category];
 
-    // verify user is admin (middleware passes requesting user's email based on their token)
+    // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -442,7 +363,6 @@ app.patch("/api/ads/update/:category/id/:id", async (req, res) => {
     }
 });
 
-
 // DELETE an ad by under a category by id
 app.delete("/api/ads/delete/:category/id/:id", async (req, res) => {
     if (!validCategory(req.params.category))
@@ -453,7 +373,7 @@ app.delete("/api/ads/delete/:category/id/:id", async (req, res) => {
 
     const AdModel = categoryModelMap[req.params.category];
 
-    // verify user is admin (middleware passes requesting user's email based on their token)
+    // verify user is admin
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );

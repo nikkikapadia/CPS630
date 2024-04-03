@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Box, Card, CardContent, Typography, TextField, Button } from "@mui/material";
 import EditAdModal from './EditAdModal';
 import EditProfileModal from './EditProfileModal';
-import { useUser } from '../contexts/UserContext';
 
+import { UserContext } from "../contexts/UserContext";
 
 
 const UserProfile = () => {
@@ -11,65 +11,71 @@ const UserProfile = () => {
   const [ads, setAds] = useState([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAd, setSelectedAd] = useState(null)
-  const { user } = useUser();
+  
+  const { user, setUser } = useContext(UserContext); 
+  
+  // NOTE: user object has all properties you need to display/edit user info
 
+  const fetchUserAds = async () => {
+    const token = user.authToken;
+    let items = [];
+    await fetch(`http://localhost:5001/api/ads/get/itemsWanted/author/${user.username}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${token}`
+        }
+    })
+    .then(res => {
+        return res.json();
+    })
+    .then(data => {
+        let temp = data;
+        temp.forEach(ad => { ad.category = 'Items Wanted'; });
+        items.push(...temp);
+        return fetch(`http://localhost:5001/api/ads/get/itemsForSale/author/${user.username}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+            }
+        });
+    })
+    .then(res => {
+        return res.json();
+    })
+    .then(data => {
+        let temp = data;
+        temp.forEach(ad => { ad.category = 'Items For Sale'; });
+        items.push(...temp);
+        return fetch(`http://localhost:5001/api/ads/get/academicServices/author/${user.username}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+            }
+        });
+    })
+    .then(res => {
+        return res.json();
+    })
+    .then(data => {
+        let temp = data;
+        temp.forEach(ad => { ad.category = 'Academic Services'; });
+        items.push(...temp);
+        setAds(items);
+        console.log('ads by user: ', ads);
+    });
+  }
 
   useEffect(() => {
-    fetchUserInfo();
     fetchUserAds();
-  }, [user]); // dependency to re-fetch when user changes
+  }, []);
 
-
-  const fetchUserInfo = async () => {
-
-    console.log('got here ');
-    try {
-      const response = await fetch('api/users/me', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.authToken}`,
-        },
-      },);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user info');
-      }
-
-      const data = await response.json();
-      console.log(data); // Check the structure of the response
-      setUserInfo({
-        name: data.fullName,
-        email: data.email,
-      });
-    } catch (error) {
-      console.error('Error fetching user info:', error);
-    }
-  };
   
-  const fetchUserAds = async () => {
-    const token = user.authToken; 
-    try {
-      const response = await fetch(`/api/ads/author/${user.username}`, { 
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch ads');
-      }
-
-      const data = await response.json();
-      setAds(data);
-    } catch (error) {
-      console.error('Error fetching user ads:', error);
-    }
-  };
-
-
-
   const handleUpdateUserInfo = (e) => {
       e.preventDefault();
       console.log('Updated Info:', userInfo);
