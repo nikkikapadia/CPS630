@@ -82,33 +82,39 @@ const UserProfile = () => {
   };
 
   const handleEditAd = (ad) => {
+    console.log(ad._id); 
     setSelectedAd(ad);
     setEditModalOpen(true);
   };
 
-  
   const handleSaveAdChanges = async (editedAd) => {
-    const token = user.authToken;
+    const token = user.authToken; // Ensure you have the user's auth token
+    const { title, description } = editedAd; // Destructure the needed properties
+  
     try {
-      const response = await fetch(`/api/ads/update/${editedAd.category}/${editedAd.id}`, {
-        method: 'PATCH',
+      const response = await fetch(`http://localhost:5001/api/ads/update/${editedAd.category}/id/${editedAd._id}`, {
+        method: "PATCH",
         headers: {
-          'Authorization' : `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(editedAd),
+        body: JSON.stringify({ title, description }), // Only send title and description in the request body
       });
-
+  
       if (!response.ok) {
         throw new Error(`Failed to update ad. Status: ${response.status}`);
       }
-
-      setEditModalOpen(false);
-      fetchUserAds(); // Refresh ads
+  
+      const data = await response.json();
+      console.log('Update successful:', data);
+  
+      // Update local state or re-fetch ads to reflect changes
+      fetchUserAds(); // Assuming this is a function you have to refresh the ads shown
     } catch (error) {
-      console.error('Error updated ad: ', error)
+      console.error('Error updating ad:', error);
     }
-  };  
+  };
 
   // const handleSaveProfile = async (updatedUserInfo) => {
   //   const token = user.authToken;
@@ -141,18 +147,24 @@ const UserProfile = () => {
           <Typography variant="h4" sx={{ mb: 2 }}>User Profile</Typography>
           <Box sx={{ mb: 4 }}>
             <Typography variant="h6" sx={{ mb: 1 }}>Personal Information</Typography>
-            <Typography>Name: {userInfo.name}</Typography>
-            <Typography>Email: {userInfo.email}</Typography>
+            <Typography>Username: {user.username}</Typography>
+            <Typography>Email: {user.email}</Typography>
           </Box>
           <Box sx={{ mb: 4 }}>
             <Typography variant="h6" sx={{ mb: 1 }}>Your Ads</Typography>
             {ads.map((ad) => (
-              <Box key={ad.id} sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
-                <Typography>{`${ad.title}: ${ad.description}`}</Typography>
-                <Button onClick={() => handleEditAd(ad)} variant="contained">Edit</Button>
+              <Box key={ad._id} sx={{ mb: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <Typography variant="h5">{ad.title}</Typography>
+                <Typography>{ad.description}</Typography>
+                {/* Render photos */}
+                {ad.photos.map((photoUrl, index) => (
+                  <img key={index} src={photoUrl} alt={`Ad photo ${index + 1}`} style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }} />
+                ))}
+                <Button onClick={() => handleEditAd(ad)} variant="contained" sx={{ mt: 2 }}>Edit</Button>
               </Box>
             ))}
           </Box>
+
         </CardContent>
       </Card>
       {selectedAd && (

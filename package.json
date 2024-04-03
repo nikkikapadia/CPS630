@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@react-google-maps/api": "^2.19.3",
+    "autosuggest-highlight": "^3.3.4"
+  }
+}

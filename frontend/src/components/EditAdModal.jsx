@@ -8,6 +8,7 @@ function EditAdModal({ open, onClose, adInfo, onSave }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(editedAd._id)
     onSave(editedAd); // Pass the edited ad back to UserProfile
     onClose(); // Close the modal
   };
