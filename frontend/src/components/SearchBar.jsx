@@ -31,6 +31,22 @@ const SearchBar = ({
     setAnchorEl(null);
   };
 
+  const [width, setWidth] = useState(window.innerWidth);
+  const [mobile, setMobile] = useState(window.innerWidth <= 770);
+  // following code chunk makes sure the search bar transforms on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+      setMobile(window.innerWidth <= 770);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [width]);
+
   const navigate = useNavigate();
 
   const pushToCategoryPage = () => {
@@ -66,6 +82,13 @@ const SearchBar = ({
     }
   }, [pathname]);
 
+  // functon to submit on enter
+  function keyPress(e) {
+    if (e.keyCode === 13) {
+      pushToCategoryPage();
+    }
+  }
+
   return (
     <div style={styles.gradient}>
       <Box
@@ -76,7 +99,8 @@ const SearchBar = ({
         minHeight={"55px"}
         bgcolor={"white"}
         mx={"auto"}
-        my={"12px"}
+        mt={"12px"}
+        mb={mobile ? "0px" : "12px"}
         display={"flex"}
       >
         {/* Search Input */}
@@ -84,8 +108,9 @@ const SearchBar = ({
         <TextField
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
+          onKeyDown={keyPress}
           sx={{
-            width: "55%",
+            width: mobile ? "100%" : "55%",
             height: "100%",
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
@@ -116,63 +141,67 @@ const SearchBar = ({
           placeholder="What are you looking for?"
         />
 
-        <Box
-          width={"25%"}
-          component={"div"}
-          sx={{ cursor: "pointer" }}
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"space-between"}
-          onClick={handleClick}
-          borderLeft={"1px solid #dedede"}
-        >
-          <Box display={"flex"} alignItems={"center"} gap={1.5} px={"20px"}>
-            <Dashboard />
-            <Box textAlign={"left"}>
-              <Typography
-                textAlign={"left"}
-                component={"span"}
-                fontSize={"14px"}
-                color={"#ddd"}
-              >
-                Categories
-              </Typography>
-              <Typography component={"p"} fontSize={"18px"} color={"black"}>
-                {selectedCategory.label}
-              </Typography>
+        {!mobile && (
+          <>
+            <Box
+              width={"25%"}
+              component={"div"}
+              sx={{ cursor: "pointer" }}
+              display={"flex"}
+              alignItems={"center"}
+              justifyContent={"space-between"}
+              onClick={handleClick}
+              borderLeft={"1px solid #dedede"}
+            >
+              <Box display={"flex"} alignItems={"center"} gap={1.5} px={"20px"}>
+                <Dashboard />
+                <Box textAlign={"left"}>
+                  <Typography
+                    textAlign={"left"}
+                    component={"span"}
+                    fontSize={"14px"}
+                    color={"#ddd"}
+                  >
+                    Categories
+                  </Typography>
+                  <Typography component={"p"} fontSize={"18px"} color={"black"}>
+                    {selectedCategory.label}
+                  </Typography>
+                </Box>
+              </Box>
+              <KeyboardArrowDown color={"#ddd"} fontSize="medium" />
             </Box>
-          </Box>
-          <KeyboardArrowDown color={"#ddd"} fontSize="medium" />
-        </Box>
 
-        {/* Menu Dropdown For category */}
+            {/* Menu Dropdown For category */}
 
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          MenuListProps={{
-            "aria-labelledby": "basic-button",
-          }}
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-          transformOrigin={{ vertical: "top", horizontal: "left" }}
-          sx={{ width: "100%" }}
-        >
-          {categories.map((category) => {
-            return (
-              <MenuItem
-                key={category.value}
-                onClick={() => {
-                  setSelectedCategory(category);
-                  handleClose();
-                }}
-              >
-                {category.label}
-              </MenuItem>
-            );
-          })}
-        </Menu>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              transformOrigin={{ vertical: "top", horizontal: "left" }}
+              sx={{ width: "100%" }}
+            >
+              {categories.map((category) => {
+                return (
+                  <MenuItem
+                    key={category.value}
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      handleClose();
+                    }}
+                  >
+                    {category.label}
+                  </MenuItem>
+                );
+              })}
+            </Menu>
+          </>
+        )}
         <Box
           sx={{
             display: "flex",
@@ -186,7 +215,7 @@ const SearchBar = ({
             variant="outlined"
             sx={{
               width: "90%",
-              height: "56px",
+              height: "100%",
               borderColor: "#213555",
               color: "#213555",
               textTransform: "capitalize",
@@ -197,6 +226,73 @@ const SearchBar = ({
           </Button>
         </Box>
       </Box>
+
+      {/* on mobile it puts category dropdown underneath search bar*/}
+      {mobile && (
+        <>
+          <Box
+            width={"100%"}
+            component={"div"}
+            sx={{ cursor: "pointer" }}
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"space-between"}
+            onClick={handleClick}
+            border={"1px solid #dedede"}
+            borderRadius={"8px"}
+            padding={"8px 0px"}
+            backgroundColor={"white"}
+            marginBottom={"12px"}
+          >
+            <Box display={"flex"} alignItems={"center"} gap={1.5} px={"20px"}>
+              <Dashboard />
+              <Box textAlign={"left"}>
+                <Typography
+                  textAlign={"left"}
+                  component={"span"}
+                  fontSize={"14px"}
+                  color={"#ddd"}
+                >
+                  Categories
+                </Typography>
+                <Typography component={"p"} fontSize={"18px"} color={"black"}>
+                  {selectedCategory.label}
+                </Typography>
+              </Box>
+            </Box>
+            <KeyboardArrowDown color={"#ddd"} fontSize="medium" />
+          </Box>
+
+          {/* Menu Dropdown For category */}
+
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            transformOrigin={{ vertical: "top", horizontal: "left" }}
+            sx={{ width: "100%" }}
+          >
+            {categories.map((category) => {
+              return (
+                <MenuItem
+                  key={category.value}
+                  onClick={() => {
+                    setSelectedCategory(category);
+                    handleClose();
+                  }}
+                >
+                  {category.label}
+                </MenuItem>
+              );
+            })}
+          </Menu>
+        </>
+      )}
     </div>
   );
 };
