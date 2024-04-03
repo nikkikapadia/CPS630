@@ -88,7 +88,7 @@ const UserProfile = () => {
   };
 
   const handleSaveAdChanges = async (editedAd) => {
-    const token = user.authToken; // Ensure you have the user's auth token
+    const token = user.authToken; 
     const { title, description } = editedAd; // Destructure the needed properties
   
     try {
@@ -99,7 +99,7 @@ const UserProfile = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, description }), // Only send title and description in the request body
+        body: JSON.stringify({ editedAd }),
       });
   
       if (!response.ok) {
@@ -110,7 +110,7 @@ const UserProfile = () => {
       console.log('Update successful:', data);
   
       // Update local state or re-fetch ads to reflect changes
-      fetchUserAds(); // Assuming this is a function you have to refresh the ads shown
+      fetchUserAds(); 
     } catch (error) {
       console.error('Error updating ad:', error);
     }
