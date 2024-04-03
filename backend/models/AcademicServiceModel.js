@@ -1,38 +1,60 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const academicServicesSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-    },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  postDate: {
+    type: Date,
+    required: true,
+  },
+  location: {
     description: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
-    postDate: {
-        type: Date,
-        required: true,
+    lat: {
+      type: Number,
+      required: true,
     },
-    location: {
-        type: String,
-        required: true,
+    lng: {
+      type: Number,
+      required: true,
     },
-    tags: [{
-        type: String,
-        required: false,
-    }],
-    photos: [{
-        type: String,
-        required: true,
-    }],
-    price: {
-        type: Number,
-        required: true,
+    place_id: {
+      type: String,
+      required: true,
     },
-    author: {
-        type: String,
-        required: true,
-    }
+  },
+  tags: [
+    {
+      type: String,
+      required: false,
+    },
+  ],
+  photos: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  price: {
+    type: Number,
+    required: true,
+  },
+  author: {
+    type: String,
+    required: true,
+  },
 });
 
-module.exports = mongoose.model('AcademicServices', academicServicesSchema, 'Academic Services');
+module.exports = mongoose.model(
+  "AcademicServices",
+  academicServicesSchema,
+  "Academic Services"
+);

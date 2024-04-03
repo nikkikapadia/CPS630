@@ -14,19 +14,17 @@ import React, { useState, useContext } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as yup from "yup";
-//import { auth } from '../firebase-config';
+import { auth } from "../firebase-config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
-import { auth } from '../firebase'
-import { UserContext } from '../contexts/UserContext';
+
+import { UserContext } from "../contexts/UserContext";
 
 const validationSchema = yup.object({
-  fullName: yup
-    .string()
-    .required("Full Name is required"),
+  fullName: yup.string().required("Full Name is required"),
   username: yup
     .string()
     .min(8, "Username should be of minimum 8 characters length")
@@ -51,8 +49,8 @@ const Register = () => {
   const navigate = useNavigate();
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); // 'success' or 'error'
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("error"); // 'success' or 'error'
 
   const formik = useFormik({
     initialValues: {
@@ -68,68 +66,70 @@ const Register = () => {
       if (values.isAgreed) {
         createUserWithEmailAndPassword(auth, values.email, values.password)
           .then(async (userCredential) => {
-            console.log(userCredential.user, "User Created Successfully")
+            console.log(userCredential.user, "User Created Successfully");
 
             const firebaseUID = userCredential.user.uid;
             const token = userCredential.user.accessToken;
 
             // Set 'isLoggedIn' to true and store 'authToken'
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('authToken', token);
-            sessionStorage.setItem('email', values.email);
-            sessionStorage.setItem('fullName', values.fullName);
-            sessionStorage.setItem('isAdmin', 'false');
-            sessionStorage.setItem('username', values.username);
-            
+            sessionStorage.setItem("isLoggedIn", "true");
+            sessionStorage.setItem("authToken", token);
+            sessionStorage.setItem("email", values.email);
+            sessionStorage.setItem("fullName", values.fullName);
+            sessionStorage.setItem("isAdmin", "false");
+            sessionStorage.setItem("username", values.username);
 
-            const userInfo = await fetch(`http://localhost:5000/api/users/new`, {
-                method: 'POST',
+            const userInfo = await fetch(
+              `http://localhost:5001/api/users/new`,
+              {
+                method: "POST",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                  authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    'username': values.username,
-                    'email': values.email,
-                    'fullName': values.fullName,
-                    'firebaseUID': firebaseUID
-                })
-            })
-            .then(res => {
-                return res.json()
-            })
-            .then(data => {
+                  username: values.username,
+                  email: values.email,
+                  fullName: values.fullName,
+                }),
+              }
+            )
+              .then((res) => {
+                return res.json();
+              })
+              .then((data) => {
                 return data;
-            });
+              });
 
-            sessionStorage.setItem('_id', userInfo._id);
+            sessionStorage.setItem("_id", userInfo._id);
 
             setUser({
-                isLoggedIn: true,
-                username: userInfo.username,
-                email: userInfo.email,
-                fullName: userInfo.fullName,
-                isAdmin: userInfo.isAdmin,
-                _id: userInfo._id,
-                authToken: token
+              isLoggedIn: true,
+              username: userInfo.username,
+              email: userInfo.email,
+              fullName: userInfo.fullName,
+              isAdmin: userInfo.isAdmin,
+              _id: userInfo._id,
+              authToken: token,
             });
 
-            setSnackbarMessage('Registration successful! You are now logged in.');
+            setSnackbarMessage(
+              "Registration successful! You are now logged in."
+            );
             setOpenSnackbar(true); // Show success Snackbar
-            navigate('/');
+            navigate("/");
           })
           .catch((error) => {
             // Register failure
             console.error("Error registering: ", error.message);
             alert(`Error registering: ${error.message}`);
             setSnackbarMessage(`Error registering: ${error.message}`);
-            setSnackbarSeverity('error');
+            setSnackbarSeverity("error");
             setOpenSnackbar(true);
           });
       } else {
         console.log("User did not agree to terms");
-        
       }
       console.log(values, "Submiited Values");
     },
@@ -139,7 +139,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpenSnackbar(false);
@@ -176,43 +176,43 @@ const Register = () => {
               Register
             </Typography>
             <TextField
-                label="Full Name"
-                id="fullName"
-                name="fullName"
+              label="Full Name"
+              id="fullName"
+              name="fullName"
+              fullWidth
+              variant="outlined"
+              value={formik.values.fullName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+              helperText={formik.touched.fullName && formik.errors.fullName}
+            />
+            <Box sx={{ width: "100%" }}>
+              <TextField
+                label="Username"
+                id="username"
+                type="username"
+                name="username"
                 fullWidth
                 variant="outlined"
-                value={formik.values.fullName}
+                value={formik.values.username}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={
-                    formik.touched.fullName && Boolean(formik.errors.fullName)
+                  formik.touched.username && Boolean(formik.errors.username)
                 }
-                helperText={formik.touched.fullName && formik.errors.fullName}
-            />
-            <Box sx={{ width: "100%" }}>
-                <TextField
-                    label="Username"
-                    id="username"
-                    type="username"
-                    name="username"
-                    fullWidth
-                    variant="outlined"
-                    value={formik.values.username}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.username && Boolean(formik.errors.username)}
-                    helperText={formik.touched.username && formik.errors.username}
-                />
-                <FormLabel
-                    sx={{
-                        mt: "8px",
-                        textAlign: "left",
-                        fontSize: "14px",
-                        display: "block",
-                    }}
-                    >
-                    This name will be displayed to other users
-                </FormLabel>
+                helperText={formik.touched.username && formik.errors.username}
+              />
+              <FormLabel
+                sx={{
+                  mt: "8px",
+                  textAlign: "left",
+                  fontSize: "14px",
+                  display: "block",
+                }}
+              >
+                This name will be displayed to other users
+              </FormLabel>
             </Box>
             <TextField
               label="Email"
@@ -272,9 +272,13 @@ const Register = () => {
                 endAdornment: (
                   <IconButton>
                     {showConfirmPassword ? (
-                      <VisibilityOff onClick={() => setShowConfirmPassword(false)} />
+                      <VisibilityOff
+                        onClick={() => setShowConfirmPassword(false)}
+                      />
                     ) : (
-                      <Visibility onClick={() => setShowConfirmPassword(true)} />
+                      <Visibility
+                        onClick={() => setShowConfirmPassword(true)}
+                      />
                     )}
                   </IconButton>
                 ),
@@ -326,14 +330,20 @@ const Register = () => {
         </CardContent>
       </Card>
 
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
-        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>
-
-    
   );
 };
 

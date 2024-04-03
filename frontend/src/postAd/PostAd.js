@@ -11,6 +11,8 @@ import {
   Select,
   MenuItem,
   FormHelperText,
+  Autocomplete,
+  Chip,
 } from "@mui/material";
 import React from "react";
 import { useFormik } from "formik";
@@ -19,12 +21,13 @@ import { useNavigate, Link } from "react-router-dom";
 
 import { firebaseStorage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { v4 } from 'uuid';
+import { v4 } from "uuid";
 
-import { UserContext } from '../contexts/UserContext';
-import { useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
+import { useContext, useState, useRef, useEffect } from "react";
 
-//import { UserContext } from '../App';
+import MapComponent from "../Map";
+import LocationPicker from "../LocationPicker";
 
 const validationSchema = yup.object({
   adTitle: yup
@@ -43,11 +46,15 @@ const validationSchema = yup.object({
       (value) => value && value.length > 0
     ),
   price: yup.number().required("Price is required"),
-  location: yup.string().required("Location is required"),
+  location: yup.object().required("Location is required"),
+  tags: yup.array(),
 });
 
 const PostAd = () => {
   const { user, setUser } = useContext(UserContext);
+  const [location, setLocation] = React.useState(null);
+
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -56,89 +63,121 @@ const PostAd = () => {
       description: "",
       price: 0,
       photos: [],
-      location: "",
+      location: location,
+      tags: [],
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
-        console.log(values, "Submiited Values");
+      console.log("Submitted form values: ", values);
 
-        // Upload photos to folder with same id name or create one
-        const uploadPhotosToFirebase = async (folderName) => {
-            let urls = [];
-            if (values.photos.length !== 0) {
-                for (const photo of values.photos) {
-                    const name = photo.name + v4();
-                    const path = `photos/${folderName}/${name}`;
-                    const imageRef = ref(firebaseStorage, path);
-                    let url = await uploadBytes(imageRef, photo)
-                    .then(() => {
-                        return getDownloadURL(ref(firebaseStorage, path))
-                    })
-                    .then(url => {
-                        return url;
-                    });
-                    urls.push(url); 
-                }
-            }
-            return urls;
+      const latlng = await fetch(
+        `http://localhost:5001/api/places/${location.place_id}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         }
-
-        // make POST request with empty photos array ---> returns id created for post
-        const token = sessionStorage.getItem('authToken');
-        
-        let result = await fetch(`http://localhost:5000/api/ads/new/${values.category}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                title: values.adTitle,
-                description: values.description,
-                postDate: new Date(),
-                author: sessionStorage.getItem("username"),
-                photos: [],
-                price: values.price, 
-                location: values.location
-            })
+      )
+        .then((res) => {
+          return res.json();
         })
-        .then(res => {
-            return res.json()
-        })
-        .then(data => {
-            return data;
+        .then((data) => {
+          console.log(data);
+          return data.result.geometry.location;
         });
-        console.log(result);
 
-        const adId = result._id;
-        const urls = await uploadPhotosToFirebase(adId);
+      // Upload photos to folder with same id name or create one
+      const uploadPhotosToFirebase = async (folderName) => {
+        let urls = [];
+        if (values.photos.length !== 0) {
+          for (const photo of values.photos) {
+            const name = photo.name + v4();
+            const path = `photos/${folderName}/${name}`;
+            const imageRef = ref(firebaseStorage, path);
+            let url = await uploadBytes(imageRef, photo)
+              .then(() => {
+                return getDownloadURL(ref(firebaseStorage, path));
+              })
+              .then((url) => {
+                return url;
+              });
+            urls.push(url);
+          }
+        }
+        return urls;
+      };
 
-        console.log('Image(s) uploaded');
-        console.log(urls);
-        
-        // now make PATCH request with updated URLs
-        result = await fetch(`http://localhost:5000/api/ads/update/${values.category}/id/${adId}`, {
-            method: 'PATCH',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'authorization': `Bearer ${token}`
+      // make POST request with empty photos array ---> returns id created for post
+      const token = user.authToken;
+
+      let result = await fetch(
+        `http://localhost:5001/api/ads/new/${values.category}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: values.adTitle,
+            description: values.description,
+            postDate: new Date(),
+            author: user.username,
+            photos: [],
+            price: values.price,
+            location: {
+              description: location.description,
+              place_id: location.place_id,
+              lat: latlng.lat,
+              lng: latlng.lng,
             },
-            body: JSON.stringify({
-                photos: urls
-            })
+            tags: values.tags,
+          }),
+        }
+      )
+        .then((res) => {
+          return res.json();
         })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            return data;
+        .then((data) => {
+          return data;
         });
-        console.log(JSON.stringify({photos: urls}));
+      console.log(result);
 
-        // clear fields
-        resetForm();
+      const adId = result._id;
+      const urls = await uploadPhotosToFirebase(adId);
+
+      console.log("Image(s) uploaded");
+      console.log(urls);
+
+      // now make PATCH request with updated URLs
+      result = await fetch(
+        `http://localhost:5001/api/ads/update/${values.category}/id/${adId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            photos: urls,
+          }),
+        }
+      )
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          return data;
+        });
+      console.log(JSON.stringify({ photos: urls }));
+
+      // clear fields
+      resetForm();
+      navigate('/');
     },
   });
 
@@ -213,7 +252,9 @@ const PostAd = () => {
               >
                 <MenuItem value={"itemsWanted"}>Items Wanted</MenuItem>
                 <MenuItem value={"itemsForSale"}>Items For Sale</MenuItem>
-                <MenuItem value={"academicServices"}>Academic Services</MenuItem>
+                <MenuItem value={"academicServices"}>
+                  Academic Services
+                </MenuItem>
               </Select>
               {formik.touched.category && formik.errors.category ? (
                 <FormHelperText sx={{ ml: 0, mt: 1, color: "crimson " }}>
@@ -254,9 +295,6 @@ const PostAd = () => {
               error={formik.touched.price && Boolean(formik.errors.price)}
               helperText={formik.touched.price && formik.errors.price}
             />
-            {/* 
-            <FormControl>
-              <FormControlLabel>Photos</FormControlLabel> */}
 
             <FormControl
               fullWidth
@@ -288,21 +326,58 @@ const PostAd = () => {
                 <FormHelperText>{formik.errors.photos}</FormHelperText>
               ) : null}
             </FormControl>
-            {/* </FormControl> */}
 
-            <TextField
-              label="Location"
-              id="location"
-              type="text"
-              name="location"
-              fullWidth
-              variant="outlined"
-              value={formik.values.location}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.location && Boolean(formik.errors.location)}
-              helperText={formik.touched.location && formik.errors.location}
-            />
+            <Box sx={{ width: "100%" }}>
+              <Autocomplete
+                multiple
+                label="Tags"
+                id="tags"
+                variant="outlined"
+                options={[]}
+                defaultValue={[]}
+                freeSolo
+                fullWidth
+                value={formik.values.tags}
+                onChange={(e, value) => formik.setFieldValue("tags", value)}
+                onBlur={formik.handleBlur}
+                error={formik.touched.tags && Boolean(formik.errors.tags)}
+                helperText={formik.touched.tags && formik.errors.tags}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      variant="filled"
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
+                  ))
+                }
+                renderInput={(params) => <TextField {...params} label="Tags" />}
+              />
+              <FormLabel
+                sx={{
+                  mt: "8px",
+                  textAlign: "left",
+                  fontSize: "14px",
+                  display: "block",
+                }}
+              >
+                Press enter to input each tag
+              </FormLabel>
+            </Box>
+
+            <FormControl
+                fullWidth
+                error={formik.touched.location && Boolean(formik.errors.location)}
+            >
+                <LocationPicker
+                    value={location}
+                    setValue={setLocation}
+                    formik={formik}
+                />
+                {formik.touched.location && formik.errors.location ? (
+                    <FormHelperText>{formik.errors.location}</FormHelperText>
+                ) : null}
+            </FormControl>
 
             <Button
               fullWidth
