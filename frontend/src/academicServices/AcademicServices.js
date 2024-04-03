@@ -99,7 +99,7 @@ export default function AcademicServices() {
                   {data?.map((item, ind) => {
                     const updatedPosting = {
                       ...item,
-                      category: "Items For Sale",
+                      category: "academicServices",
                     };
                     return (
                       <ListingItem
@@ -130,7 +130,7 @@ export default function AcademicServices() {
                     servicesData?.map((item, ind) => {
                       const updatedPosting = {
                         ...item,
-                        category: "Items For Sale",
+                        category: "academicServices",
                       };
                       return (
                         <ListingItem

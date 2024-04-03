@@ -98,7 +98,7 @@ export default function ItemsForSale() {
                   {data?.map((item, ind) => {
                     const updatedPosting = {
                       ...item,
-                      category: "Items For Sale",
+                      category: "itemsForSale",
                     };
                     return (
                       <ListingItem
@@ -129,7 +129,7 @@ export default function ItemsForSale() {
                     saleData?.map((item, ind) => {
                       const updatedPosting = {
                         ...item,
-                        category: "Items For Sale",
+                        category: "itemsForSale",
                       };
                       return (
                         <ListingItem

@@ -126,6 +126,7 @@ function ViewPostingModal({ open, onClose, post }) {
               postInfo={postInfo}
               setPostInfo={setPostInfo}
               setEdit={setEdit}
+              onClose={handleClose}
               user={user}
             />
           )}
