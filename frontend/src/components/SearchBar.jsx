@@ -37,7 +37,7 @@ const SearchBar = ({
   useEffect(() => {
     const handleResize = () => {
       setWidth(window.innerWidth);
-      setMobile(width <= 770);
+      setMobile(window.innerWidth <= 770);
     };
 
     window.addEventListener("resize", handleResize);
