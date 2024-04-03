@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -19,6 +19,8 @@ import {
   FormHelperText,
   FormLabel,
   Select,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -26,10 +28,19 @@ import { posts } from "./mockData";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import "./AllPosts.css";
+import { SnackbarContext } from "../contexts/SnackbarContext";
 
 const rows = posts;
 
 function AllPosts() {
+  const {
+    showSnackbar,
+    setShowSnackbar,
+    snackbarMessage,
+    setSnackbarMessage,
+    snackbarSeverity,
+  } = useContext(SnackbarContext);
+
   const [open, setOpen] = useState(false);
   const [openedPost, setOpenedPost] = useState({});
   const [searchValue, setSearchValue] = useState("");
@@ -49,6 +60,25 @@ function AllPosts() {
       <SearchBar value={searchValue} handleChange={setSearchValue} />
       <BasicTable handleOpen={onOpen} />
       <PostModal open={open} post={openedPost} onClose={onClose} />
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={() => {
+          setShowSnackbar(false);
+          setSnackbarMessage("");
+        }}
+      >
+        <Alert
+          onClose={() => {
+            setShowSnackbar(false);
+            setSnackbarMessage("");
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
@@ -188,6 +218,9 @@ function PostModal({ open, onClose, post }) {
 }
 
 function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
+  const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
+    useContext(SnackbarContext);
+
   const handleClose = () => {
     setOpenDeleteModal(false);
   };
@@ -195,6 +228,9 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
   const handleYes = () => {
     setOpenDeleteModal(false);
     onCloseModal();
+    setShowSnackbar(true);
+    setSnackbarMessage("Post Successfully Deleted");
+    setSnackbarSeverity("success");
   };
 
   const handleCancel = () => {

@@ -22,6 +22,7 @@ import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
 
 import { UserContext } from "../contexts/UserContext";
+import { SnackbarContext } from "../contexts/SnackbarContext";
 
 const validationSchema = yup.object({
   fullName: yup.string().required("Full Name is required"),
@@ -45,12 +46,16 @@ const validationSchema = yup.object({
 
 const Register = () => {
   const { user, setUser } = useContext(UserContext);
+  const {
+    showSnackbar,
+    setShowSnackbar,
+    setSnackbarMessage,
+    snackbarMessage,
+    snackbarSeverity,
+    setSnackbarSeverity,
+  } = useContext(SnackbarContext);
 
   const navigate = useNavigate();
-
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("error"); // 'success' or 'error'
 
   const formik = useFormik({
     initialValues: {
@@ -99,6 +104,11 @@ const Register = () => {
               })
               .then((data) => {
                 return data;
+              })
+              .catch((error) => {
+                setSnackbarMessage(`Error registering: ${error.message}`);
+                setSnackbarSeverity("error");
+                setShowSnackbar(true);
               });
 
             sessionStorage.setItem("_id", userInfo._id);
@@ -116,7 +126,8 @@ const Register = () => {
             setSnackbarMessage(
               "Registration successful! You are now logged in."
             );
-            setOpenSnackbar(true); // Show success Snackbar
+            setSnackbarSeverity("success");
+            setShowSnackbar(true); // Show success Snackbar
             navigate("/");
           })
           .catch((error) => {
@@ -125,7 +136,7 @@ const Register = () => {
             alert(`Error registering: ${error.message}`);
             setSnackbarMessage(`Error registering: ${error.message}`);
             setSnackbarSeverity("error");
-            setOpenSnackbar(true);
+            setShowSnackbar(true);
           });
       } else {
         console.log("User did not agree to terms");
@@ -141,7 +152,8 @@ const Register = () => {
     if (reason === "clickaway") {
       return;
     }
-    setOpenSnackbar(false);
+    setSnackbarMessage("");
+    setShowSnackbar(false);
   };
 
   return (
@@ -330,12 +342,12 @@ const Register = () => {
       </Card>
 
       <Snackbar
-        open={openSnackbar}
+        open={showSnackbar}
         autoHideDuration={6000}
-        onClose={() => setOpenSnackbar(false)}
+        onClose={handleCloseSnackbar}
       >
         <Alert
-          onClose={() => setOpenSnackbar(false)}
+          onClose={handleCloseSnackbar}
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
         >

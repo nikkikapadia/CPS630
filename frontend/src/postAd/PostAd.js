@@ -13,6 +13,8 @@ import {
   FormHelperText,
   Autocomplete,
   Chip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import React from "react";
 import { useFormik } from "formik";
@@ -24,6 +26,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 
 import { UserContext } from "../contexts/UserContext";
+import { SnackbarContext } from "../contexts/SnackbarContext";
 import { useContext, useState, useRef, useEffect } from "react";
 
 import MapComponent from "../Map";
@@ -52,6 +55,14 @@ const validationSchema = yup.object({
 
 const PostAd = () => {
   const { user, setUser } = useContext(UserContext);
+  const {
+    showSnackbar,
+    setShowSnackbar,
+    setSnackbarMessage,
+    snackbarMessage,
+    snackbarSeverity,
+    setSnackbarSeverity,
+  } = useContext(SnackbarContext);
   const [location, setLocation] = React.useState(null);
 
   const navigate = useNavigate();
@@ -86,6 +97,11 @@ const PostAd = () => {
         .then((data) => {
           console.log(data);
           return data.result.geometry.location;
+        })
+        .catch((error) => {
+          setShowSnackbar(true);
+          setSnackbarMessage("Failed to submit post");
+          setSnackbarSeverity("error");
         });
 
       // Upload photos to folder with same id name or create one
@@ -143,7 +159,13 @@ const PostAd = () => {
         })
         .then((data) => {
           return data;
+        })
+        .catch((error) => {
+          setShowSnackbar(true);
+          setSnackbarMessage("Failed to submit post");
+          setSnackbarSeverity("error");
         });
+
       console.log(result);
 
       const adId = result._id;
@@ -172,231 +194,268 @@ const PostAd = () => {
         })
         .then((data) => {
           return data;
+        })
+        .catch((error) => {
+          setShowSnackbar(true);
+          setSnackbarMessage("Failed to submit post");
+          setSnackbarSeverity("error");
         });
       console.log(JSON.stringify({ photos: urls }));
 
       // clear fields
       resetForm();
-      navigate('/');
+
+      setShowSnackbar(true);
+      setSnackbarMessage("Post uploaded successfully");
+      setSnackbarSeverity("success");
+      navigate("/");
     },
   });
 
   return (
-    <Box width={"100%"}>
-      <Card
-        elevation={0}
-        sx={{
-          maxWidth: "600px",
-          margin: "40px auto",
-          width: { xs: "90%", sm: "100%" },
-          backgroundColor: "white",
-          boxShadow: "0px 1px 5px rgba(52, 55, 70, 0.1) ",
-        }}
-      >
-        <CardContent
+    <>
+      <Box width={"100%"}>
+        <Card
+          elevation={0}
           sx={{
-            px: { xs: 3, sm: 4.5 },
-            py: { xs: 3, sm: 4 },
+            maxWidth: "600px",
+            margin: "40px auto",
+            width: { xs: "90%", sm: "100%" },
+            backgroundColor: "white",
+            boxShadow: "0px 1px 5px rgba(52, 55, 70, 0.1) ",
           }}
         >
-          <form
-            onSubmit={formik.handleSubmit}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              flexDirection: "column",
-              gap: "35px",
+          <CardContent
+            sx={{
+              px: { xs: 3, sm: 4.5 },
+              py: { xs: 3, sm: 4 },
             }}
           >
-            <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
-              Post Ad
-            </Typography>
-            <Box sx={{ width: "100%" }}>
+            <form
+              onSubmit={formik.handleSubmit}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                flexDirection: "column",
+                gap: "35px",
+              }}
+            >
+              <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
+                Post Ad
+              </Typography>
+              <Box sx={{ width: "100%" }}>
+                <TextField
+                  label="Ad Title"
+                  id="adTitle"
+                  name="adTitle"
+                  fullWidth
+                  variant="outlined"
+                  value={formik.values.adTitle}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.adTitle && Boolean(formik.errors.adTitle)
+                  }
+                  helperText={formik.touched.adTitle && formik.errors.adTitle}
+                />
+                <FormLabel
+                  sx={{
+                    mt: "8px",
+                    textAlign: "left",
+                    fontSize: "14px",
+                    display: "block",
+                  }}
+                >
+                  Ad Title will be displayed on the top of your ad
+                </FormLabel>
+              </Box>
+              <FormControl fullWidth>
+                <InputLabel id="ad-category">Category</InputLabel>
+                <Select
+                  labelId="ad-category"
+                  id="ad-category"
+                  placeholder="Category"
+                  value={formik.values.category}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  name="category"
+                  sx={{ textAlign: "left" }}
+                  // value={age}
+                  label="Category"
+                  // onChange={handleChange}
+                >
+                  <MenuItem value={"itemsWanted"}>Items Wanted</MenuItem>
+                  <MenuItem value={"itemsForSale"}>Items For Sale</MenuItem>
+                  <MenuItem value={"academicServices"}>
+                    Academic Services
+                  </MenuItem>
+                </Select>
+                {formik.touched.category && formik.errors.category ? (
+                  <FormHelperText sx={{ ml: 0, mt: 1, color: "crimson " }}>
+                    {formik.errors.category}
+                  </FormHelperText>
+                ) : null}
+              </FormControl>
+
               <TextField
-                label="Ad Title"
-                id="adTitle"
-                name="adTitle"
+                label="Description"
+                id="description"
+                name="description"
                 fullWidth
                 variant="outlined"
-                value={formik.values.adTitle}
+                value={formik.values.description}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched.adTitle && Boolean(formik.errors.adTitle)}
-                helperText={formik.touched.adTitle && formik.errors.adTitle}
-              />
-              <FormLabel
-                sx={{
-                  mt: "8px",
-                  textAlign: "left",
-                  fontSize: "14px",
-                  display: "block",
-                }}
-              >
-                Ad Title will be displayed on the top of your ad
-              </FormLabel>
-            </Box>
-            <FormControl fullWidth>
-              <InputLabel id="ad-category">Category</InputLabel>
-              <Select
-                labelId="ad-category"
-                id="ad-category"
-                placeholder="Category"
-                value={formik.values.category}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                name="category"
-                sx={{ textAlign: "left" }}
-                // value={age}
-                label="Category"
-                // onChange={handleChange}
-              >
-                <MenuItem value={"itemsWanted"}>Items Wanted</MenuItem>
-                <MenuItem value={"itemsForSale"}>Items For Sale</MenuItem>
-                <MenuItem value={"academicServices"}>
-                  Academic Services
-                </MenuItem>
-              </Select>
-              {formik.touched.category && formik.errors.category ? (
-                <FormHelperText sx={{ ml: 0, mt: 1, color: "crimson " }}>
-                  {formik.errors.category}
-                </FormHelperText>
-              ) : null}
-            </FormControl>
-
-            <TextField
-              label="Description"
-              id="description"
-              name="description"
-              fullWidth
-              variant="outlined"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.description && Boolean(formik.errors.description)
-              }
-              helperText={
-                formik.touched.description && formik.errors.description
-              }
-              multiline
-              rows={4}
-            />
-
-            <TextField
-              label="Price"
-              id="price"
-              type="number"
-              name="price"
-              fullWidth
-              variant="outlined"
-              value={formik.values.price}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.price && Boolean(formik.errors.price)}
-              helperText={formik.touched.price && formik.errors.price}
-            />
-
-            <FormControl
-              fullWidth
-              error={formik.touched.photos && Boolean(formik.errors.photos)}
-            >
-              <label
-                htmlFor="photos"
-                style={{ textAlign: "left", marginBottom: 7 }}
-              >
-                Photos
-              </label>
-              <input
-                id="photos"
-                name="photos"
-                type="file"
-                onChange={(event) => {
-                  formik.setFieldValue("photos", event.currentTarget.files);
-                }}
-                style={{
-                  width: "95%",
-                  padding: "20px 13px 20px 13px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                }}
-                onBlur={formik.handleBlur}
-                multiple
-              />
-              {formik.touched.photos && formik.errors.photos ? (
-                <FormHelperText>{formik.errors.photos}</FormHelperText>
-              ) : null}
-            </FormControl>
-
-            <Box sx={{ width: "100%" }}>
-              <Autocomplete
-                multiple
-                label="Tags"
-                id="tags"
-                variant="outlined"
-                options={[]}
-                defaultValue={[]}
-                freeSolo
-                fullWidth
-                value={formik.values.tags}
-                onChange={(e, value) => formik.setFieldValue("tags", value)}
-                onBlur={formik.handleBlur}
-                error={formik.touched.tags && Boolean(formik.errors.tags)}
-                helperText={formik.touched.tags && formik.errors.tags}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      variant="filled"
-                      label={option}
-                      {...getTagProps({ index })}
-                    />
-                  ))
+                error={
+                  formik.touched.description &&
+                  Boolean(formik.errors.description)
                 }
-                renderInput={(params) => <TextField {...params} label="Tags" />}
+                helperText={
+                  formik.touched.description && formik.errors.description
+                }
+                multiline
+                rows={4}
               />
-              <FormLabel
-                sx={{
-                  mt: "8px",
-                  textAlign: "left",
-                  fontSize: "14px",
-                  display: "block",
-                }}
-              >
-                Press enter to input each tag
-              </FormLabel>
-            </Box>
 
-            <FormControl
+              <TextField
+                label="Price"
+                id="price"
+                type="number"
+                name="price"
                 fullWidth
-                error={formik.touched.location && Boolean(formik.errors.location)}
-            >
+                variant="outlined"
+                value={formik.values.price}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.price && Boolean(formik.errors.price)}
+                helperText={formik.touched.price && formik.errors.price}
+              />
+
+              <FormControl
+                fullWidth
+                error={formik.touched.photos && Boolean(formik.errors.photos)}
+              >
+                <label
+                  htmlFor="photos"
+                  style={{ textAlign: "left", marginBottom: 7 }}
+                >
+                  Photos
+                </label>
+                <input
+                  id="photos"
+                  name="photos"
+                  type="file"
+                  onChange={(event) => {
+                    formik.setFieldValue("photos", event.currentTarget.files);
+                  }}
+                  style={{
+                    width: "95%",
+                    padding: "20px 13px 20px 13px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                  }}
+                  onBlur={formik.handleBlur}
+                  multiple
+                />
+                {formik.touched.photos && formik.errors.photos ? (
+                  <FormHelperText>{formik.errors.photos}</FormHelperText>
+                ) : null}
+              </FormControl>
+
+              <Box sx={{ width: "100%" }}>
+                <Autocomplete
+                  multiple
+                  label="Tags"
+                  id="tags"
+                  variant="outlined"
+                  options={[]}
+                  defaultValue={[]}
+                  freeSolo
+                  fullWidth
+                  value={formik.values.tags}
+                  onChange={(e, value) => formik.setFieldValue("tags", value)}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.tags && Boolean(formik.errors.tags)}
+                  helperText={formik.touched.tags && formik.errors.tags}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip
+                        variant="filled"
+                        label={option}
+                        {...getTagProps({ index })}
+                      />
+                    ))
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Tags" />
+                  )}
+                />
+                <FormLabel
+                  sx={{
+                    mt: "8px",
+                    textAlign: "left",
+                    fontSize: "14px",
+                    display: "block",
+                  }}
+                >
+                  Press enter to input each tag
+                </FormLabel>
+              </Box>
+
+              <FormControl
+                fullWidth
+                error={
+                  formik.touched.location && Boolean(formik.errors.location)
+                }
+              >
                 <LocationPicker
-                    value={location}
-                    setValue={setLocation}
-                    formik={formik}
+                  value={location}
+                  setValue={setLocation}
+                  formik={formik}
                 />
                 {formik.touched.location && formik.errors.location ? (
-                    <FormHelperText>{formik.errors.location}</FormHelperText>
+                  <FormHelperText>{formik.errors.location}</FormHelperText>
                 ) : null}
-            </FormControl>
+              </FormControl>
 
-            <Button
-              fullWidth
-              sx={{
-                backgroundColor: "#213555",
-                py: 1.5,
-                textTransform: "capitalize",
-                fontSize: "16px",
-                ":hover": { backgroundColor: "#213555" },
-              }}
-              variant="contained"
-              type="submit"
-            >
-              Post Ad
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
+              <Button
+                fullWidth
+                sx={{
+                  backgroundColor: "#213555",
+                  py: 1.5,
+                  textTransform: "capitalize",
+                  fontSize: "16px",
+                  ":hover": { backgroundColor: "#213555" },
+                }}
+                variant="contained"
+                type="submit"
+              >
+                Post Ad
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </Box>
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={() => {
+          setShowSnackbar(false);
+          setSnackbarMessage("");
+        }}
+      >
+        <Alert
+          onClose={() => {
+            setShowSnackbar(false);
+            setSnackbarMessage("");
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 

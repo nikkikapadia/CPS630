@@ -10,23 +10,23 @@ import CardMedia from "@mui/material/CardMedia";
 import { Box, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 import { UserContext } from "../contexts/UserContext";
 import ViewPostingModal from "../components/ViewPostingModal";
 import { SearchBar, categories } from "../components/SearchBar";
-
-// function HomeSearch() {
-//   const [searchValue, setSearchValue] = React.useState("");
-//   return (
-//     <div style={homeStyles.gradient}>
-//       <h1>Search Here!</h1>
-//       <SearchBar value={searchValue} handleChange={setSearchValue} />
-//     </div>
-//   );
-// }
+import { SnackbarContext } from "../contexts/SnackbarContext";
 
 export function HomePage({ admin }) {
   const { user, setUser } = useContext(UserContext);
+  const {
+    showSnackbar,
+    setShowSnackbar,
+    snackbarMessage,
+    setSnackbarMessage,
+    snackbarSeverity,
+  } = useContext(SnackbarContext);
 
   const [wantedData, setWantedData] = React.useState([]);
   const [saleData, setSaleData] = React.useState([]);
@@ -125,33 +125,37 @@ export function HomePage({ admin }) {
         onClose={handleModalClose}
         post={modalPost}
       />
+      <SnackbarContext.Provider
+        value={{
+          showSnackbar,
+          setShowSnackbar,
+          snackbarMessage,
+          setSnackbarMessage,
+        }}
+      >
+        <Snackbar
+          open={showSnackbar}
+          autoHideDuration={6000}
+          onClose={() => {
+            setShowSnackbar(false);
+            setSnackbarMessage("");
+          }}
+        >
+          <Alert
+            onClose={() => {
+              setShowSnackbar(false);
+              setSnackbarMessage("");
+            }}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </SnackbarContext.Provider>
     </>
   );
 }
-
-// function SearchBar({ value, handleChange }) {
-//   const onChange = useCallback(
-//     (event) => handleChange(event.target.value),
-//     [handleChange]
-//   );
-
-//   return (
-//     <div className="search">
-//       <input
-//         type="text"
-//         placeholder="Search"
-//         value={value}
-//         onChange={onChange}
-//         className="search-input"
-//       />
-//       <img
-//         src={require("../images/search.png")}
-//         className="search-logo"
-//         alt="search"
-//       />
-//     </div>
-//   );
-// }
 
 function Row({ title, data, admin, setModalOpen, setModalPost }) {
   const categoryMap = {
