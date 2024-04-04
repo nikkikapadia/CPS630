@@ -198,6 +198,23 @@ const Login = () => {
                 ),
               }}
             />
+          {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 5,
+            }}
+          >
+            <CircularProgress
+              size={50}
+              thickness={4}
+              style={{ color: "#213555" }}
+            />
+          </Box>
+        ) : (
+            <>
             <Button
               fullWidth
               sx={{
@@ -212,17 +229,8 @@ const Login = () => {
               type="submit"
               disabled={loading}
             >
-              {loading ? (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      color: 'white',
-                      position: 'absolute', // Position spinner over the button
-                    }}
-                  />
-                ) : (
-                  "Login"
-                )}
+              
+                  Login
             </Button>
             <Box
               sx={{
@@ -244,6 +252,8 @@ const Login = () => {
                 </Link>
               </Typography>
             </Box>
+            </>
+        )}
           </form>
         </CardContent>
       </Card>

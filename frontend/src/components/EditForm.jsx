@@ -12,6 +12,7 @@ import {
   Select,
   Chip,
   Autocomplete,
+  CircularProgress
 } from "@mui/material";
 
 import { useFormik } from "formik";
@@ -23,6 +24,8 @@ import LocationPicker from "../LocationPicker";
 
 function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
   const [location, setLocation] = React.useState(postInfo.location);
+
+  const [loading, setLoading] = React.useState(false);
 
   const validationSchema = yup.object({
     adTitle: yup
@@ -58,6 +61,8 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      setLoading(true);
+
       const apiRoute = "http://localhost:5001/api";
       const samePhotos =
         values.photos.toString() === postInfo.photos.toString();
@@ -169,6 +174,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
         tags: values.tags,
       });
 
+      setLoading(false);
       setEdit(false);
     },
   });
@@ -327,6 +333,22 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
         renderInput={(params) => <TextField {...params} label="Tags" />}
       />
 
+      {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 5,
+            }}
+          >
+            <CircularProgress
+              size={50}
+              thickness={4}
+              style={{ color: "#213555" }}
+            />
+          </Box>
+        ) : (
       <Button
         fullWidth
         sx={{
@@ -341,6 +363,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
       >
         Save Edits
       </Button>
+      )}
     </form>
   );
 }

@@ -313,6 +313,23 @@ const Register = () => {
               name="isAgreed"
               onChange={formik.handleChange}
             />
+            {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 5,
+            }}
+          >
+            <CircularProgress
+              size={50}
+              thickness={4}
+              style={{ color: "#213555" }}
+            />
+          </Box>
+        ) : (
+            <>
             <Button
               fullWidth
               sx={{
@@ -326,17 +343,7 @@ const Register = () => {
               type="submit"
               disabled={loading || !formik.values.isAgreed} // Disable when loading or terms not agreed
             >
-              {loading ? (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    color: 'white',
-                    position: 'absolute', // Center spinner in the button
-                  }}
-                />
-              ) : (
-                "Register"
-              )}
+                Register
             </Button>
             <Box
               sx={{
@@ -358,6 +365,8 @@ const Register = () => {
                 </Link>
               </Typography>
             </Box>
+            </>
+        )}
           </form>
         </CardContent>
       </Card>

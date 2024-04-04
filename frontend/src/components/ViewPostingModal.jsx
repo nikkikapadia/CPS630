@@ -48,10 +48,10 @@ function ViewPostingModal({ open, onClose, post }) {
                   >
                     {postInfo.title}
                   </Typography>
-                  <Typography sx={{ color: "#cccccc" }}>
+                  <Typography sx={{ color: "black", marginTop: "10px" }}>
                     Posted By: {postInfo.author}
                   </Typography>
-                  <Typography sx={{ color: "#cccccc" }}>
+                  <Typography sx={{ color: "black" }}>
                     {new Date(postInfo.postDate).toLocaleString()}
                   </Typography>
                 </div>
@@ -75,7 +75,9 @@ function ViewPostingModal({ open, onClose, post }) {
                   )}
                 </div>
               </div>
-
+              <Typography sx={{ color: "black" }}>
+                    Tags:
+              </Typography>
               {postInfo.tags &&
                 postInfo.tags.map((tag, index) => {
                   return <Chip label={tag} key={index} sx={{ mr: 1, mb: 1 }} />;

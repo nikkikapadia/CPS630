@@ -423,6 +423,22 @@ const PostAd = () => {
                 ) : null}
               </FormControl>
 
+              {loading ? (
+                <Box
+                    sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: 5,
+                    }}
+                >
+                    <CircularProgress
+                    size={50}
+                    thickness={4}
+                    style={{ color: "#213555" }}
+                    />
+                </Box>
+              ) : (
               <Button
                 fullWidth
                 sx={{
@@ -437,22 +453,9 @@ const PostAd = () => {
                 type="submit"
                 disabled={loading || !formik.isValid}
               >
-                {loading ? (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      color: 'white',
-                      position: 'absolute',
-                      left: '50%',
-                      top: '50%',
-                      marginLeft: '-12px', // Half of the spinner size to center it horizontally
-                      marginTop: '-12px', // Half of the spinner size to center it vertically
-                    }}
-                  />
-                ) : (
-                  "Post Ad"
-                )}
+                  Post Ad
               </Button>
+              )}
             </form>
           </CardContent>
         </Card>

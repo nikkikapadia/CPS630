@@ -28,6 +28,8 @@ app.use(express.json());
 app.use(cors());
 app.use(middleware.decodeToken);
 
+
+// GET location co-ordinates for placeID
 app.get("/api/places/:placeID", async (req, res) => {
     try {
         const location = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.params.placeID}&fields=geometry&key=${process.env.GOOGLE_MAPS_API_KEY}`)
@@ -42,14 +44,28 @@ app.get("/api/places/:placeID", async (req, res) => {
     catch (error) {
         res.status(400).json({ error: error.message });
     }
-})
-
+});
 
 // GET user by id
 app.get("/api/users/get/id/:id", async (req, res) => {
+    // verify user is admin (requestingUser header set by middleware after decoding token)
+    const result = await User.findOne({ email: req.requestingUser.email }).select(
+        ["isAdmin", "username"]
+    );
+    const isAdmin = result.isAdmin;
+    if (isAdmin == null)
+        return res
+            .status(400)
+            .json({ error: "Can not find user in database to validate credentials" });
+    // if user not admin, check if they are updating their own info
+    else if (isAdmin == false && req.params.username != result.username)
+        return res
+            .status(400)
+            .json({ error: "User not admin or not authorized to make this request" });
+            
     try {
         const user = await User.find({ _id: req.params.id });
-        res.status(200).json(user);
+        user != null ? res.status(200).json(user) : res.status(200).json([]); // returns [] if no users found
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -57,9 +73,24 @@ app.get("/api/users/get/id/:id", async (req, res) => {
 
 // GET user by email
 app.get("/api/users/get/email/:email", async (req, res) => {
+    // verify user is admin (requestingUser header set by middleware after decoding token)
+    const result = await User.findOne({ email: req.requestingUser.email }).select(
+        ["isAdmin", "username"]
+    );
+    const isAdmin = result.isAdmin;
+    if (isAdmin == null)
+        return res
+            .status(400)
+            .json({ error: "Can not find user in database to validate credentials" });
+    // if user not admin, check if they are updating their own info
+    else if (isAdmin == false && req.params.username != result.username)
+        return res
+            .status(400)
+            .json({ error: "User not admin or not authorized to make this request" });
+
     try {
         const user = await User.find({ email: req.params.email });
-        res.status(200).json(user);
+        user != null ? res.status(200).json(user) : res.status(200).json([]); // returns [] if no users found
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -67,9 +98,25 @@ app.get("/api/users/get/email/:email", async (req, res) => {
 
 // GET user by username
 app.get("/api/users/get/username/:username", async (req, res) => {
+    // verify user is admin (requestingUser header set by middleware after decoding token)
+    const result = await User.findOne({ email: req.requestingUser.email }).select(
+        ["isAdmin", "username"]
+    );
+    const isAdmin = result.isAdmin;
+    if (isAdmin == null)
+        return res
+            .status(400)
+            .json({ error: "Can not find user in database to validate credentials" });
+    // if user not admin, check if they are updating their own info
+    else if (isAdmin == false && req.params.username != result.username)
+        return res
+            .status(400)
+            .json({ error: "User not admin or not authorized to make this request" });
+
     try {
         const user = await User.find({ username: req.params.username });
-        res.status(200).json(user);
+        console.log(user);
+        user != null ? res.status(200).json(user) : res.status(200).json([]); // returns [] if no users found
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -77,7 +124,7 @@ app.get("/api/users/get/username/:username", async (req, res) => {
 
 // GET all users
 app.get("/api/users/get", async (req, res) => {
-    // verify user is admin
+    // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         "isAdmin"
     );
@@ -116,7 +163,7 @@ app.post("/api/users/new", async (req, res) => {
 
 // PATCH (update) a user by username
 app.patch("/api/users/update/username/:username", async (req, res) => {
-    // verify user is admin
+    // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -151,7 +198,7 @@ app.patch("/api/users/update/username/:username", async (req, res) => {
 
 // PATCH (update) a user by email
 app.patch("/api/users/update/email/:email", async (req, res) => {
-    // verify user is admin
+    // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -186,7 +233,7 @@ app.patch("/api/users/update/email/:email", async (req, res) => {
 
 // DELETE a user by username
 app.delete("/api/users/delete/username/:username", async (req, res) => {
-    // verify user is admin
+    // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -211,7 +258,7 @@ app.delete("/api/users/delete/username/:username", async (req, res) => {
 
 // DELETE a user by email
 app.delete("/api/users/delete/email/:email", async (req, res) => {
-    // verify user is admin
+    // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -329,7 +376,7 @@ app.patch("/api/ads/update/:category/id/:id", async (req, res) => {
 
     const AdModel = categoryModelMap[req.params.category];
 
-    // verify user is admin
+    // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );
@@ -373,7 +420,7 @@ app.delete("/api/ads/delete/:category/id/:id", async (req, res) => {
 
     const AdModel = categoryModelMap[req.params.category];
 
-    // verify user is admin
+    // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
     );

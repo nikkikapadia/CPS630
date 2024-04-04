@@ -21,6 +21,7 @@ import {
   Select,
   Snackbar,
   Alert,
+  CircularProgress
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,8 +30,9 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import "./Users.css";
 import { SnackbarContext } from "../contexts/SnackbarContext";
+import { UserContext } from "../contexts/UserContext";
 
-const rows = users;
+//const rows = users;
 
 function Users() {
   const {
@@ -55,11 +57,38 @@ function Users() {
     setOpenedUser({});
   };
 
+  const {user, setUser} = useContext(UserContext);
+
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    const token = user.authToken;
+    await fetch(`http://localhost:5001/api/users/get`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${token}`
+        }
+    })
+    .then(res => {
+        return res.json()
+    })
+    .then(data => {
+        console.log(data);
+        setRows(data);
+    });
+  }
+
   return (
     <>
       <SearchBar value={searchValue} handleChange={setSearchValue} />
-      <BasicTable handleOpen={onOpen} />
-      <UserModal open={open} user={openedUser} onClose={onClose} />
+      <BasicTable handleOpen={onOpen} rows={rows} />
+      <UserModal open={open} user={openedUser} onClose={onClose} rows={rows} fetchUsers={fetchUsers} />
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
@@ -87,7 +116,7 @@ function Users() {
   );
 }
 
-function BasicTable({ handleOpen }) {
+function BasicTable({ handleOpen, rows }) {
   return (
     <div className="centered-table">
       <TableContainer component={Paper} sx={{ maxWidth: 1000 }}>
@@ -95,6 +124,7 @@ function BasicTable({ handleOpen }) {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
+              <TableCell>Username</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell align="right">Type</TableCell>
@@ -103,23 +133,24 @@ function BasicTable({ handleOpen }) {
           <TableBody>
             {rows.map((row) => (
               <TableRow
-                key={row.id}
+                key={row._id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.id}
+                  {row._id}
                 </TableCell>
+                <TableCell>{row.username}</TableCell>
                 <TableCell>
                   <Link
                     sx={{ cursor: "pointer" }}
                     onClick={() => handleOpen(row)}
                   >
-                    {row.name}
+                    {row.fullName}
                   </Link>
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
                 <TableCell align="right">
-                  {row.admin ? "Admin" : "General"}
+                  {row.isAdmin ? "Admin" : "General"}
                 </TableCell>
               </TableRow>
             ))}
@@ -132,7 +163,7 @@ function BasicTable({ handleOpen }) {
 
 export default Users;
 
-function UserModal({ open, onClose, user }) {
+function UserModal({ open, onClose, user, rows, fetchUsers }) {
   const [edit, setEdit] = useState(false);
   const [userInfo, setUserInfo] = useState(user);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -168,7 +199,7 @@ function UserModal({ open, onClose, user }) {
             <>
               <div className="title-buttons-group">
                 <Typography id="modal-modal-title" variant="h4" component="h2">
-                  {userInfo.name}
+                  {userInfo.fullName}
                 </Typography>
                 <div>
                   <Button
@@ -191,7 +222,7 @@ function UserModal({ open, onClose, user }) {
                 Email: {userInfo.email}
               </Typography>
               <Typography sx={{ mt: 2 }}>
-                Password: {userInfo.password}
+                Username: {userInfo.username}
               </Typography>
               <Typography sx={{ mt: 2 }}>
                 Admin: {userInfo.admin ? "Yes" : "No"}
@@ -205,6 +236,8 @@ function UserModal({ open, onClose, user }) {
               userInfo={userInfo}
               setUserInfo={setUserInfo}
               setEdit={setEdit}
+              rows={rows}
+              fetchUsers={fetchUsers}
             />
           )}
         </Box>
@@ -214,20 +247,127 @@ function UserModal({ open, onClose, user }) {
         setOpenDeleteModal={setOpenDeleteModal}
         openDeleteModal={openDeleteModal}
         onCloseModal={onClose}
+        userInfo={userInfo}
+        rows={rows}
+        fetchUsers={fetchUsers}
       />
     </>
   );
 }
 
-function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
+function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, userInfo, rows, fetchUsers }) {
   const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
     useContext(SnackbarContext);
+
+  const { user, userContext } = useContext(UserContext);
+
+  const [loading ,setLoading] = useState(false);
 
   const handleClose = () => {
     setOpenDeleteModal(false);
   };
 
-  const handleYes = () => {
+  const handleYes = async () => {
+    setLoading(true);
+    const token = user.authToken;
+    const apiRoute = "http://localhost:5001/api";
+
+    const fetchUserAds = async () => {
+        const token = user.authToken;
+        let items = [];
+        await fetch(`http://localhost:5001/api/ads/get/itemsWanted/author/${userInfo.username}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+            }
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(data => {
+            let temp = data;
+            temp.forEach(ad => { ad.category = 'itemsWanted'; });
+            items.push(...temp);
+            return fetch(`http://localhost:5001/api/ads/get/itemsForSale/author/${userInfo.username}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                }
+            });
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(data => {
+            let temp = data;
+            temp.forEach(ad => { ad.category = 'itemsForSale'; });
+            items.push(...temp);
+            return fetch(`http://localhost:5001/api/ads/get/academicServices/author/${userInfo.username}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                }
+            });
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(data => {
+            let temp = data;
+            temp.forEach(ad => { ad.category = 'academicServices'; });
+            items.push(...temp);
+            
+        });
+        return items;
+    }
+
+    const adsByUser = await fetchUserAds();
+
+    for (const ad of adsByUser) {
+        const result = await fetch(
+            `${apiRoute}/ads/delete/${ad.category}/id/${ad._id}`,
+            {
+              method: "DELETE",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        .then((res) => {
+            return res.json();
+        })
+        .then((data) => {
+            return data;
+        });
+    }
+
+    const result = await fetch(
+        `${apiRoute}/users/delete/email/${userInfo.email}`,
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      )
+    .then((res) => {
+        return res.json();
+    })
+    .then((data) => {
+        return data;
+    });
+    fetchUsers();
+    setLoading(false);
     setOpenDeleteModal(false);
     onCloseModal();
     setShowSnackbar(true);
@@ -245,6 +385,22 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
         <Typography variant="h5" component="h2">
           Are you sure you want to delete this user?
         </Typography>
+        {loading ? (
+        <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: 5,
+        }}
+      >
+        <CircularProgress
+          size={50}
+          thickness={4}
+          style={{ color: "#213555" }}
+        />
+      </Box>
+      ) : (
         <div style={{ textAlign: "end" }}>
           <Button
             aria-label="Delete"
@@ -262,40 +418,190 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
             Cancel
           </Button>
         </div>
+      )}
       </Box>
     </Modal>
   );
 }
 
-function EditForm({ userInfo, setUserInfo, setEdit }) {
+function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers }) {
+  const {
+        showSnackbar,
+        setShowSnackbar,
+        snackbarMessage,
+        setSnackbarMessage,
+        snackbarSeverity,
+        setSnackbarSeverity
+  } = useContext(SnackbarContext);
+  const { user, setUser } = useContext(UserContext);
+
+  const [loading, setLoading] = useState(false);
+
   // admin cannot edit passwords so it's not part of the form
   const validationSchema = yup.object({
     fullName: yup.string().required("Full Name is required"),
-    email: yup
-      .string()
-      .email("Enter a valid email")
-      .required("Email is required"),
+    username: yup.string().required("Username is required"),
     admin: yup.boolean().required("Account type is required"),
   });
 
   const formik = useFormik({
     initialValues: {
-      fullName: userInfo.name,
-      email: userInfo.email,
-      admin: userInfo.admin,
+      fullName: userInfo.fullName,
+      username: userInfo.username,
+      admin: userInfo.isAdmin,
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      // put db updates here
-      console.log(values, "Submiited Values");
-      setUserInfo({
-        ...userInfo,
-        name: values.fullName,
-        email: values.email,
-        admin: values.admin,
-      });
-      setEdit(false);
-    },
+    onSubmit: async (values) => {
+        console.log(formik.initialValues.username);
+        setLoading(true);
+        const token = user.authToken;
+        const apiRoute = "http://localhost:5001/api";
+
+        // if username edited, check if doesn't exist already and if not then update ads containing old username with new username
+        if (formik.initialValues.username != values.username) {
+            const user = await fetch(
+                `${apiRoute}/users/get/username/${values.username}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        authorization: `Bearer ${token}`,
+                    }
+                }
+                )
+                .then((res) => {
+                    return res.json();
+                })
+                .then((data) => {
+                    return data;
+            });
+
+            // found user with new username
+            if (user.length != 0) {
+                setShowSnackbar(true);
+                setSnackbarMessage("Another user already exists with that username");
+                setSnackbarSeverity("error");
+                setLoading(false);
+                return;
+            }
+            else {
+                const fetchUserAds = async () => {
+                    const token = user.authToken;
+                    let items = [];
+                    await fetch(`http://localhost:5001/api/ads/get/itemsWanted/author/${formik.initialValues.username}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'authorization': `Bearer ${token}`
+                        }
+                    })
+                    .then(res => {
+                        return res.json();
+                    })
+                    .then(data => {
+                        let temp = data;
+                        temp.forEach(ad => { ad.category = 'itemsWanted'; });
+                        items.push(...temp);
+                        return fetch(`http://localhost:5001/api/ads/get/itemsForSale/author/${formik.initialValues.username}`, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'authorization': `Bearer ${token}`
+                            }
+                        });
+                    })
+                    .then(res => {
+                        return res.json();
+                    })
+                    .then(data => {
+                        let temp = data;
+                        temp.forEach(ad => { ad.category = 'itemsForSale'; });
+                        items.push(...temp);
+                        return fetch(`http://localhost:5001/api/ads/get/academicServices/author/${formik.initialValues.username}`, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'authorization': `Bearer ${token}`
+                            }
+                        });
+                    })
+                    .then(res => {
+                        return res.json();
+                    })
+                    .then(data => {
+                        let temp = data;
+                        temp.forEach(ad => { ad.category = 'academicServices'; });
+                        items.push(...temp);
+                        
+                    });
+                    return items;
+                }
+
+                const adsByUser = await fetchUserAds();
+
+                for (const ad of adsByUser) {
+                    const result = await fetch(
+                    `${apiRoute}/ads/update/${ad.category}/id/${ad._id}`,
+                    {
+                        method: "PATCH",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            author: values.username
+                        })
+                    }
+                    )
+                    .then((res) => {
+                        return res.json();
+                    })
+                    .then((data) => {
+                        return data;
+                    });
+                }
+            }
+        }
+
+        const result = await fetch(
+            `${apiRoute}/users/update/email/${userInfo.email}`,
+            {
+                method: "PATCH",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    fullName: values.fullName,
+                    isAdmin: values.admin,
+                    username: values.username
+                })
+            }
+        )
+        .then((res) => {
+            return res.json();
+        })
+        .then((data) => {
+            return data;
+        });
+        fetchUsers();
+        setLoading(false);
+        console.log(values, "Submiited Values");
+        setUserInfo({
+            ...userInfo,
+            name: values.fullName,
+            username: values.username,
+            admin: values.admin,
+        });
+        setEdit(false);
+        
+      },
   });
 
   return (
@@ -324,30 +630,21 @@ function EditForm({ userInfo, setUserInfo, setEdit }) {
           error={formik.touched.fullName && Boolean(formik.errors.fullName)}
           helperText={formik.touched.fullName && formik.errors.fullName}
         />
-        <FormLabel
-          sx={{
-            mt: "8px",
-            textAlign: "left",
-            fontSize: "14px",
-            display: "block",
-          }}
-        >
-          Your Name will be displayed on your public profile
-        </FormLabel>
       </Box>
-      <TextField
-        label="Email"
-        id="email"
-        type="email"
-        name="email"
-        fullWidth
-        variant="outlined"
-        value={formik.values.email}
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        error={formik.touched.email && Boolean(formik.errors.email)}
-        helperText={formik.touched.email && formik.errors.email}
-      />
+      <Box sx={{ width: "100%" }}>
+        <TextField
+          label="User Name"
+          id="username"
+          name="username"
+          fullWidth
+          variant="outlined"
+          value={formik.values.username}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.username && Boolean(formik.errors.username)}
+          helperText={formik.touched.username && formik.errors.username}
+        />
+      </Box>
       <FormControl fullWidth>
         <InputLabel id="admin">Admin</InputLabel>
         <Select
@@ -371,6 +668,22 @@ function EditForm({ userInfo, setUserInfo, setEdit }) {
         ) : null}
       </FormControl>
 
+      {loading ? (
+        <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: 5,
+        }}
+      >
+        <CircularProgress
+          size={50}
+          thickness={4}
+          style={{ color: "#213555" }}
+        />
+      </Box>
+      ) : (
       <Button
         fullWidth
         sx={{
@@ -385,6 +698,7 @@ function EditForm({ userInfo, setUserInfo, setEdit }) {
       >
         Save Edits
       </Button>
+      )}
     </form>
   );
 }
