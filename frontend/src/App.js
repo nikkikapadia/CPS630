@@ -13,6 +13,8 @@ import AllPosts from "./allPosts/AllPosts";
 import Users from "./users/Users";
 import Messages from "./messages/Messages";
 import { auth } from "./firebase-config";
+import MyPosts from "./allPosts/MyPosts";
+import MyProfile from "./users/MyProfile";
 
 import { UserContext } from "./contexts/UserContext";
 import { useContext } from "react";
@@ -59,8 +61,8 @@ function App() {
             element={user.isLoggedIn ? <PostAd /> : <Login />}
           />
           <Route path="/settings" element={<div></div>} />
-          <Route path="/profile" element={<div></div>} />
-          <Route path="/myposts" element={<div></div>} />
+          <Route path="/profile" element={user.isLoggedIn ? <MyProfile /> : <Login />} />
+          <Route path="/myposts" element={user.isLoggedIn ? <MyPosts /> : <Login /> } />
           <Route path="/messages" element={<Messages />} />
           <Route path="/messages/:chatId" element={<Messages />} />
           {user.isAdmin && <Route path="/posts" element={<AllPosts />} />}

@@ -238,7 +238,7 @@ export default function Navigation({ admin }) {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <MenuItem>
+          <MenuItem onClick={() => navigate("/myposts")}>
             <ListItemIcon>
               <ArticleIcon fontSize="small" />
             </ListItemIcon>
@@ -257,7 +257,7 @@ export default function Navigation({ admin }) {
             Post Ad
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={() => navigate("/profile")}>
             <ListItemIcon>
               <AccountCircleIcon />
             </ListItemIcon>

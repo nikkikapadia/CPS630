@@ -44,7 +44,7 @@ import LocationPicker from "../LocationPicker";
 
 import { UserContext } from "../contexts/UserContext";
 
-function AllPosts() {
+function MyPosts() {
   const {
     showSnackbar,
     setShowSnackbar,
@@ -79,7 +79,7 @@ function AllPosts() {
 
   const fetchPosts = async () => {
     let ads = [];
-    await fetch(`http://localhost:5001/api/ads/get/itemsWanted`, {
+    await fetch(`http://localhost:5001/api/ads/get/itemsWanted/author/${user.username}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -96,7 +96,7 @@ function AllPosts() {
           ad.category = "itemsWanted";
         });
         ads.push(...temp);
-        return fetch(`http://localhost:5001/api/ads/get/itemsForSale`, {
+        return fetch(`http://localhost:5001/api/ads/get/itemsForSale/author/${user.username}`, {
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -114,7 +114,7 @@ function AllPosts() {
           ad.category = "itemsForSale";
         });
         ads.push(...temp);
-        return fetch(`http://localhost:5001/api/ads/get/academicServices`, {
+        return fetch(`http://localhost:5001/api/ads/get/academicServices/author/${user.username}`, {
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -225,7 +225,7 @@ function BasicTable({ handleOpen, rows }) {
   );
 }
 
-export default AllPosts;
+export default MyPosts;
 
 function PostModal({ open, onClose, post, rows, fetchPosts }) {
   const [edit, setEdit] = useState(false);
@@ -657,7 +657,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts, onClose })
       console.log(values, "Submiited Values");
       setPostInfo({
         ...postInfo,
-        title: values.adTitle,
+        name: values.name,
         price: values.price,
         description: values.description,
         picture: values.photos,

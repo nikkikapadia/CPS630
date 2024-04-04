@@ -153,6 +153,7 @@ app.patch("/api/users/update/username/:username", async (req, res) => {
 
 // PATCH (update) a user by email
 app.patch("/api/users/update/email/:email", async (req, res) => {
+    /*
     // verify user is admin (requestingUser header set by middleware after decoding token)
     const result = await User.findOne({ email: req.requestingUser.email }).select(
         ["isAdmin", "username"]
@@ -171,6 +172,7 @@ app.patch("/api/users/update/email/:email", async (req, res) => {
     // only admin request can make another user admin
     let body = req.body;
     if (!isAdmin && body.isAdmin) body.isAdmin = false;
+    */
 
     try {
         const user = await User.findOneAndUpdate(

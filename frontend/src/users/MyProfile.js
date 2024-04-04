@@ -34,7 +34,7 @@ import { UserContext } from "../contexts/UserContext";
 
 //const rows = users;
 
-function Users() {
+function MyProfile() {
   const {
     showSnackbar,
     setShowSnackbar,
@@ -63,11 +63,11 @@ function Users() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [user.username]);
 
   const fetchUsers = async () => {
     const token = user.authToken;
-    await fetch(`http://localhost:5001/api/users/get`, {
+    await fetch(`http://localhost:5001/api/users/get/username/${user.username}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -86,7 +86,6 @@ function Users() {
 
   return (
     <>
-      <SearchBar value={searchValue} handleChange={setSearchValue} />
       <BasicTable
         handleOpen={onOpen}
         rows={rows.filter((val) => {
@@ -177,7 +176,7 @@ function BasicTable({ handleOpen, rows }) {
   );
 }
 
-export default Users;
+export default MyProfile;
 
 function UserModal({ open, onClose, user, rows, fetchUsers }) {
   const [edit, setEdit] = useState(false);
@@ -635,7 +634,11 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
         .then((data) => {
           return data;
         });
+      
+      setTimeout(() => {setUser({...user, fullName: values.fullName, username: values.username})}, 100);
+      console.log('changed user: ', user); 
       fetchUsers();
+      //fetchUsers();
       setLoading(false);
       console.log(values, "Submiited Values");
       setUserInfo({
@@ -690,6 +693,7 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
           helperText={formik.touched.username && formik.errors.username}
         />
       </Box>
+      {/*
       <FormControl fullWidth>
         <InputLabel id="admin">Admin</InputLabel>
         <Select
@@ -712,6 +716,7 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
           </FormHelperText>
         ) : null}
       </FormControl>
+        */}
 
       {loading ? (
         <Box
