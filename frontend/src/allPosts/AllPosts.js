@@ -23,7 +23,7 @@ import {
   Select,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -69,72 +69,92 @@ function AllPosts() {
 
   const { user, setUser } = useContext(UserContext);
 
-    const [rows, setRows] = useState([]);
-    
-    useEffect(() => {
-        fetchPosts();
-    }, []);
+  const [rows, setRows] = useState([]);
 
-    const token = user.authToken;
-        
-    const fetchPosts = async () => {
-        let ads = [];
-        await fetch(`http://localhost:5001/api/ads/get/itemsWanted`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'authorization': `Bearer ${token}`
-            }
-        })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            let temp = data;
-            temp.forEach(ad => { ad.category = 'itemsWanted'; });
-            ads.push(...temp);
-            return fetch(`http://localhost:5001/api/ads/get/itemsForSale`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`
-                }
-            });
-        })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            let temp = data;
-            temp.forEach(ad => { ad.category = 'itemsForSale'; });
-            ads.push(...temp);
-            return fetch(`http://localhost:5001/api/ads/get/academicServices`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`
-                }
-            });
-        })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            let temp = data;
-            temp.forEach(ad => { ad.category = 'academicServices'; });
-            ads.push(...temp);
-            setRows(ads);
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const token = user.authToken;
+
+  const fetchPosts = async () => {
+    let ads = [];
+    await fetch(`http://localhost:5001/api/ads/get/itemsWanted`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        let temp = data;
+        temp.forEach((ad) => {
+          ad.category = "itemsWanted";
         });
-    }
+        ads.push(...temp);
+        return fetch(`http://localhost:5001/api/ads/get/itemsForSale`, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        });
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        let temp = data;
+        temp.forEach((ad) => {
+          ad.category = "itemsForSale";
+        });
+        ads.push(...temp);
+        return fetch(`http://localhost:5001/api/ads/get/academicServices`, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        });
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        let temp = data;
+        temp.forEach((ad) => {
+          ad.category = "academicServices";
+        });
+        ads.push(...temp);
+        setRows(ads);
+      });
+  };
 
   return (
     <>
       <SearchBar value={searchValue} handleChange={setSearchValue} />
-      <BasicTable handleOpen={onOpen} rows={rows} />
-      <PostModal open={open} post={openedPost} onClose={onClose} rows={rows} fetchPosts={fetchPosts} />
+      <BasicTable
+        handleOpen={onOpen}
+        rows={rows.filter((val) => {
+          return (
+            val._id.includes(searchValue) ||
+            val.title.toLowerCase().includes(searchValue.toLowerCase())
+          );
+        })}
+      />
+      <PostModal
+        open={open}
+        post={openedPost}
+        onClose={onClose}
+        rows={rows}
+        fetchPosts={fetchPosts}
+      />
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
@@ -288,7 +308,7 @@ function PostModal({ open, onClose, post, rows, fetchPosts }) {
           )}
         </Box>
           */}
-          <Box sx={style}>
+        <Box sx={style}>
           {!edit ? (
             <>
               <div className="title-buttons-group">
@@ -331,9 +351,7 @@ function PostModal({ open, onClose, post, rows, fetchPosts }) {
                   </Button>
                 </div>
               </div>
-              <Typography sx={{ color: "black" }}>
-                    Tags:
-              </Typography>
+              <Typography sx={{ color: "black" }}>Tags:</Typography>
               {postInfo.tags &&
                 postInfo.tags.map((tag, index) => {
                   return <Chip label={tag} key={index} sx={{ mr: 1, mb: 1 }} />;
@@ -405,7 +423,14 @@ function PostModal({ open, onClose, post, rows, fetchPosts }) {
   );
 }
 
-function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, postInfo, rows, fetchPosts }) {
+function DeleteModal({
+  setOpenDeleteModal,
+  openDeleteModal,
+  onCloseModal,
+  postInfo,
+  rows,
+  fetchPosts,
+}) {
   const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
     useContext(SnackbarContext);
 
@@ -422,22 +447,22 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, postIn
     const token = user.authToken;
     const apiRoute = "http://localhost:5001/api";
     const result = await fetch(
-        `${apiRoute}/ads/delete/${postInfo.category}/id/${postInfo._id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
-          },
-        }
-      )
-    .then((res) => {
+      `${apiRoute}/ads/delete/${postInfo.category}/id/${postInfo._id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
         return res.json();
-    })
-    .then((data) => {
+      })
+      .then((data) => {
         return data;
-    });
+      });
     fetchPosts();
     setLoading(false);
     setOpenDeleteModal(false);
@@ -473,23 +498,23 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, postIn
             />
           </Box>
         ) : (
-        <div style={{ textAlign: "end" }}>
-          <Button
-            aria-label="Delete"
-            sx={{ backgroundColor: "#213555", color: "#FFF" }}
-            variant="contained"
-            onClick={handleYes}
-          >
-            Yes
-          </Button>
-          <Button
-            aria-label="Edit"
-            sx={{ color: "#213555" }}
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
-        </div>
+          <div style={{ textAlign: "end" }}>
+            <Button
+              aria-label="Delete"
+              sx={{ backgroundColor: "#213555", color: "#FFF" }}
+              variant="contained"
+              onClick={handleYes}
+            >
+              Yes
+            </Button>
+            <Button
+              aria-label="Edit"
+              sx={{ color: "#213555" }}
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+          </div>
         )}
       </Box>
     </Modal>
@@ -531,7 +556,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts }) {
       description: postInfo.description,
       price: Number(postInfo.price),
       photos: postInfo.photos,
-      location: postInfo.location
+      location: postInfo.location,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -589,7 +614,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts }) {
           samePhotos,
           postInfo.author,
           location,
-          latlng,
+          latlng
           //onClose
         );
       } else {
@@ -783,12 +808,12 @@ function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts }) {
         error={formik.touched.location && Boolean(formik.errors.location)}
       >
         <LocationPicker
-            value={location}
-            setValue={setLocation}
-            formik={formik}
+          value={location}
+          setValue={setLocation}
+          formik={formik}
         />
         {formik.touched.location && formik.errors.location ? (
-            <FormHelperText>{formik.errors.location}</FormHelperText>
+          <FormHelperText>{formik.errors.location}</FormHelperText>
         ) : null}
       </FormControl>
 
@@ -835,27 +860,27 @@ function SearchBar({ value, handleChange }) {
 }
 
 const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "50%",
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-    maxHeight: "80%",
-    overflow: "scroll",
-    "@media (max-width: 770px)": {
-      width: "80%",
-    },
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "50%",
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  maxHeight: "80%",
+  overflow: "scroll",
+  "@media (max-width: 770px)": {
+    width: "80%",
+  },
 };
 
 const imageRow = {
-    display: "flex",
-    flexWrap: "nowrap",
-    overflowX: "auto",
-    gap: "1em",
+  display: "flex",
+  flexWrap: "nowrap",
+  overflowX: "auto",
+  gap: "1em",
 };
 
 const deleteStyle = {
@@ -870,92 +895,70 @@ const deleteStyle = {
   p: 4,
 };
 
-
 async function newPostAndDelete(
-    apiRoute,
-    values,
-    token,
-    uploadPhotosToFirebase,
-    postInfo,
-    samePhotos,
-    username,
-    location,
-    latlng,
-    //onClose
-  ) {
-    // make POST request with empty photos array ---> returns id created for post
-    let result = await fetch(`${apiRoute}/ads/new/${values.category}`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token}`,
+  apiRoute,
+  values,
+  token,
+  uploadPhotosToFirebase,
+  postInfo,
+  samePhotos,
+  username,
+  location,
+  latlng
+  //onClose
+) {
+  // make POST request with empty photos array ---> returns id created for post
+  let result = await fetch(`${apiRoute}/ads/new/${values.category}`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      title: values.adTitle,
+      description: values.description,
+      postDate: new Date(),
+      author: username,
+      photos: samePhotos ? values.photos : [],
+      price: values.price,
+      location: {
+        description: location.description,
+        place_id: location.place_id,
+        lat: latlng.lat,
+        lng: latlng.lng,
       },
-      body: JSON.stringify({
-        title: values.adTitle,
-        description: values.description,
-        postDate: new Date(),
-        author: username,
-        photos: samePhotos ? values.photos : [],
-        price: values.price,
-        location: {
-          description: location.description,
-          place_id: location.place_id,
-          lat: latlng.lat,
-          lng: latlng.lng,
-        },
-        tags: values.tags,
-      }),
+      tags: values.tags,
+    }),
+  })
+    .then((res) => {
+      return res.json();
     })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        return data;
-      });
-    console.log(result);
-  
-    if (!samePhotos) {
-      const adId = result._id;
-      const urls = await uploadPhotosToFirebase(adId);
-  
-      console.log("Image(s) uploaded");
-      console.log(urls);
-  
-      // now make PATCH request with updated URLs
-      result = await fetch(
-        `${apiRoute}/ads/update/${values.category}/id/${adId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            photos: urls,
-          }),
-        }
-      )
-        .then((res) => {
-          return res.json();
-        })
-        .then((data) => {
-          return data;
-        });
-      console.log(JSON.stringify({ photos: urls }));
-    }
-  
-    // Delete ad in other category
+    .then((data) => {
+      return data;
+    });
+  console.log(result);
+
+  if (!samePhotos) {
+    const adId = result._id;
+    const urls = await uploadPhotosToFirebase(adId);
+
+    console.log("Image(s) uploaded");
+    console.log(urls);
+
+    // now make PATCH request with updated URLs
     result = await fetch(
-      `${apiRoute}/ads/delete/${postInfo.category}/id/${postInfo._id}`,
+      `${apiRoute}/ads/update/${values.category}/id/${adId}`,
       {
-        method: "DELETE",
+        method: "PATCH",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({
+          photos: urls,
+        }),
       }
     )
       .then((res) => {
@@ -964,11 +967,28 @@ async function newPostAndDelete(
       .then((data) => {
         return data;
       });
-  
-    // close modal
-    //onClose();
+    console.log(JSON.stringify({ photos: urls }));
   }
 
+  // Delete ad in other category
+  result = await fetch(
+    `${apiRoute}/ads/delete/${postInfo.category}/id/${postInfo._id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    }
+  )
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      return data;
+    });
 
-  
-  
+  // close modal
+  //onClose();
+}
