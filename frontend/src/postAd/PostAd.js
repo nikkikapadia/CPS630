@@ -21,7 +21,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
 
-import { firebaseStorage } from "../firebase";
+import { firebaseStorage } from "../firebase-config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 
@@ -439,6 +439,10 @@ const PostAd = () => {
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
         onClose={() => {
           setShowSnackbar(false);
           setSnackbarMessage("");
@@ -450,7 +454,7 @@ const PostAd = () => {
             setSnackbarMessage("");
           }}
           severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+          sx={{ width: "100%", fontSize: 20, alignItems: "center" }}
         >
           {snackbarMessage}
         </Alert>
