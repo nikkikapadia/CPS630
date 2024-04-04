@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import "@fontsource/inter";
 import Typography from "@mui/material/Typography";
@@ -163,11 +164,17 @@ function Row({ title, data, admin, setModalOpen, setModalPost }) {
     ItemsWanted: "itemsWanted",
     AcademicServices: "academicServices",
   };
+
+  const pageMap = {
+    "Items For Sale": "sale",
+    "Items Wanted": "wanted",
+    "Academic Services": "services",
+  };
   return (
     <Box sx={homeStyles.row}>
       <h2 style={homeStyles.header}>{title}</h2>
       <Box sx={homeStyles.cardRow}>
-        {data.map((posting) => {
+        {data.slice(0, 10).map((posting) => {
           const updatedPosting = {
             ...posting,
             category: categoryMap[title.replaceAll(" ", "")],
@@ -186,8 +193,38 @@ function Row({ title, data, admin, setModalOpen, setModalPost }) {
             />
           );
         })}
+        {data.length >= 10 && <SeeMoreCard page={pageMap[title]} />}
       </Box>
     </Box>
+  );
+}
+
+function SeeMoreCard({ page }) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/${page}`);
+  };
+
+  return (
+    <Card
+      sx={{
+        width: 300,
+        flex: "0 0 auto",
+        backgroundColor: "transparent",
+        boxShadow: "none",
+        alignContent: "center",
+      }}
+    >
+      <CardActionArea
+        sx={homeStyles.seeMoreCardClickable}
+        onClick={handleClick}
+      >
+        <CardContent sx={homeStyles.seeMoreCardContent}>
+          <Typography variant="h5">See More...</Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 }
 
@@ -284,6 +321,24 @@ const homeStyles = {
     flexDirection: "column",
     justifyContent: "space-between",
     width: "-webkit-fill-available",
+  },
+  seeMoreCardContent: {
+    textAlign: "center",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-evenly",
+    width: "-webkit-fill-available",
+    backgroundColor: "white",
+  },
+
+  seeMoreCardClickable: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    height: "100",
+    fontFamily: "Inter",
   },
 
   cardClickable: {
