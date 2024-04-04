@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -19,6 +19,8 @@ import {
   FormHelperText,
   FormLabel,
   Select,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -26,10 +28,19 @@ import { users } from "./mockData";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import "./Users.css";
+import { SnackbarContext } from "../contexts/SnackbarContext";
 
 const rows = users;
 
 function Users() {
+  const {
+    showSnackbar,
+    setShowSnackbar,
+    snackbarMessage,
+    setSnackbarMessage,
+    snackbarSeverity,
+  } = useContext(SnackbarContext);
+
   const [open, setOpen] = useState(false);
   const [openedUser, setOpenedUser] = useState({});
   const [searchValue, setSearchValue] = useState("");
@@ -49,6 +60,25 @@ function Users() {
       <SearchBar value={searchValue} handleChange={setSearchValue} />
       <BasicTable handleOpen={onOpen} />
       <UserModal open={open} user={openedUser} onClose={onClose} />
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={() => {
+          setShowSnackbar(false);
+          setSnackbarMessage("");
+        }}
+      >
+        <Alert
+          onClose={() => {
+            setShowSnackbar(false);
+            setSnackbarMessage("");
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
@@ -186,6 +216,9 @@ function UserModal({ open, onClose, user }) {
 }
 
 function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
+  const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
+    useContext(SnackbarContext);
+
   const handleClose = () => {
     setOpenDeleteModal(false);
   };
@@ -193,6 +226,9 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal }) {
   const handleYes = () => {
     setOpenDeleteModal(false);
     onCloseModal();
+    setShowSnackbar(true);
+    setSnackbarMessage("User Successfully Deleted");
+    setSnackbarSeverity("success");
   };
 
   const handleCancel = () => {
