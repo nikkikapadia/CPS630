@@ -15,6 +15,7 @@ import {
   Chip,
   Snackbar,
   Alert,
+  CircularProgress
 } from "@mui/material";
 import React from "react";
 import { useFormik } from "formik";
@@ -64,6 +65,7 @@ const PostAd = () => {
     setSnackbarSeverity,
   } = useContext(SnackbarContext);
   const [location, setLocation] = React.useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -79,6 +81,7 @@ const PostAd = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
+      setLoading(true);
       console.log("Submitted form values: ", values);
 
       const latlng = await fetch(
@@ -102,6 +105,8 @@ const PostAd = () => {
           setShowSnackbar(true);
           setSnackbarMessage("Failed to submit post");
           setSnackbarSeverity("error");
+          setLoading(false);
+          return;
         });
 
       // Upload photos to folder with same id name or create one
@@ -204,7 +209,7 @@ const PostAd = () => {
 
       // clear fields
       resetForm();
-
+      setLoading(false);
       setShowSnackbar(true);
       setSnackbarMessage("Post uploaded successfully");
       setSnackbarSeverity("success");
@@ -426,11 +431,27 @@ const PostAd = () => {
                   textTransform: "capitalize",
                   fontSize: "16px",
                   ":hover": { backgroundColor: "#213555" },
+                  postion: 'relative',
                 }}
                 variant="contained"
                 type="submit"
+                disabled={loading || !formik.isValid}
               >
-                Post Ad
+                {loading ? (
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      color: 'white',
+                      position: 'absolute',
+                      left: '50%',
+                      top: '50%',
+                      marginLeft: '-12px', // Half of the spinner size to center it horizontally
+                      marginTop: '-12px', // Half of the spinner size to center it vertically
+                    }}
+                  />
+                ) : (
+                  "Post Ad"
+                )}
               </Button>
             </form>
           </CardContent>
