@@ -33,6 +33,10 @@ import { useContext, useState, useRef, useEffect } from "react";
 import MapComponent from "../Map";
 import LocationPicker from "../LocationPicker";
 
+function isPrecise(num){
+  return /\d+\.\d{2}/gm.test(String(num));
+}
+
 const validationSchema = yup.object({
   adTitle: yup
     .string()
@@ -49,7 +53,10 @@ const validationSchema = yup.object({
       "At least one photo is required",
       (value) => value && value.length > 0
     ),
-  price: yup.number().required("Price is required"),
+  price: yup
+    .number()
+    .required("Price is required to two decimal places")
+    .isPrecise(),
   location: yup.object().required("Location is required"),
   tags: yup.array(),
 });
