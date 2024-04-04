@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Box,
   TextField,
@@ -11,33 +11,112 @@ import { Create, MoreHoriz, Send, StarBorder } from "@mui/icons-material";
 import SingleUserDisplay from "./SingleUserDisplay";
 import { useParams } from "react-router-dom";
 import SingleMessage from "./SingleMessage";
-import { chatmessages, chats } from "./messagesFakeData";
+// import { chatmessages, chats } from "./messagesFakeData";
+
+import { UserContext } from "../contexts/UserContext";
 
 const Messages = () => {
+  const { user } = useContext(UserContext);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [findedChat, setFindedChat] = useState(null);
+  const [chats, setChats] = useState([]);
+
+  const apiRoot = "http://localhost:5001/api";
 
   const params = useParams();
 
+  const token = user.authToken;
+
   useEffect(() => {
-    if (params.chatId) {
-      setSelectedChat(params.chatId);
+    async function fetchData() {
+      await fetch(`${apiRoot}/chats/get/${user.username}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setChats(data);
+          console.log(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching messages data:", error);
+        });
     }
-  }, [params.chatId]);
+
+    fetchData();
+  }, [token, user.username]);
+
+  // useEffect(() => {
+  //   if (params.chatId) {
+  //     setSelectedChat(params.chatId);
+  //   }
+  // }, [params.chatId]);
+
+  useEffect(() => {
+    setFindedChat(chats.find((chat) => chat._id === selectedChat));
+  }, [selectedChat]);
 
   useEffect(() => {
     if (selectedChat) {
-      setMessages(chatmessages[selectedChat] || []);
+      setMessages(findedChat?.messages || []);
     }
   }, [selectedChat]);
 
-  useEffect(() => {
-    setFindedChat(chats.find((chat) => chat.id === +selectedChat));
-  }, [selectedChat]);
+  const handleSendMessage = async () => {
+    console.log(findedChat);
+    await fetch(
+      `${apiRoot}/chats/newmessage/${findedChat.user1}/${findedChat.user2}`,
+      {
+        method: "PATCH",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              sender: user.username,
+              message: newMessage,
+              date: new Date(),
+            },
+          ],
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => data)
+      .catch((error) => {
+        console.error("Error sending messages data:", error);
+      });
 
-  console.log(findedChat, "finded");
+    await fetch(
+      `${apiRoot}/chats/get/${findedChat.user1}/${findedChat.user2}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => setMessages(data))
+      .catch((error) => {
+        console.error("Error fetching messages data:", error);
+      });
+
+    setNewMessage("");
+  };
+
+  // console.log(findedChat, "finded");
 
   //   const handleSendMessage = () => {
   //     setMessages({
@@ -47,6 +126,7 @@ const Messages = () => {
   //     setNewMessage("");
   //   };
 
+  // console.log("chats", chats);
   return (
     <Box
       display="flex"
@@ -82,18 +162,19 @@ const Messages = () => {
             <IconButton>
               <MoreHoriz fontSize="medium" />
             </IconButton>
-            <IconButton>
-              <Create fontSize="medium" />
-            </IconButton>
           </Box>
         </Box>
-        {chats.map((chat) => (
-          <SingleUserDisplay
-            chat={chat}
-            selectedChat={selectedChat}
-            setSelectedChat={setSelectedChat}
-          />
-        ))}
+        {chats &&
+          chats.map((chat) => (
+            <SingleUserDisplay
+              chat={chat}
+              selectedChat={selectedChat}
+              setSelectedChat={setSelectedChat}
+              user={user}
+              setMessages={setMessages}
+              messages={messages}
+            />
+          ))}
       </Box>
       <Box flex={1} bgcolor={"background.paper"}>
         {selectedChat ? (
@@ -117,7 +198,9 @@ const Messages = () => {
                   fontWeight={"600"}
                   variant="body2"
                 >
-                  {findedChat?.senderName}
+                  {findedChat?.user1 === user.username
+                    ? findedChat?.user2
+                    : findedChat?.user1}
                 </Typography>
                 <Box display="flex" alignItems="center">
                   <Box
@@ -143,14 +226,16 @@ const Messages = () => {
             </Box>
             <Box
               pt={1.5}
+              pb={"200px"}
+              height={"50%"}
               sx={{
-                overflowY: "auto",
+                overflowY: "scroll",
                 maxHeight: "calc(81.5vh)",
               }}
             >
               {messages &&
                 messages?.map((message, index) => (
-                  <SingleMessage message={message} key={index} />
+                  <SingleMessage message={message} key={index} user={user} />
                 ))}
             </Box>
             <Box
@@ -181,7 +266,7 @@ const Messages = () => {
                   "&:hover": { bgcolor: "#213555", opacity: 0.9 },
                 }}
                 variant="contained"
-                // onClick={handleSendMessage}
+                onClick={handleSendMessage}
                 disabled={!newMessage}
                 endIcon={<Send />}
               >

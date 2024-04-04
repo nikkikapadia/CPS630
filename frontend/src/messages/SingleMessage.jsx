@@ -1,8 +1,6 @@
 import { Avatar, Box, Typography } from "@mui/material";
 
-const SingleMessage = ({ message }) => {
-  console.log(message, "message");
-
+const SingleMessage = ({ message, user }) => {
   return (
     <Box
       flex={1}
@@ -17,13 +15,14 @@ const SingleMessage = ({ message }) => {
       }}
     >
       <Avatar sx={{ width: 40, height: 40, fontSize: "16px" }}>
-        {" "}
-        {message?.senderName === "Me" ? "ME" : message?.senderName?.slice(0, 1)}
+        {message[0]?.sender === user.username
+          ? "ME"
+          : message[0]?.sender?.slice(0, 1)}
       </Avatar>
       <Box width={"100%"}>
         <Box display={"flex"} alignItems={"center"} gap={2}>
           <Typography variant={"body2"} fontWeight={"600"} fontSize={"14px"}>
-            {message?.senderName}{" "}
+            {message[0]?.sender}{" "}
           </Typography>
           <Box
             sx={{
@@ -33,7 +32,9 @@ const SingleMessage = ({ message }) => {
               bgcolor: "grey.500",
             }}
           />
-          <Typography variant={"body2"}>2:36pm</Typography>
+          <Typography variant={"body2"}>
+            {new Date(message[0].date).toLocaleTimeString()}
+          </Typography>
         </Box>
         <Typography
           maxWidth={"70%"}
@@ -41,7 +42,7 @@ const SingleMessage = ({ message }) => {
           textAlign={"left"}
           mt={1}
         >
-          {message?.message}
+          {message[0]?.message}
         </Typography>
       </Box>
     </Box>
