@@ -48,7 +48,10 @@ const validationSchema = yup.object({
       "At least one photo is required",
       (value) => value && value.length > 0
     ),
-  price: yup.number().required("Price is required"),
+  price: yup
+    .number()
+    .required("Price is required to two decimal places")
+    .toFixed(2),
   location: yup.object().required("Location is required"),
   tags: yup.array(),
 });
