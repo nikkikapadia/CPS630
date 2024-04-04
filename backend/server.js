@@ -48,21 +48,6 @@ app.get("/api/places/:placeID", async (req, res) => {
 
 // GET user by id
 app.get("/api/users/get/id/:id", async (req, res) => {
-    // verify user is admin (requestingUser header set by middleware after decoding token)
-    const result = await User.findOne({ email: req.requestingUser.email }).select(
-        ["isAdmin", "username"]
-    );
-    const isAdmin = result.isAdmin;
-    if (isAdmin == null)
-        return res
-            .status(400)
-            .json({ error: "Can not find user in database to validate credentials" });
-    // if user not admin, check if they are updating their own info
-    else if (isAdmin == false && req.params.username != result.username)
-        return res
-            .status(400)
-            .json({ error: "User not admin or not authorized to make this request" });
-            
     try {
         const user = await User.find({ _id: req.params.id });
         user != null ? res.status(200).json(user) : res.status(200).json([]); // returns [] if no users found
@@ -73,21 +58,6 @@ app.get("/api/users/get/id/:id", async (req, res) => {
 
 // GET user by email
 app.get("/api/users/get/email/:email", async (req, res) => {
-    // verify user is admin (requestingUser header set by middleware after decoding token)
-    const result = await User.findOne({ email: req.requestingUser.email }).select(
-        ["isAdmin", "username"]
-    );
-    const isAdmin = result.isAdmin;
-    if (isAdmin == null)
-        return res
-            .status(400)
-            .json({ error: "Can not find user in database to validate credentials" });
-    // if user not admin, check if they are updating their own info
-    else if (isAdmin == false && req.params.username != result.username)
-        return res
-            .status(400)
-            .json({ error: "User not admin or not authorized to make this request" });
-
     try {
         const user = await User.find({ email: req.params.email });
         user != null ? res.status(200).json(user) : res.status(200).json([]); // returns [] if no users found
@@ -98,21 +68,6 @@ app.get("/api/users/get/email/:email", async (req, res) => {
 
 // GET user by username
 app.get("/api/users/get/username/:username", async (req, res) => {
-    // verify user is admin (requestingUser header set by middleware after decoding token)
-    const result = await User.findOne({ email: req.requestingUser.email }).select(
-        ["isAdmin", "username"]
-    );
-    const isAdmin = result.isAdmin;
-    if (isAdmin == null)
-        return res
-            .status(400)
-            .json({ error: "Can not find user in database to validate credentials" });
-    // if user not admin, check if they are updating their own info
-    else if (isAdmin == false && req.params.username != result.username)
-        return res
-            .status(400)
-            .json({ error: "User not admin or not authorized to make this request" });
-
     try {
         const user = await User.find({ username: req.params.username });
         console.log(user);
