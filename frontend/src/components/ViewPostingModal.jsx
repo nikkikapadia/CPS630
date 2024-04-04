@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Modal, Box, Typography, Button, Chip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
@@ -15,6 +16,8 @@ function ViewPostingModal({ open, onClose, post }) {
 
   const { user, setUser } = useContext(UserContext);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     setPostInfo(post);
   }, [post]);
@@ -28,37 +31,29 @@ function ViewPostingModal({ open, onClose, post }) {
     setEdit(false);
   };
 
+  const token = user.authToken;
+
   const handleChatClick = async () => {
-    //   let result = await fetch(`${apiRoute}//new/${values.category}`, {
-    //   method: "POST",
-    //   headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "application/json",
-    //     authorization: `Bearer ${token}`,
-    //   },
-    //   body: JSON.stringify({
-    //     title: values.adTitle,
-    //     description: values.description,
-    //     postDate: new Date(),
-    //     author: username,
-    //     photos: samePhotos ? values.photos : [],
-    //     price: values.price,
-    //     location: {
-    //       description: location.description,
-    //       place_id: location.place_id,
-    //       lat: latlng.lat,
-    //       lng: latlng.lng,
-    //     },
-    //     tags: values.tags,
-    //   }),
-    // })
-    //   .then((res) => {
-    //     return res.json();
-    //   })
-    //   .then((data) => {
-    //     return data;
-    //   });
-    // console.log(result);
+    let result = await fetch(`http://localhost:5001/api/chats/new`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user1: user.username,
+        user2: postInfo.author,
+        messages: [],
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        return data;
+      });
+    navigate(`/messages/${result._id}`);
   };
 
   return (
@@ -151,7 +146,7 @@ function ViewPostingModal({ open, onClose, post }) {
                 disabled={!user.isLoggedIn}
                 sx={{ backgroundColor: "#213555", mr: 2 }}
                 onClick={handleChatClick}
-                href={"/messages"}
+                // href={"/messages"}
               >
                 Chat
               </Button>

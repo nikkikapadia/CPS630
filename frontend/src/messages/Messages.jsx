@@ -40,7 +40,10 @@ const Messages = () => {
         },
       })
         .then((res) => res.json())
-        .then((data) => setChats(data))
+        .then((data) => {
+          setChats(data);
+          console.log(data);
+        })
         .catch((error) => {
           console.error("Error fetching messages data:", error);
         });
@@ -49,25 +52,26 @@ const Messages = () => {
     fetchData();
   }, [token, user.username]);
 
-  useEffect(() => {
-    if (params.chatId) {
-      setSelectedChat(params.chatId);
-    }
-  }, [params.chatId]);
-
-  useEffect(() => {
-    if (selectedChat) {
-      setMessages(findedChat.messages || []);
-    }
-  }, [selectedChat]);
+  // useEffect(() => {
+  //   if (params.chatId) {
+  //     setSelectedChat(params.chatId);
+  //   }
+  // }, [params.chatId]);
 
   useEffect(() => {
     setFindedChat(chats.find((chat) => chat._id === selectedChat));
   }, [selectedChat]);
 
-  const handleSendMessage = () => {
-    fetch(
-      `${apiRoot}/api/chats/newmessage/${selectedChat.user1}/${selectedChat.user2}`,
+  useEffect(() => {
+    if (selectedChat) {
+      setMessages(findedChat?.messages || []);
+    }
+  }, [selectedChat]);
+
+  const handleSendMessage = async () => {
+    console.log(findedChat);
+    await fetch(
+      `${apiRoot}/chats/newmessage/${findedChat.user1}/${findedChat.user2}`,
       {
         method: "PATCH",
         headers: {
@@ -77,7 +81,6 @@ const Messages = () => {
         },
         body: JSON.stringify({
           messages: [
-            ...messages,
             {
               sender: user.username,
               message: newMessage,
@@ -88,10 +91,29 @@ const Messages = () => {
       }
     )
       .then((res) => res.json())
-      .then((data) => setChats(data))
+      .then((data) => data)
       .catch((error) => {
         console.error("Error sending messages data:", error);
       });
+
+    await fetch(
+      `${apiRoot}/chats/get/${findedChat.user1}/${findedChat.user2}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => setMessages(data))
+      .catch((error) => {
+        console.error("Error fetching messages data:", error);
+      });
+
+    setNewMessage("");
   };
 
   // console.log(findedChat, "finded");
@@ -142,13 +164,17 @@ const Messages = () => {
             </IconButton>
           </Box>
         </Box>
-        {chats.map((chat) => (
-          <SingleUserDisplay
-            chat={chat}
-            selectedChat={selectedChat}
-            setSelectedChat={setSelectedChat}
-          />
-        ))}
+        {chats &&
+          chats.map((chat) => (
+            <SingleUserDisplay
+              chat={chat}
+              selectedChat={selectedChat}
+              setSelectedChat={setSelectedChat}
+              user={user}
+              setMessages={setMessages}
+              messages={messages}
+            />
+          ))}
       </Box>
       <Box flex={1} bgcolor={"background.paper"}>
         {selectedChat ? (
@@ -200,8 +226,10 @@ const Messages = () => {
             </Box>
             <Box
               pt={1.5}
+              pb={"200px"}
+              height={"50%"}
               sx={{
-                overflowY: "auto",
+                overflowY: "scroll",
                 maxHeight: "calc(81.5vh)",
               }}
             >
