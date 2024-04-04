@@ -21,7 +21,7 @@ import {
   Select,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -57,7 +57,7 @@ function Users() {
     setOpenedUser({});
   };
 
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const [rows, setRows] = useState([]);
 
@@ -68,27 +68,43 @@ function Users() {
   const fetchUsers = async () => {
     const token = user.authToken;
     await fetch(`http://localhost:5001/api/users/get`, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'authorization': `Bearer ${token}`
-        }
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
     })
-    .then(res => {
-        return res.json()
-    })
-    .then(data => {
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
         console.log(data);
         setRows(data);
-    });
-  }
+      });
+  };
 
   return (
     <>
       <SearchBar value={searchValue} handleChange={setSearchValue} />
-      <BasicTable handleOpen={onOpen} rows={rows} />
-      <UserModal open={open} user={openedUser} onClose={onClose} rows={rows} fetchUsers={fetchUsers} />
+      <BasicTable
+        handleOpen={onOpen}
+        rows={rows.filter((val) => {
+          return (
+            val._id.includes(searchValue) ||
+            val.username.toLowerCase().includes(searchValue.toLowerCase()) ||
+            val.fullName.toLowerCase().includes(searchValue.toLowerCase()) ||
+            val.email.toLowerCase().includes(searchValue.toLowerCase())
+          );
+        })}
+      />
+      <UserModal
+        open={open}
+        user={openedUser}
+        onClose={onClose}
+        rows={rows}
+        fetchUsers={fetchUsers}
+      />
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
@@ -255,13 +271,20 @@ function UserModal({ open, onClose, user, rows, fetchUsers }) {
   );
 }
 
-function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, userInfo, rows, fetchUsers }) {
+function DeleteModal({
+  setOpenDeleteModal,
+  openDeleteModal,
+  onCloseModal,
+  userInfo,
+  rows,
+  fetchUsers,
+}) {
   const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
     useContext(SnackbarContext);
 
   const { user, userContext } = useContext(UserContext);
 
-  const [loading ,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
     setOpenDeleteModal(false);
@@ -273,84 +296,79 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, userIn
     const apiRoute = "http://localhost:5001/api";
 
     const fetchUserAds = async () => {
-        const token = user.authToken;
-        let items = [];
-        await fetch(`http://localhost:5001/api/ads/get/itemsWanted/author/${userInfo.username}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'authorization': `Bearer ${token}`
-            }
+      const token = user.authToken;
+      let items = [];
+      await fetch(
+        `http://localhost:5001/api/ads/get/itemsWanted/author/${userInfo.username}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      )
+        .then((res) => {
+          return res.json();
         })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            let temp = data;
-            temp.forEach(ad => { ad.category = 'itemsWanted'; });
-            items.push(...temp);
-            return fetch(`http://localhost:5001/api/ads/get/itemsForSale/author/${userInfo.username}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`
-                }
-            });
-        })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            let temp = data;
-            temp.forEach(ad => { ad.category = 'itemsForSale'; });
-            items.push(...temp);
-            return fetch(`http://localhost:5001/api/ads/get/academicServices/author/${userInfo.username}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`
-                }
-            });
-        })
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            let temp = data;
-            temp.forEach(ad => { ad.category = 'academicServices'; });
-            items.push(...temp);
-            
-        });
-        return items;
-    }
-
-    const adsByUser = await fetchUserAds();
-
-    for (const ad of adsByUser) {
-        const result = await fetch(
-            `${apiRoute}/ads/delete/${ad.category}/id/${ad._id}`,
+        .then((data) => {
+          let temp = data;
+          temp.forEach((ad) => {
+            ad.category = "itemsWanted";
+          });
+          items.push(...temp);
+          return fetch(
+            `http://localhost:5001/api/ads/get/itemsForSale/author/${userInfo.username}`,
             {
-              method: "DELETE",
+              method: "GET",
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
                 authorization: `Bearer ${token}`,
               },
             }
-          )
+          );
+        })
         .then((res) => {
-            return res.json();
+          return res.json();
         })
         .then((data) => {
-            return data;
+          let temp = data;
+          temp.forEach((ad) => {
+            ad.category = "itemsForSale";
+          });
+          items.push(...temp);
+          return fetch(
+            `http://localhost:5001/api/ads/get/academicServices/author/${userInfo.username}`,
+            {
+              method: "GET",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          let temp = data;
+          temp.forEach((ad) => {
+            ad.category = "academicServices";
+          });
+          items.push(...temp);
         });
-    }
+      return items;
+    };
 
-    const result = await fetch(
-        `${apiRoute}/users/delete/email/${userInfo.email}`,
+    const adsByUser = await fetchUserAds();
+
+    for (const ad of adsByUser) {
+      const result = await fetch(
+        `${apiRoute}/ads/delete/${ad.category}/id/${ad._id}`,
         {
           method: "DELETE",
           headers: {
@@ -360,12 +378,31 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, userIn
           },
         }
       )
-    .then((res) => {
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          return data;
+        });
+    }
+
+    const result = await fetch(
+      `${apiRoute}/users/delete/email/${userInfo.email}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
         return res.json();
-    })
-    .then((data) => {
+      })
+      .then((data) => {
         return data;
-    });
+      });
     fetchUsers();
     setLoading(false);
     setOpenDeleteModal(false);
@@ -386,53 +423,47 @@ function DeleteModal({ setOpenDeleteModal, openDeleteModal, onCloseModal, userIn
           Are you sure you want to delete this user?
         </Typography>
         {loading ? (
-        <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: 5,
-        }}
-      >
-        <CircularProgress
-          size={50}
-          thickness={4}
-          style={{ color: "#213555" }}
-        />
-      </Box>
-      ) : (
-        <div style={{ textAlign: "end" }}>
-          <Button
-            aria-label="Delete"
-            sx={{ backgroundColor: "#213555", color: "#FFF" }}
-            variant="contained"
-            onClick={handleYes}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 5,
+            }}
           >
-            Yes
-          </Button>
-          <Button
-            aria-label="Edit"
-            sx={{ color: "#213555" }}
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
-        </div>
-      )}
+            <CircularProgress
+              size={50}
+              thickness={4}
+              style={{ color: "#213555" }}
+            />
+          </Box>
+        ) : (
+          <div style={{ textAlign: "end" }}>
+            <Button
+              aria-label="Delete"
+              sx={{ backgroundColor: "#213555", color: "#FFF" }}
+              variant="contained"
+              onClick={handleYes}
+            >
+              Yes
+            </Button>
+            <Button
+              aria-label="Edit"
+              sx={{ color: "#213555" }}
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
       </Box>
     </Modal>
   );
 }
 
 function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers }) {
-  const {
-        showSnackbar,
-        setShowSnackbar,
-        snackbarMessage,
-        setSnackbarMessage,
-        snackbarSeverity,
-        setSnackbarSeverity
-  } = useContext(SnackbarContext);
+  const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
+    useContext(SnackbarContext);
   const { user, setUser } = useContext(UserContext);
 
   const [loading, setLoading] = useState(false);
@@ -452,156 +483,168 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers }) {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-        console.log(formik.initialValues.username);
-        setLoading(true);
-        const token = user.authToken;
-        const apiRoute = "http://localhost:5001/api";
+      console.log(formik.initialValues.username);
+      setLoading(true);
+      const token = user.authToken;
+      const apiRoute = "http://localhost:5001/api";
 
-        // if username edited, check if doesn't exist already and if not then update ads containing old username with new username
-        if (formik.initialValues.username != values.username) {
-            const user = await fetch(
-                `${apiRoute}/users/get/username/${values.username}`,
-                {
+      // if username edited, check if doesn't exist already and if not then update ads containing old username with new username
+      if (formik.initialValues.username != values.username) {
+        const user = await fetch(
+          `${apiRoute}/users/get/username/${values.username}`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+          }
+        )
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            return data;
+          });
+
+        // found user with new username
+        if (user.length != 0) {
+          setShowSnackbar(true);
+          setSnackbarMessage("Another user already exists with that username");
+          setSnackbarSeverity("error");
+          setLoading(false);
+          return;
+        } else {
+          const fetchUserAds = async () => {
+            const token = user.authToken;
+            let items = [];
+            await fetch(
+              `http://localhost:5001/api/ads/get/itemsWanted/author/${formik.initialValues.username}`,
+              {
+                method: "GET",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                  authorization: `Bearer ${token}`,
+                },
+              }
+            )
+              .then((res) => {
+                return res.json();
+              })
+              .then((data) => {
+                let temp = data;
+                temp.forEach((ad) => {
+                  ad.category = "itemsWanted";
+                });
+                items.push(...temp);
+                return fetch(
+                  `http://localhost:5001/api/ads/get/itemsForSale/author/${formik.initialValues.username}`,
+                  {
                     method: "GET",
                     headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json",
-                        authorization: `Bearer ${token}`,
-                    }
-                }
-                )
-                .then((res) => {
-                    return res.json();
-                })
-                .then((data) => {
-                    return data;
-            });
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                      authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+              })
+              .then((res) => {
+                return res.json();
+              })
+              .then((data) => {
+                let temp = data;
+                temp.forEach((ad) => {
+                  ad.category = "itemsForSale";
+                });
+                items.push(...temp);
+                return fetch(
+                  `http://localhost:5001/api/ads/get/academicServices/author/${formik.initialValues.username}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                      authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+              })
+              .then((res) => {
+                return res.json();
+              })
+              .then((data) => {
+                let temp = data;
+                temp.forEach((ad) => {
+                  ad.category = "academicServices";
+                });
+                items.push(...temp);
+              });
+            return items;
+          };
 
-            // found user with new username
-            if (user.length != 0) {
-                setShowSnackbar(true);
-                setSnackbarMessage("Another user already exists with that username");
-                setSnackbarSeverity("error");
-                setLoading(false);
-                return;
-            }
-            else {
-                const fetchUserAds = async () => {
-                    const token = user.authToken;
-                    let items = [];
-                    await fetch(`http://localhost:5001/api/ads/get/itemsWanted/author/${formik.initialValues.username}`, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'authorization': `Bearer ${token}`
-                        }
-                    })
-                    .then(res => {
-                        return res.json();
-                    })
-                    .then(data => {
-                        let temp = data;
-                        temp.forEach(ad => { ad.category = 'itemsWanted'; });
-                        items.push(...temp);
-                        return fetch(`http://localhost:5001/api/ads/get/itemsForSale/author/${formik.initialValues.username}`, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json',
-                                'authorization': `Bearer ${token}`
-                            }
-                        });
-                    })
-                    .then(res => {
-                        return res.json();
-                    })
-                    .then(data => {
-                        let temp = data;
-                        temp.forEach(ad => { ad.category = 'itemsForSale'; });
-                        items.push(...temp);
-                        return fetch(`http://localhost:5001/api/ads/get/academicServices/author/${formik.initialValues.username}`, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json',
-                                'authorization': `Bearer ${token}`
-                            }
-                        });
-                    })
-                    .then(res => {
-                        return res.json();
-                    })
-                    .then(data => {
-                        let temp = data;
-                        temp.forEach(ad => { ad.category = 'academicServices'; });
-                        items.push(...temp);
-                        
-                    });
-                    return items;
-                }
+          const adsByUser = await fetchUserAds();
 
-                const adsByUser = await fetchUserAds();
-
-                for (const ad of adsByUser) {
-                    const result = await fetch(
-                    `${apiRoute}/ads/update/${ad.category}/id/${ad._id}`,
-                    {
-                        method: "PATCH",
-                        headers: {
-                            Accept: "application/json",
-                            "Content-Type": "application/json",
-                            authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({
-                            author: values.username
-                        })
-                    }
-                    )
-                    .then((res) => {
-                        return res.json();
-                    })
-                    .then((data) => {
-                        return data;
-                    });
-                }
-            }
-        }
-
-        const result = await fetch(
-            `${apiRoute}/users/update/email/${userInfo.email}`,
-            {
+          for (const ad of adsByUser) {
+            const result = await fetch(
+              `${apiRoute}/ads/update/${ad.category}/id/${ad._id}`,
+              {
                 method: "PATCH",
                 headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                    authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                  authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    fullName: values.fullName,
-                    isAdmin: values.admin,
-                    username: values.username
-                })
-            }
-        )
+                  author: values.username,
+                }),
+              }
+            )
+              .then((res) => {
+                return res.json();
+              })
+              .then((data) => {
+                return data;
+              });
+          }
+        }
+      }
+
+      const result = await fetch(
+        `${apiRoute}/users/update/email/${userInfo.email}`,
+        {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            fullName: values.fullName,
+            isAdmin: values.admin,
+            username: values.username,
+          }),
+        }
+      )
         .then((res) => {
-            return res.json();
+          return res.json();
         })
         .then((data) => {
-            return data;
+          return data;
         });
-        fetchUsers();
-        setLoading(false);
-        console.log(values, "Submiited Values");
-        setUserInfo({
-            ...userInfo,
-            name: values.fullName,
-            username: values.username,
-            admin: values.admin,
-        });
-        setEdit(false);
-        
-      },
+      fetchUsers();
+      setLoading(false);
+      console.log(values, "Submiited Values");
+      setUserInfo({
+        ...userInfo,
+        name: values.fullName,
+        username: values.username,
+        admin: values.admin,
+      });
+      setEdit(false);
+    },
   });
 
   return (
@@ -670,34 +713,34 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers }) {
 
       {loading ? (
         <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: 5,
-        }}
-      >
-        <CircularProgress
-          size={50}
-          thickness={4}
-          style={{ color: "#213555" }}
-        />
-      </Box>
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 5,
+          }}
+        >
+          <CircularProgress
+            size={50}
+            thickness={4}
+            style={{ color: "#213555" }}
+          />
+        </Box>
       ) : (
-      <Button
-        fullWidth
-        sx={{
-          backgroundColor: "#213555",
-          py: 1.5,
-          textTransform: "capitalize",
-          fontSize: "16px",
-          ":hover": { backgroundColor: "#213555" },
-        }}
-        variant="contained"
-        type="submit"
-      >
-        Save Edits
-      </Button>
+        <Button
+          fullWidth
+          sx={{
+            backgroundColor: "#213555",
+            py: 1.5,
+            textTransform: "capitalize",
+            fontSize: "16px",
+            ":hover": { backgroundColor: "#213555" },
+          }}
+          variant="contained"
+          type="submit"
+        >
+          Save Edits
+        </Button>
       )}
     </form>
   );
