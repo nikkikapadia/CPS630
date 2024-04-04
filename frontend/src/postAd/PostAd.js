@@ -15,7 +15,7 @@ import {
   Chip,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import React from "react";
 import { useFormik } from "formik";
@@ -33,7 +33,7 @@ import { useContext, useState, useRef, useEffect } from "react";
 import MapComponent from "../Map";
 import LocationPicker from "../LocationPicker";
 
-function isPrecise(num){
+function isPrecise(num) {
   return /\d+\.\d{2}/gm.test(String(num));
 }
 
@@ -53,10 +53,8 @@ const validationSchema = yup.object({
       "At least one photo is required",
       (value) => value && value.length > 0
     ),
-  price: yup
-    .number()
-    .required("Price is required to two decimal places"),
-    //.isPrecise(),
+  price: yup.number().required("Price is required to two decimal places"),
+  // .isPrecise(),
   location: yup.object().required("Location is required"),
   tags: yup.array(),
 });
@@ -432,36 +430,36 @@ const PostAd = () => {
 
               {loading ? (
                 <Box
-                    sx={{
+                  sx={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     marginTop: 5,
-                    }}
+                  }}
                 >
-                    <CircularProgress
+                  <CircularProgress
                     size={50}
                     thickness={4}
                     style={{ color: "#213555" }}
-                    />
+                  />
                 </Box>
               ) : (
-              <Button
-                fullWidth
-                sx={{
-                  backgroundColor: "#213555",
-                  py: 1.5,
-                  textTransform: "capitalize",
-                  fontSize: "16px",
-                  ":hover": { backgroundColor: "#213555" },
-                  postion: 'relative',
-                }}
-                variant="contained"
-                type="submit"
-                disabled={loading || !formik.isValid}
-              >
+                <Button
+                  fullWidth
+                  sx={{
+                    backgroundColor: "#213555",
+                    py: 1.5,
+                    textTransform: "capitalize",
+                    fontSize: "16px",
+                    ":hover": { backgroundColor: "#213555" },
+                    postion: "relative",
+                  }}
+                  variant="contained"
+                  type="submit"
+                  disabled={loading || !formik.isValid}
+                >
                   Post Ad
-              </Button>
+                </Button>
               )}
             </form>
           </CardContent>

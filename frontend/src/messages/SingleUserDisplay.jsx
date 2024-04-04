@@ -5,7 +5,7 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
   const navigate = useNavigate();
 
   const handleUserClick = () => {
-    setSelectedChat(chat.id);
+    setSelectedChat(chat._id);
   };
 
   return (
@@ -20,7 +20,7 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
       px={1.5}
       width={"300px"}
       onClick={() => {
-        navigate(`/messages/${chat.id}`);
+        navigate(`/messages/${chat._id}`);
         handleUserClick();
       }}
       sx={{
@@ -31,7 +31,7 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
         borderLeft: selectedChat == chat.id ? "3px solid #213555" : "none",
       }}
     >
-      <Avatar> {chat.senderName?.slice(0, 1)}</Avatar>
+      <Avatar> {chat.sender}</Avatar>
       <Box width={"225px"}>
         <Box
           display={"flex"}
@@ -41,7 +41,7 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
           width={"100%"}
         >
           <Typography variant={"body2"} fontWeight={"600"} fontSize={"14px"}>
-            {chat.senderName}
+            {chat.sender}
           </Typography>
           <Typography variant={"body2"}>Jan 12, 2022</Typography>
         </Box>
@@ -56,7 +56,7 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
             display: "block",
           }}
         >
-          {chat.last_message}
+          {chat.messages[chat.messages.length - 1]}
         </Typography>
       </Box>
     </Box>

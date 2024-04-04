@@ -27,6 +27,40 @@ function ViewPostingModal({ open, onClose, post }) {
     onClose();
     setEdit(false);
   };
+
+  const handleChatClick = async () => {
+    //   let result = await fetch(`${apiRoute}//new/${values.category}`, {
+    //   method: "POST",
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Content-Type": "application/json",
+    //     authorization: `Bearer ${token}`,
+    //   },
+    //   body: JSON.stringify({
+    //     title: values.adTitle,
+    //     description: values.description,
+    //     postDate: new Date(),
+    //     author: username,
+    //     photos: samePhotos ? values.photos : [],
+    //     price: values.price,
+    //     location: {
+    //       description: location.description,
+    //       place_id: location.place_id,
+    //       lat: latlng.lat,
+    //       lng: latlng.lng,
+    //     },
+    //     tags: values.tags,
+    //   }),
+    // })
+    //   .then((res) => {
+    //     return res.json();
+    //   })
+    //   .then((data) => {
+    //     return data;
+    //   });
+    // console.log(result);
+  };
+
   return (
     <>
       <Modal
@@ -75,9 +109,7 @@ function ViewPostingModal({ open, onClose, post }) {
                   )}
                 </div>
               </div>
-              <Typography sx={{ color: "black" }}>
-                    Tags:
-              </Typography>
+              <Typography sx={{ color: "black" }}>Tags:</Typography>
               {postInfo.tags &&
                 postInfo.tags.map((tag, index) => {
                   return <Chip label={tag} key={index} sx={{ mr: 1, mb: 1 }} />;
@@ -118,6 +150,7 @@ function ViewPostingModal({ open, onClose, post }) {
                 variant="contained"
                 disabled={!user.isLoggedIn}
                 sx={{ backgroundColor: "#213555", mr: 2 }}
+                onClick={handleChatClick}
                 href={"/messages"}
               >
                 Chat

@@ -1,6 +1,6 @@
 import { Avatar, Box, Typography } from "@mui/material";
 
-const SingleMessage = ({ message }) => {
+const SingleMessage = ({ message, user }) => {
   console.log(message, "message");
 
   return (
@@ -18,12 +18,14 @@ const SingleMessage = ({ message }) => {
     >
       <Avatar sx={{ width: 40, height: 40, fontSize: "16px" }}>
         {" "}
-        {message?.senderName === "Me" ? "ME" : message?.senderName?.slice(0, 1)}
+        {message?.sender === user.username
+          ? "ME"
+          : message?.sender?.slice(0, 1)}
       </Avatar>
       <Box width={"100%"}>
         <Box display={"flex"} alignItems={"center"} gap={2}>
           <Typography variant={"body2"} fontWeight={"600"} fontSize={"14px"}>
-            {message?.senderName}{" "}
+            {message?.sender}{" "}
           </Typography>
           <Box
             sx={{
@@ -33,7 +35,9 @@ const SingleMessage = ({ message }) => {
               bgcolor: "grey.500",
             }}
           />
-          <Typography variant={"body2"}>2:36pm</Typography>
+          <Typography variant={"body2"}>
+            {new Date(message.date).getTime()}
+          </Typography>
         </Box>
         <Typography
           maxWidth={"70%"}
