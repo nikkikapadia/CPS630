@@ -238,12 +238,6 @@ export default function Navigation({ admin }) {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <MenuItem onClick={handleClose}>
-            <Avatar /> Profile
-          </MenuItem>
-          <MenuItem onClick={handleClose}>
-            <Avatar /> My account
-          </MenuItem>
           <MenuItem>
             <ListItemIcon>
               <ArticleIcon fontSize="small" />
