@@ -16,7 +16,7 @@ import {
 
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { firebaseStorage } from "../firebase";
+import { firebaseStorage } from "../firebase-config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import LocationPicker from "../LocationPicker";
