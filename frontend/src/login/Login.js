@@ -9,6 +9,7 @@ import {
   Typography,
   Checkbox,
   IconButton,
+  CircularProgress
 } from "@mui/material";
 import React, { useState, useContext, useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -52,6 +53,9 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -59,6 +63,7 @@ const Login = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      setLoading(true) // start loading
       signInWithEmailAndPassword(auth, values.email, values.password)
         .then(async (userCredential) => {
           console.log(userCredential.user, "User Logged In Successfully"); // Sign-in successful
@@ -114,7 +119,10 @@ const Login = () => {
           alert(`Error signing in: ${error.message}`);
           setSnackbarMessage(`Error signing in: ${error.message}`);
           setSnackbarSeverity("error");
-          setShowSnackbar(true);
+          setShowSnackbar(true); // Corrected from setOpenSnackbar to setShowSnackbar, to match the change to context-based approach
+        })
+        .finally(() => {
+          setLoading(false); // stop loading once promise settles
         });
       console.log(values, "Submiited Values");
     },
@@ -198,11 +206,23 @@ const Login = () => {
                 textTransform: "capitalize",
                 fontSize: "16px",
                 ":hover": { backgroundColor: "#213555" },
+                position: 'relative',
               }}
               variant="contained"
               type="submit"
+              disabled={loading}
             >
-              Login
+              {loading ? (
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      color: 'white',
+                      position: 'absolute', // Position spinner over the button
+                    }}
+                  />
+                ) : (
+                  "Login"
+                )}
             </Button>
             <Box
               sx={{
