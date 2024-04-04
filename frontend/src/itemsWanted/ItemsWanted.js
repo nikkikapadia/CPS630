@@ -102,6 +102,29 @@ export default function ItemsWanted() {
     setFilteredData(results);
   }, [wantedData, priceRange, selectedTags]);
 
+    // Fetching data based on search
+    useEffect(() => {
+      if (!search) return; 
+  
+      const fetchSearchData = async () => {
+        try {
+          const response = await fetch(`http://localhost:5001/api/ads/search?category=${selectedCategory.value}&search=${search}`, {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+          });
+          const searchData = await response.json();
+          setWantedData(searchData);
+        } catch (error) {
+          console.error("Error fetching search data:", error);
+        }
+      };
+  
+      fetchSearchData();
+    }, [search, selectedCategory.value]);
+
 
   return (
     <>
