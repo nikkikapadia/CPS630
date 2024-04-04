@@ -50,6 +50,9 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -113,7 +116,7 @@ const Login = () => {
           alert(`Error signing in: ${error.message}`);
           setSnackbarMessage(`Error signing in: ${error.message}`);
           setSnackbarSeverity("error");
-          setOpenSnackbar(true);
+          setShowSnackbar(true); // Corrected from setOpenSnackbar to setShowSnackbar, to match the change to context-based approach
         })
         .finally(() => {
           setLoading(false); // stop loading once promise settles

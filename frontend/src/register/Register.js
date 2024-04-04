@@ -9,6 +9,7 @@ import {
   Typography,
   Checkbox,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import React, { useState, useContext } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -70,6 +71,7 @@ const Register = () => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       if (values.isAgreed) {
+        setLoading(true); // Start loading before the registration process
         createUserWithEmailAndPassword(auth, values.email, values.password)
           .then(async (userCredential) => {
             console.log(userCredential.user, "User Created Successfully");
@@ -138,6 +140,9 @@ const Register = () => {
             setSnackbarMessage(`Error registering: ${error.message}`);
             setSnackbarSeverity("error");
             setShowSnackbar(true);
+          })
+          .finally(() => {
+            setLoading(false)
           });
       } else {
         console.log("User did not agree to terms");
@@ -148,6 +153,8 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
@@ -314,9 +321,19 @@ const Register = () => {
               }}
               variant="contained"
               type="submit"
-              disabled={!formik.values.isAgreed}
+              disabled={loading || !formik.values.isAgreed} // Disable when loading or terms not agreed
             >
-              Register
+              {loading ? (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    color: 'white',
+                    position: 'absolute', // Center spinner in the button
+                  }}
+                />
+              ) : (
+                "Register"
+              )}
             </Button>
             <Box
               sx={{
