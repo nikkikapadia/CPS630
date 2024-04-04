@@ -23,7 +23,7 @@ export default function ItemsForSale() {
 
   const [saleData, setSaleData] = useState([]);
   const [filteredData, setFilteredData] = useState({});
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([0, 500]);
   const [selectedTags, setSelectedTags] = useState([]);
 
 
@@ -44,10 +44,24 @@ export default function ItemsForSale() {
     `ads/search?category=${selectedCategory.value}&search=${search}`
   );
 
+  const tagOptions = [
+    { value: 'electronics', label: 'Electronics' },
+    { value: 'books', label: 'Books' },
+    { value: 'furniture', label: 'Furniture' },
+    { value: 'clothing', label: 'Clothing' },
+    { value: 'kitchenware', label: 'Kitchenware' },
+    { value: 'tutor', label: 'Tutor' },
+    { value: 'housing', label: 'Housing' },
+    { value: 'school', label: 'School' },
+    { value: 'tools', label: 'Tools' },
+    { value: 'pens', label: 'Pens' },
+  ];
+
   const resetFilters = () => {
     setSearchValue("");
     setSelectedCategory(categories[1]);
-    setPriceRange([0, 1000]);
+    setPriceRange([0, 500]);
+    setSelectedTags([]);
     setFilteredData(saleData);
   };
 
@@ -73,134 +87,22 @@ export default function ItemsForSale() {
     fetchData();
   }, [modalPost]);
 
-  // useEffect(() => {
-  //   if (!search) return;
-  //   fetchData();
-  // }, [pathname, search]);
-
   useEffect(() => {
-    // Filter saleData based on the selected category
-    const results = saleData.filter(item => item.category === selectedCategory.value && item.price >= priceRange[0] && item.price <= priceRange[1]);
+
+    console.log("Original saleData:", saleData);
+    console.log("Selected Tags:", selectedTags);
+    console.log("Price Range:", priceRange);
+
+    const results = saleData.filter(item => {
+      const priceMatch = item.price >= priceRange[0] && item.price <= priceRange[1];
+      const tagMatch = selectedTags.length === 0 || selectedTags.some(tag => item.tags?.includes(tag));
+      
+      return priceMatch && tagMatch;
+    });
+  
+  
     setFilteredData(results);
-  }, [selectedCategory, saleData, priceRange]);
-
-//   return (
-//     <>
-//       <SearchBar
-//         searchValue={searchValue}
-//         setSearchValue={setSearchValue}
-//         selectedCategory={selectedCategory}
-//         setSelectedCategory={setSelectedCategory}
-//       />
-//       <Box sx={{ width: "95%", mx: "auto", pb: "20px" }}>
-//         {loading ? (
-//           <Box
-//             sx={{
-//               display: "flex",
-//               alignItems: "center",
-//               justifyContent: "center",
-//               marginTop: 5,
-//             }}
-//           >
-//             <CircularProgress
-//               size={50}
-//               thickness={4}
-//               style={{ color: "#213555" }}
-//             />
-//           </Box>
-//         ) : (
-//           <>
-//             <Typography
-//               variant="h1"
-//               sx={{
-//                 fontSize: "24px",
-//                 fontWeight: "600",
-//                 color: "#222222",
-//                 mt: "30px",
-//                 textAlign: "left",
-//               }}
-//             >
-//               {data && search && `Found ${data.length}`} Items For Sale Near You
-//             </Typography>
-//             <Divider sx={{ my: "30px" }} />
-//             <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-//               {data?.length > 0 && search ? (
-//                 <>
-//                   {data?.map((item, ind) => {
-//                     const updatedPosting = {
-//                       ...item,
-//                       category: "itemsForSale",
-//                     };
-//                     return (
-//                       <ListingItem
-//                         key={ind}
-//                         onClick={() => {
-//                           setModalOpen(true);
-//                           setModalPost(updatedPosting);
-//                         }}
-//                         {...updatedPosting}
-//                       />
-//                     );
-//                   })}
-//                 </>
-//               ) : search && data?.length === 0 ? (
-//                 <Box
-//                   sx={{
-//                     display: "flex",
-//                     alignItems: "center",
-//                     justifyContent: "center",
-//                     marginTop: 5,
-//                   }}
-//                 >
-//                   <Typography>No Items Found</Typography>
-//                 </Box>
-//               ) : (
-//                 <>
-//                   {saleData.length !== 0 ? (
-//                     saleData?.map((item, ind) => {
-//                       const updatedPosting = {
-//                         ...item,
-//                         category: "itemsForSale",
-//                       };
-//                       return (
-//                         <ListingItem
-//                           key={ind}
-//                           onClick={() => {
-//                             setModalOpen(true);
-//                             setModalPost(updatedPosting);
-//                           }}
-//                           {...updatedPosting}
-//                         />
-//                       );
-//                     })
-//                   ) : (
-//                     <Typography
-//                       variant="p"
-//                       sx={{
-//                         fontWeight: "600",
-//                         color: "#222222",
-//                         mt: "30px",
-//                         textAlign: "centre",
-//                       }}
-//                     >
-//                       No Items For Sale Near You
-//                     </Typography>
-//                   )}
-//                 </>
-//               )}
-//             </Box>
-//           </>
-//         )}
-
-//         <ViewPostingModal
-//           open={modalOpen}
-//           onClose={handleModalClose}
-//           post={modalPost}
-//         />
-//       </Box>
-//     </>
-//   );
-// }
+  }, [saleData, priceRange, selectedTags]);
 
 return (
   <>
@@ -229,12 +131,12 @@ return (
             </Box>
           )}
         >
-          {categories.map((category) => (
+          {tagOptions.map((tag) => (
             <MenuItem
-              key={category.value}
-              value={category.value}
+              key={tag.value}
+              value={tag.value}
             >
-              {category.label}
+              {tag.label}
             </MenuItem>
           ))}
         </Select>
@@ -251,10 +153,20 @@ return (
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
           min={0}
-          max={1000}
+          max={500}
         />
       </Box>
+
+      {/* Reset Filters Button */}
+      <Button 
+        variant="outlined" 
+        onClick={resetFilters} 
+        sx={{ height: 'fit-content', alignSelf: 'flex-end' }}
+      >
+        Reset Filters
+      </Button>
     </Box>
+
     <Box sx={{ width: "95%", mx: "auto", pb: "20px" }}>
       {loading ? (
         <CircularProgress size={50} thickness={4} style={{ color: "#213555", margin: "auto" }} />
