@@ -55,8 +55,8 @@ const validationSchema = yup.object({
     ),
   price: yup
     .number()
-    .required("Price is required to two decimal places")
-    .isPrecise(),
+    .required("Price is required to two decimal places"),
+    //.isPrecise(),
   location: yup.object().required("Location is required"),
   tags: yup.array(),
 });
