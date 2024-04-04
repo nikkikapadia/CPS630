@@ -14,7 +14,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Button from "@mui/material/Button";
-import logo from "./tmu-trade-logo.svg";
+import logo from "./tmu-classified-logo.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { PostAdd } from "@mui/icons-material";
 import { Typography } from "@mui/material";
