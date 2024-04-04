@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Modal, Box, Typography, Button, Chip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
@@ -15,6 +16,8 @@ function ViewPostingModal({ open, onClose, post }) {
 
   const { user, setUser } = useContext(UserContext);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     setPostInfo(post);
   }, [post]);
@@ -27,6 +30,32 @@ function ViewPostingModal({ open, onClose, post }) {
     onClose();
     setEdit(false);
   };
+
+  const token = user.authToken;
+
+  const handleChatClick = async () => {
+    let result = await fetch(`http://localhost:5001/api/chats/new`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user1: user.username,
+        user2: postInfo.author,
+        messages: [],
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        return data;
+      });
+    navigate(`/messages/${result._id}`);
+  };
+
   return (
     <>
       <Modal
@@ -75,9 +104,7 @@ function ViewPostingModal({ open, onClose, post }) {
                   )}
                 </div>
               </div>
-              <Typography sx={{ color: "black" }}>
-                    Tags:
-              </Typography>
+              <Typography sx={{ color: "black" }}>Tags:</Typography>
               {postInfo.tags &&
                 postInfo.tags.map((tag, index) => {
                   return <Chip label={tag} key={index} sx={{ mr: 1, mb: 1 }} />;
@@ -118,7 +145,8 @@ function ViewPostingModal({ open, onClose, post }) {
                 variant="contained"
                 disabled={!user.isLoggedIn}
                 sx={{ backgroundColor: "#213555", mr: 2 }}
-                href={"/messages"}
+                onClick={handleChatClick}
+                // href={"/messages"}
               >
                 Chat
               </Button>

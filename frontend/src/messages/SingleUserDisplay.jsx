@@ -1,11 +1,31 @@
 import { Avatar, Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
+const SingleUserDisplay = ({
+  chat,
+  selectedChat,
+  setSelectedChat,
+  user,
+  setMessages,
+  messages,
+}) => {
   const navigate = useNavigate();
 
   const handleUserClick = () => {
-    setSelectedChat(chat.id);
+    setSelectedChat(chat._id);
+    fetch(`http://localhost:5001/api/chats/get/${chat.user1}/${chat.user2}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${user.authToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setMessages(data))
+      .catch((error) => {
+        console.error("Error fetching messages data:", error);
+      });
   };
 
   return (
@@ -20,18 +40,22 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
       px={1.5}
       width={"300px"}
       onClick={() => {
-        navigate(`/messages/${chat.id}`);
+        navigate(`/messages/${chat._id}`);
         handleUserClick();
       }}
       sx={{
         cursor: "pointer",
         "&:hover": { backgroundColor: "grey.200" },
         transition: "all 150ms ease-in-out",
-        backgroundColor: selectedChat == chat.id ? "grey.200" : "transparent",
-        borderLeft: selectedChat == chat.id ? "3px solid #213555" : "none",
+        backgroundColor: selectedChat == chat._id ? "grey.200" : "transparent",
+        borderLeft: selectedChat == chat._id ? "3px solid #213555" : "none",
       }}
     >
-      <Avatar> {chat.senderName?.slice(0, 1)}</Avatar>
+      <Avatar>
+        {chat.user1 === user.username
+          ? chat.user2.slice(0, 1)
+          : chat.user1.slice(0, 1)}
+      </Avatar>
       <Box width={"225px"}>
         <Box
           display={"flex"}
@@ -41,23 +65,10 @@ const SingleUserDisplay = ({ chat, selectedChat, setSelectedChat }) => {
           width={"100%"}
         >
           <Typography variant={"body2"} fontWeight={"600"} fontSize={"14px"}>
-            {chat.senderName}
+            {chat.user1 === user.username ? chat.user2 : chat.user1}
           </Typography>
-          <Typography variant={"body2"}>Jan 12, 2022</Typography>
+          <Typography variant={"body2"}>{chat.date}</Typography>
         </Box>
-        <Typography
-          variant={"subtitle2"}
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            marginTop: "0.6rem",
-            maxWidth: "100%",
-            display: "block",
-          }}
-        >
-          {chat.last_message}
-        </Typography>
       </Box>
     </Box>
   );

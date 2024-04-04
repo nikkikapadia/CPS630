@@ -9,7 +9,7 @@ import {
   Typography,
   Checkbox,
   IconButton,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import React, { useState, useContext, useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -55,7 +55,6 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
-
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -63,7 +62,7 @@ const Login = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      setLoading(true) // start loading
+      setLoading(true); // start loading
       signInWithEmailAndPassword(auth, values.email, values.password)
         .then(async (userCredential) => {
           console.log(userCredential.user, "User Logged In Successfully"); // Sign-in successful
@@ -198,62 +197,61 @@ const Login = () => {
                 ),
               }}
             />
-          {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: 5,
-            }}
-          >
-            <CircularProgress
-              size={50}
-              thickness={4}
-              style={{ color: "#213555" }}
-            />
-          </Box>
-        ) : (
-            <>
-            <Button
-              fullWidth
-              sx={{
-                backgroundColor: "#213555",
-                py: 1.5,
-                textTransform: "capitalize",
-                fontSize: "16px",
-                ":hover": { backgroundColor: "#213555" },
-                position: 'relative',
-              }}
-              variant="contained"
-              type="submit"
-              disabled={loading}
-            >
-              
+            {loading ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 5,
+                }}
+              >
+                <CircularProgress
+                  size={50}
+                  thickness={4}
+                  style={{ color: "#213555" }}
+                />
+              </Box>
+            ) : (
+              <>
+                <Button
+                  fullWidth
+                  sx={{
+                    backgroundColor: "#213555",
+                    py: 1.5,
+                    textTransform: "capitalize",
+                    fontSize: "16px",
+                    ":hover": { backgroundColor: "#213555" },
+                    position: "relative",
+                  }}
+                  variant="contained"
+                  type="submit"
+                  disabled={loading}
+                >
                   Login
-            </Button>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-              }}
-            >
-              <Typography sx={{ textAlign: "center" }}>
-                Dont have an account?{" "}
-                <Link to={"/register"} style={{ textDecoration: "none" }}>
-                  <Typography
-                    component={"span"}
-                    sx={{ color: "#213555", fontWeight: "bold" }}
-                  >
-                    Register
+                </Button>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Typography sx={{ textAlign: "center" }}>
+                    Dont have an account?{" "}
+                    <Link to={"/register"} style={{ textDecoration: "none" }}>
+                      <Typography
+                        component={"span"}
+                        sx={{ color: "#213555", fontWeight: "bold" }}
+                      >
+                        Register
+                      </Typography>
+                    </Link>
                   </Typography>
-                </Link>
-              </Typography>
-            </Box>
-            </>
-        )}
+                </Box>
+              </>
+            )}
           </form>
         </CardContent>
       </Card>
