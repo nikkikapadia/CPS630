@@ -33,7 +33,10 @@ const validationSchema = yup.object({
   email: yup
     .string()
     .email("Enter a valid email")
-    .matches(/@torontomu\.ca$/, "Email addresses must end with the domain @torontomu.ca.")
+    .matches(
+      /@torontomu\.ca$/,
+      "Email addresses must end with the domain @torontomu.ca."
+    )
     .required("Email is required"),
   password: yup
     .string()
@@ -345,12 +348,16 @@ const Register = () => {
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
         onClose={handleCloseSnackbar}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+          sx={{ width: "100%", fontSize: 20, alignItems: "center" }}
         >
           {snackbarMessage}
         </Alert>

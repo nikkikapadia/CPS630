@@ -63,6 +63,10 @@ function Users() {
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
         onClose={() => {
           setShowSnackbar(false);
           setSnackbarMessage("");
@@ -74,7 +78,7 @@ function Users() {
             setSnackbarMessage("");
           }}
           severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+          sx={{ width: "100%", fontSize: 20, alignItems: "center" }}
         >
           {snackbarMessage}
         </Alert>

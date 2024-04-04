@@ -16,7 +16,7 @@ import {
 
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { firebaseStorage } from "../firebase";
+import { firebaseStorage } from "../firebase-config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import LocationPicker from "../LocationPicker";
@@ -296,12 +296,12 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
         error={formik.touched.location && Boolean(formik.errors.location)}
       >
         <LocationPicker
-            value={location}
-            setValue={setLocation}
-            formik={formik}
+          value={location}
+          setValue={setLocation}
+          formik={formik}
         />
         {formik.touched.location && formik.errors.location ? (
-            <FormHelperText>{formik.errors.location}</FormHelperText>
+          <FormHelperText>{formik.errors.location}</FormHelperText>
         ) : null}
       </FormControl>
 
