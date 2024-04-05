@@ -90,7 +90,7 @@ const PostAd = () => {
       console.log("Submitted form values: ", values);
 
       const latlng = await fetch(
-        `http://localhost:5001/api/places/${location.place_id}`,
+        `https://cps630.onrender.com/api/places/${location.place_id}`,
         {
           method: "GET",
           headers: {
@@ -139,7 +139,7 @@ const PostAd = () => {
       const token = user.authToken;
 
       let result = await fetch(
-        `http://localhost:5001/api/ads/new/${values.category}`,
+        `https://cps630.onrender.com/api/ads/new/${values.category}`,
         {
           method: "POST",
           headers: {
@@ -186,7 +186,7 @@ const PostAd = () => {
 
       // now make PATCH request with updated URLs
       result = await fetch(
-        `http://localhost:5001/api/ads/update/${values.category}/id/${adId}`,
+        `https://cps630.onrender.com/api/ads/update/${values.category}/id/${adId}`,
         {
           method: "PATCH",
           headers: {

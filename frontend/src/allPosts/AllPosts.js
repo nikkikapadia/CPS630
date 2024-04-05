@@ -79,7 +79,7 @@ function AllPosts() {
 
   const fetchPosts = async () => {
     let ads = [];
-    await fetch(`http://localhost:5001/api/ads/get/itemsWanted`, {
+    await fetch(`https://cps630.onrender.com/api/ads/get/itemsWanted`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -96,7 +96,7 @@ function AllPosts() {
           ad.category = "itemsWanted";
         });
         ads.push(...temp);
-        return fetch(`http://localhost:5001/api/ads/get/itemsForSale`, {
+        return fetch(`https://cps630.onrender.com/api/ads/get/itemsForSale`, {
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -114,7 +114,7 @@ function AllPosts() {
           ad.category = "itemsForSale";
         });
         ads.push(...temp);
-        return fetch(`http://localhost:5001/api/ads/get/academicServices`, {
+        return fetch(`https://cps630.onrender.com/api/ads/get/academicServices`, {
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -445,7 +445,7 @@ function DeleteModal({
   const handleYes = async () => {
     setLoading(true);
     const token = user.authToken;
-    const apiRoute = "http://localhost:5001/api";
+    const apiRoute = "https://cps630.onrender.com/api";
     const result = await fetch(
       `${apiRoute}/ads/delete/${postInfo.category}/id/${postInfo._id}`,
       {
@@ -561,7 +561,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts, onClose })
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       // need to implement database updates here
-      const apiRoute = "http://localhost:5001/api";
+      const apiRoute = "https://cps630.onrender.com/api";
       const samePhotos =
         values.photos.toString() === postInfo.photos.toString();
 

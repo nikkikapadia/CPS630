@@ -90,7 +90,7 @@ const Register = () => {
             sessionStorage.setItem("username", values.username);
 
             const userInfo = await fetch(
-              `http://localhost:5001/api/users/new`,
+              `https://cps630.onrender.com/api/users/new`,
               {
                 method: "POST",
                 headers: {

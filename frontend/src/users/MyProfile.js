@@ -67,7 +67,7 @@ function MyProfile() {
 
   const fetchUsers = async () => {
     const token = user.authToken;
-    await fetch(`http://localhost:5001/api/users/get/username/${user.username}`, {
+    await fetch(`https://cps630.onrender.com/api/users/get/username/${user.username}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -293,13 +293,13 @@ function DeleteModal({
   const handleYes = async () => {
     setLoading(true);
     const token = user.authToken;
-    const apiRoute = "http://localhost:5001/api";
+    const apiRoute = "https://cps630.onrender.com/api";
 
     const fetchUserAds = async () => {
       const token = user.authToken;
       let items = [];
       await fetch(
-        `http://localhost:5001/api/ads/get/itemsWanted/author/${userInfo.username}`,
+        `https://cps630.onrender.com/api/ads/get/itemsWanted/author/${userInfo.username}`,
         {
           method: "GET",
           headers: {
@@ -319,7 +319,7 @@ function DeleteModal({
           });
           items.push(...temp);
           return fetch(
-            `http://localhost:5001/api/ads/get/itemsForSale/author/${userInfo.username}`,
+            `https://cps630.onrender.com/api/ads/get/itemsForSale/author/${userInfo.username}`,
             {
               method: "GET",
               headers: {
@@ -340,7 +340,7 @@ function DeleteModal({
           });
           items.push(...temp);
           return fetch(
-            `http://localhost:5001/api/ads/get/academicServices/author/${userInfo.username}`,
+            `https://cps630.onrender.com/api/ads/get/academicServices/author/${userInfo.username}`,
             {
               method: "GET",
               headers: {
@@ -486,7 +486,7 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
       console.log(formik.initialValues.username);
       setLoading(true);
       const token = user.authToken;
-      const apiRoute = "http://localhost:5001/api";
+      const apiRoute = "https://cps630.onrender.com/api";
 
       // if username edited, check if doesn't exist already and if not then update ads containing old username with new username
       if (formik.initialValues.username != values.username) {
@@ -520,7 +520,7 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
             const token = user.authToken;
             let items = [];
             await fetch(
-              `http://localhost:5001/api/ads/get/itemsWanted/author/${formik.initialValues.username}`,
+              `https://cps630.onrender.com/api/ads/get/itemsWanted/author/${formik.initialValues.username}`,
               {
                 method: "GET",
                 headers: {
@@ -540,7 +540,7 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
                 });
                 items.push(...temp);
                 return fetch(
-                  `http://localhost:5001/api/ads/get/itemsForSale/author/${formik.initialValues.username}`,
+                  `https://cps630.onrender.com/api/ads/get/itemsForSale/author/${formik.initialValues.username}`,
                   {
                     method: "GET",
                     headers: {
@@ -561,7 +561,7 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
                 });
                 items.push(...temp);
                 return fetch(
-                  `http://localhost:5001/api/ads/get/academicServices/author/${formik.initialValues.username}`,
+                  `https://cps630.onrender.com/api/ads/get/academicServices/author/${formik.initialValues.username}`,
                   {
                     method: "GET",
                     headers: {

@@ -23,7 +23,7 @@ const Messages = () => {
   const [findedChat, setFindedChat] = useState(null);
   const [chats, setChats] = useState([]);
 
-  const apiRoot = "http://localhost:5001/api";
+  const apiRoot = "https://cps630.onrender.com/api";
 
   const params = useParams();
 
