@@ -22,11 +22,13 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import LocationPicker from "../LocationPicker";
 
+// Edit form component
 function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
   const [location, setLocation] = React.useState(postInfo.location);
 
   const [loading, setLoading] = React.useState(false);
 
+  // yup validation schema to ensure edited items are valid
   const validationSchema = yup.object({
     adTitle: yup
       .string()
@@ -48,8 +50,8 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
     tags: yup.array(),
   });
 
-  // initial values are values that are there already
   const formik = useFormik({
+    // initial values are values that are there already
     initialValues: {
       adTitle: postInfo.title,
       category: postInfo.category,
@@ -60,6 +62,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
       tags: postInfo.tags,
     },
     validationSchema: validationSchema,
+    // update database with edited values
     onSubmit: async (values) => {
       setLoading(true);
 
@@ -67,6 +70,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
       const samePhotos =
         values.photos.toString() === postInfo.photos.toString();
 
+      // get lat and lng of new location with given place id 
       const latlng = await fetch(`${apiRoute}/places/${location.place_id}`, {
         method: "GET",
         headers: {
@@ -370,6 +374,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
 
 export default EditForm;
 
+// helper function to update database with edited post when category changes
 async function newPostAndDelete(
   apiRoute,
   values,

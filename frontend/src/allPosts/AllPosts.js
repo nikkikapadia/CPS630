@@ -44,6 +44,7 @@ import LocationPicker from "../LocationPicker";
 
 import { UserContext } from "../contexts/UserContext";
 
+// component to show all posts for admins
 function AllPosts() {
   const {
     showSnackbar,
@@ -67,16 +68,21 @@ function AllPosts() {
     setOpenedPost({});
   };
 
+  // user context
   const { user, setUser } = useContext(UserContext);
 
+  // state to hold all posts
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
     fetchPosts();
   }, []);
 
+
+  // auth token
   const token = user.authToken;
 
+  // retreives all posts
   const fetchPosts = async () => {
     let ads = [];
     await fetch(`https://cps630.onrender.com/api/ads/get/itemsWanted`, {
@@ -139,6 +145,7 @@ function AllPosts() {
   return (
     <>
       <SearchBar value={searchValue} handleChange={setSearchValue} />
+      {/* Table to contain all posts */}
       <BasicTable
         handleOpen={onOpen}
         rows={rows.filter((val) => {
@@ -148,6 +155,7 @@ function AllPosts() {
           );
         })}
       />
+      {/* View post details */}
       <PostModal
         open={open}
         post={openedPost}
@@ -155,6 +163,7 @@ function AllPosts() {
         rows={rows}
         fetchPosts={fetchPosts}
       />
+      {/* notification popup */}
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
@@ -182,6 +191,7 @@ function AllPosts() {
   );
 }
 
+// component to contain all posts
 function BasicTable({ handleOpen, rows }) {
   return (
     <div className="centered-table">
@@ -227,6 +237,7 @@ function BasicTable({ handleOpen, rows }) {
 
 export default AllPosts;
 
+// component to view and edit post details
 function PostModal({ open, onClose, post, rows, fetchPosts }) {
   const [edit, setEdit] = useState(false);
   const [postInfo, setPostInfo] = useState(post);
@@ -308,6 +319,8 @@ function PostModal({ open, onClose, post, rows, fetchPosts }) {
           )}
         </Box>
           */}
+
+        {/* Post details */}
         <Box sx={style}>
           {!edit ? (
             <>
@@ -423,6 +436,7 @@ function PostModal({ open, onClose, post, rows, fetchPosts }) {
   );
 }
 
+// modal to confirm admin choice to delete post
 function DeleteModal({
   setOpenDeleteModal,
   openDeleteModal,
@@ -438,14 +452,17 @@ function DeleteModal({
 
   const [loading, setLoading] = useState(false);
 
+  // close modal
   const handleClose = () => {
     setOpenDeleteModal(false);
   };
 
+  // delete post
   const handleYes = async () => {
     setLoading(true);
     const token = user.authToken;
     const apiRoute = "https://cps630.onrender.com/api";
+    // make delete request
     const result = await fetch(
       `${apiRoute}/ads/delete/${postInfo.category}/id/${postInfo._id}`,
       {
@@ -463,6 +480,8 @@ function DeleteModal({
       .then((data) => {
         return data;
       });
+    
+    // refresh all posts, close modal, and show notification message
     fetchPosts();
     setLoading(false);
     setOpenDeleteModal(false);
@@ -472,6 +491,7 @@ function DeleteModal({
     setSnackbarSeverity("success");
   };
 
+  // cancel (close modal)
   const handleCancel = () => {
     setOpenDeleteModal(false);
   };
@@ -521,11 +541,13 @@ function DeleteModal({
   );
 }
 
+// Modal to edit selected post
 function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts, onClose }) {
   const { user, setUser } = useContext(UserContext);
 
   const [location, setLocation] = useState(postInfo.location);
 
+  // yup validation schema to ensure edited values are valid
   const validationSchema = yup.object({
     adTitle: yup
       .string()
@@ -560,7 +582,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts, onClose })
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      // need to implement database updates here
+      // update database with post edits
       const apiRoute = "https://cps630.onrender.com/api";
       const samePhotos =
         values.photos.toString() === postInfo.photos.toString();
@@ -836,6 +858,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, rows, fetchPosts, onClose })
   );
 }
 
+// search bar component to search all posts
 function SearchBar({ value, handleChange }) {
   const onChange = useCallback(
     (event) => handleChange(event.target.value),
@@ -860,6 +883,7 @@ function SearchBar({ value, handleChange }) {
   );
 }
 
+// styles for components
 const style = {
   position: "absolute",
   top: "50%",
@@ -896,6 +920,7 @@ const deleteStyle = {
   p: 4,
 };
 
+// helper function to edit posts when category changes
 async function newPostAndDelete(
   apiRoute,
   values,

@@ -20,10 +20,10 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import useFetchData from "../hooks/useFetchData";
 import { CategoryContext } from "../contexts/CategoryContext";
 
+// Academic services page
 export default function AcademicServices() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPost, setModalPost] = useState({});
-
   const [servicesData, setServicesData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 500]);
@@ -34,18 +34,17 @@ export default function AcademicServices() {
     setModalPost({});
   };
 
+  // search parameters
   const [searchParams] = useSearchParams();
   const search = searchParams.get("search");
-
   const [searchValue, setSearchValue] = useState(search || "");
   const { selectedCategory, setSelectedCategory } = useContext(CategoryContext);
-
   const pathname = useLocation().pathname;
-
   const { data, loading, fetchData } = useFetchData(
     `ads/search?category=${selectedCategory.value}&search=${search}`
   );
 
+  // tags for filters
   const tagOptions = [
     { value: "electronics", label: "Electronics" },
     { value: "books", label: "Books" },
@@ -114,6 +113,7 @@ export default function AcademicServices() {
     fetchData();
   }, [modalPost, search, selectedCategory.value]);
 
+  // update results based on filter changes
   useEffect(() => {
     const results = servicesData.filter((item) => {
       const priceMatch =
@@ -249,6 +249,7 @@ export default function AcademicServices() {
             </Box>
           </>
         )}
+        {/* View ad details */}
         <ViewPostingModal
           open={modalOpen}
           onClose={handleModalClose}

@@ -1,4 +1,7 @@
+// Environment variables
 require("dotenv").config();
+
+// Middleware
 const express = require("express");
 const mongoose = require("mongoose");
 const middleware = require("./middleware");
@@ -6,12 +9,14 @@ const cors = require("cors");
 
 const app = express();
 
+// Mongoose data models
 const User = require("./models/UserModel");
 const ItemWanted = require("./models/ItemWantedModel");
 const ItemForSale = require("./models/ItemForSaleModel");
 const AcademicService = require("./models/AcademicServiceModel");
 const Chat = require("./models/ChatModel");
 
+// Initialize server and database connection
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => {
@@ -24,10 +29,12 @@ mongoose
         console.log(error);
 });
 
+// GET status of server
 app.get('/api/status', (req, res) => {
     res.status(200).send({ status: 'Server is running' });
-  });
+});
 
+// Middleware stack
 app.use(express.json());
 app.use(cors());
 app.use(middleware.decodeToken);
@@ -246,10 +253,12 @@ app.delete("/api/users/delete/email/:email", async (req, res) => {
     }
 });
 
+// function to verify ad category is valid
 const validCategory = (string) =>
     string == "academicServices" ||
     string == "itemsForSale" ||
     string == "itemsWanted";
+// category model map
 const categoryModelMap = {
     academicServices: AcademicService,
     itemsForSale: ItemForSale,
@@ -258,6 +267,7 @@ const categoryModelMap = {
 
 // GET all ads under a category
 app.get("/api/ads/get/:category", async (req, res) => {
+    // verify ad category is valid
     if (!validCategory(req.params.category))
         return res.status(400).json({
             error:
@@ -275,6 +285,7 @@ app.get("/api/ads/get/:category", async (req, res) => {
 
 // GET ad by category and id
 app.get("/api/ads/get/:category/id/:id", async (req, res) => {
+    // verify ad category is valid
     if (!validCategory(req.params.category))
         return res.status(400).json({
             error:
@@ -292,6 +303,7 @@ app.get("/api/ads/get/:category/id/:id", async (req, res) => {
 
 // GET ads by category and author
 app.get("/api/ads/get/:category/author/:author", async (req, res) => {
+    // verify ad category is valid
     if (!validCategory(req.params.category))
         return res.status(400).json({
             error:
@@ -312,6 +324,7 @@ app.get("/api/ads/get/:category/author/:author", async (req, res) => {
 
 // POST (create) a new ad under a category
 app.post("/api/ads/new/:category", async (req, res) => {
+    // verify ad category is valid
     if (!validCategory(req.params.category))
         return res.status(400).json({
             error:
@@ -329,6 +342,7 @@ app.post("/api/ads/new/:category", async (req, res) => {
 
 // PATCH (update) an ad by category and id
 app.patch("/api/ads/update/:category/id/:id", async (req, res) => {
+    // verify ad category is valid
     if (!validCategory(req.params.category))
         return res.status(400).json({
             error:
@@ -373,6 +387,7 @@ app.patch("/api/ads/update/:category/id/:id", async (req, res) => {
 
 // DELETE an ad by under a category by id
 app.delete("/api/ads/delete/:category/id/:id", async (req, res) => {
+    // verify ad category is valid
     if (!validCategory(req.params.category))
         return res.status(400).json({
             error:
@@ -496,14 +511,14 @@ app.delete("/api/chats/delete/:user1/:user2", async (req, res) => {
     }
 });
 
-// Create search functionality for the ads based on different categories
-
+// GET ads based on search query under specified category searching on title, description, location, and tags
 app.get("/api/ads/search", async (req, res) => {
     const category = req.query.category;
     const searchQuery = req.query.search;
 
     console.log(category, searchQuery, "form backend repsonse yeah");
 
+    // verify ad category is valid
     if (!validCategory(category))
         return res.status(400).json({
             error:
@@ -512,6 +527,7 @@ app.get("/api/ads/search", async (req, res) => {
 
     const AdModel = categoryModelMap[category];
 
+    // search based on title, description, location, and tags
     try {
         const ads = await AdModel.find({
             $or: [
@@ -526,7 +542,4 @@ app.get("/api/ads/search", async (req, res) => {
         console.log(error, "error");
         res.status(400).json({ error: error.message });
     }
-})
-
-
-  ;
+});

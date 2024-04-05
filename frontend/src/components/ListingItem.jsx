@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 
+// component to show ad listing on Academic Services, Items For Sale, and Items Wanted pages
 export default function ListingItem({
   location,
   price,

@@ -2,6 +2,7 @@ import React from "react";
 import { GoogleMap, useLoadScript, MarkerF } from "@react-google-maps/api";
 //import { REACT_APP_GOOGLE_MAPS_KEY } from "../constants/constants";
 
+// Display google map based on specified lat and lng
 const MapComponent = ({ selectedLocation }) => {
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: "AIzaSyDNeK_2XCQL6gnYQ7Ej1yuQtIBig5pOJz8"

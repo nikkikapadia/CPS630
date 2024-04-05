@@ -21,6 +21,7 @@ import { SearchBar, categories } from "../components/SearchBar";
 import { SnackbarContext } from "../contexts/SnackbarContext";
 import { CategoryContext } from "../contexts/CategoryContext";
 
+// homepage component
 export function HomePage({ admin }) {
   const { user, setUser } = useContext(UserContext);
   const {
@@ -42,6 +43,7 @@ export function HomePage({ admin }) {
 
   const apiRoot = "https://cps630.onrender.com/api";
 
+  // fetch all ads
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -171,6 +173,7 @@ export function HomePage({ admin }) {
   );
 }
 
+// row containing ads for a specified ad category
 function Row({ title, data, admin, setModalOpen, setModalPost, loading }) {
   const categoryMap = {
     ItemsForSale: "itemsForSale",
@@ -229,6 +232,7 @@ function Row({ title, data, admin, setModalOpen, setModalPost, loading }) {
   );
 }
 
+// view more ads card
 function SeeMoreCard({ page }) {
   const navigate = useNavigate();
 

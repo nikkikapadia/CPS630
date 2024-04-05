@@ -29,6 +29,7 @@ function App() {
     });
   }
 
+  // routes to various pages with checking based on if user logged in or is an admin
   return (
     <div className="App">
       <UserContext.Provider value={{ user, setUser }}>
@@ -40,7 +41,6 @@ function App() {
               user.isAdmin ? <AllPosts /> : <HomePage admin={user.isAdmin} />
             }
           />
-          {/* replace these when the pages are made */}
           <Route path="/wanted" element={<ItemsWanted />} />
           <Route
             path="/login"

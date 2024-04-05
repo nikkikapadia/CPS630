@@ -11,12 +11,14 @@ class Middleware {
         }
         else 
         {
+            // check for authorization token in header
             if (!req.headers.authorization) {
                 console.log("Bad request. Require authorization token.");
                 return res.status(400).json({ error: "Bad request. Require authorization token." });
             }
 
             const token = req.headers.authorization.split(" ")[1];
+            // try to verify auth token
             try {
                 const decodedValue = await admin.auth().verifyIdToken(token);
                 if (decodedValue) {

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+// 404 page
 function Page404() {
   return (
     <div>

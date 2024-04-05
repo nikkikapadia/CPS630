@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+// user info
 const initUser = {
     isLoggedIn: false,
     username: '',
@@ -12,11 +13,13 @@ const initUser = {
 
 export const UserContext = createContext();
 
+// check local storage for user details
 const getInitialState = () => {
     const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : initUser;
 };
 
+// global context to store and update user information
 const UserContextProvider = (props) => {
     const [user, setUser] = useState(getInitialState);
 

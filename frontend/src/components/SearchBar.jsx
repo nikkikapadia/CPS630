@@ -16,6 +16,7 @@ const categories = [
   { label: "Items Wanted", value: "itemsWanted" },
 ];
 
+// Search bar component used in home page and each three ad category types
 const SearchBar = ({
   searchValue,
   setSearchValue,
@@ -49,6 +50,7 @@ const SearchBar = ({
 
   const navigate = useNavigate();
 
+  // decide which page to go to based on where the user selected the search to be performed on
   const pushToCategoryPage = () => {
     if (!searchValue) {
       if (selectedCategory.value === "academicServices") {

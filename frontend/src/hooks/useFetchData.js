@@ -2,6 +2,7 @@ import { useState } from "react";
 
 const baseURL = "https://cps630.onrender.com/api/";
 
+// custom react hook to fetch ads (used for ad search results)
 const useFetchData = (url) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);

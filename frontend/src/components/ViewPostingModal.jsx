@@ -10,6 +10,7 @@ import EditForm from "./EditForm";
 
 import MapComponent from "../Map";
 
+// modal component to show posting details for ads on homepage, and each ad category type pages
 function ViewPostingModal({ open, onClose, post }) {
   const [edit, setEdit] = useState(false);
   const [postInfo, setPostInfo] = useState(post);
@@ -33,6 +34,7 @@ function ViewPostingModal({ open, onClose, post }) {
 
   const token = user.authToken;
 
+  // create or go to chat (if one already exists) with user who posted ad
   const handleChatClick = async () => {
     let result = await fetch(`https://cps630.onrender.com/api/chats/new`, {
       method: "POST",

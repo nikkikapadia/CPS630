@@ -24,6 +24,7 @@ function loadScript(src, position, id) {
 
 const autocompleteService = { current: null };
 
+// Location picker component that displays list of relevant locations based on user input
 export default function LocationPicker({ value, setValue, formik }) {
   //const [value, setValue] = React.useState(null);
   const [inputValue, setInputValue] = React.useState("");
