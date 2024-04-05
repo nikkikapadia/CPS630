@@ -8,6 +8,9 @@ const SingleUserDisplay = ({
   user,
   setMessages,
   messages,
+  setMenuOpen,
+  menuOpen,
+  mobile,
 }) => {
   const navigate = useNavigate();
 
@@ -26,6 +29,8 @@ const SingleUserDisplay = ({
       .catch((error) => {
         console.error("Error fetching messages data:", error);
       });
+
+    setMenuOpen(false);
   };
 
   return (

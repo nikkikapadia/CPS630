@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   TextField,
@@ -7,27 +8,33 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
-import { Create, MoreHoriz, Send, StarBorder } from "@mui/icons-material";
+import { MoreHoriz, Send, StarBorder, Delete } from "@mui/icons-material";
 import SingleUserDisplay from "./SingleUserDisplay";
 import { useParams } from "react-router-dom";
 import SingleMessage from "./SingleMessage";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 // import { chatmessages, chats } from "./messagesFakeData";
 
 import { UserContext } from "../contexts/UserContext";
 
 const Messages = () => {
+  const params = useParams();
+
   const { user } = useContext(UserContext);
-  const [selectedChat, setSelectedChat] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(params.chatId || null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [findedChat, setFindedChat] = useState(null);
   const [chats, setChats] = useState([]);
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
+
   const apiRoot = "https://cps630.onrender.com/api";
 
-  const params = useParams();
-
   const token = user.authToken;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -42,7 +49,6 @@ const Messages = () => {
         .then((res) => res.json())
         .then((data) => {
           setChats(data);
-          console.log(data);
         })
         .catch((error) => {
           console.error("Error fetching messages data:", error);
@@ -52,24 +58,31 @@ const Messages = () => {
     fetchData();
   }, [token, user.username]);
 
-  // useEffect(() => {
-  //   if (params.chatId) {
-  //     setSelectedChat(params.chatId);
-  //   }
-  // }, [params.chatId]);
-
-  useEffect(() => {
-    setFindedChat(chats.find((chat) => chat._id === selectedChat));
-  }, [selectedChat]);
-
   useEffect(() => {
     if (selectedChat) {
-      setMessages(findedChat?.messages || []);
+      setFindedChat(chats.find((chat) => chat._id === selectedChat));
     }
-  }, [selectedChat]);
+  }, [chats, selectedChat]);
+
+  useEffect(() => {
+    if (selectedChat && findedChat) {
+      fetch(`${apiRoot}/chats/get/${findedChat.user1}/${findedChat.user2}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => setMessages(data))
+        .catch((error) => {
+          console.error("Error fetching messages data:", error);
+        });
+    }
+  }, [findedChat, selectedChat, token]);
 
   const handleSendMessage = async () => {
-    console.log(findedChat);
     await fetch(
       `${apiRoot}/chats/newmessage/${findedChat.user1}/${findedChat.user2}`,
       {
@@ -116,17 +129,49 @@ const Messages = () => {
     setNewMessage("");
   };
 
-  // console.log(findedChat, "finded");
+  const handleDelete = async () => {
+    await fetch(
+      `${apiRoot}/chats/delete/${findedChat.user1}/${findedChat.user2}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setMessages(data);
+        setSelectedChat(null);
+        setMessages([]);
+        setFindedChat(null);
+      })
+      .catch((error) => {
+        console.error("Error fetching messages data:", error);
+      });
 
-  //   const handleSendMessage = () => {
-  //     setMessages({
-  //       ...messages,
-  //       [selectedUser]: [...(messages[selectedUser] || []), newMessage],
-  //     });
-  //     setNewMessage("");
-  //   };
+    navigate("/messages");
+    window.location.reload();
+  };
 
-  // console.log("chats", chats);
+  const [width, setWidth] = useState(window.innerWidth);
+  const [mobile, setMobile] = useState(window.innerWidth <= 770);
+  // following code chunk makes sure the search bar transforms on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+      setMobile(window.innerWidth <= 770);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [width]);
+
   return (
     <Box
       display="flex"
@@ -144,6 +189,7 @@ const Messages = () => {
         borderRight={1}
         borderColor="grey.300"
         bgcolor={"background.paper"}
+        display={mobile && !menuOpen && selectedChat ? "none" : "block"}
       >
         <Box
           sx={{
@@ -158,11 +204,6 @@ const Messages = () => {
           borderColor="grey.300"
         >
           <Typography variant="h6">Messages</Typography>
-          <Box display={"flex"} alignItems={"center"}>
-            <IconButton>
-              <MoreHoriz fontSize="medium" />
-            </IconButton>
-          </Box>
         </Box>
         {chats &&
           chats.map((chat) => (
@@ -173,10 +214,17 @@ const Messages = () => {
               user={user}
               setMessages={setMessages}
               messages={messages}
+              setMenuOpen={setMenuOpen}
+              menuOpen={setMenuOpen}
+              mobile={mobile}
             />
           ))}
       </Box>
-      <Box flex={1} bgcolor={"background.paper"}>
+      <Box
+        flex={1}
+        bgcolor={"background.paper"}
+        display={mobile && menuOpen ? "none" : "block"}
+      >
         {selectedChat ? (
           <>
             <Box
@@ -191,6 +239,12 @@ const Messages = () => {
               borderBottom={1}
               borderColor="grey.300"
             >
+              {mobile && (
+                <ArrowBackIosNewIcon
+                  onClick={() => setMenuOpen(true)}
+                  sx={{ cursor: "pointer" }}
+                />
+              )}
               <Box>
                 <Typography
                   textAlign={"left"}
@@ -216,11 +270,8 @@ const Messages = () => {
                 </Box>
               </Box>
               <Stack direction="row">
-                <IconButton>
-                  <MoreHoriz fontSize="medium" />
-                </IconButton>
-                <IconButton>
-                  <StarBorder fontSize="medium" />
+                <IconButton onClick={handleDelete}>
+                  <Delete fontSize="medium" />
                 </IconButton>
               </Stack>
             </Box>
@@ -244,7 +295,7 @@ const Messages = () => {
               minHeight={"8vh"}
               bgcolor={"background.paper"}
               display="flex"
-              width={"calc(100% - 300px)"}
+              width={mobile ? "100%" : "calc(100% - 300px)"}
               alignItems="center"
               borderTop={1}
               borderColor="grey.300"
@@ -263,6 +314,7 @@ const Messages = () => {
               <Button
                 sx={{
                   bgcolor: "#213555",
+                  mr: mobile ? "8px" : "0",
                   "&:hover": { bgcolor: "#213555", opacity: 0.9 },
                 }}
                 variant="contained"
