@@ -44,7 +44,13 @@ function ViewPostingModal({ open, onClose, post }) {
       body: JSON.stringify({
         user1: user.username,
         user2: postInfo.author,
-        messages: [],
+        messages: [
+          {
+            sender: user.username,
+            message: `Hi! I am interested in ${postInfo.title}`,
+            date: new Date(),
+          },
+        ],
       }),
     })
       .then((res) => {
@@ -52,8 +58,39 @@ function ViewPostingModal({ open, onClose, post }) {
       })
       .then((data) => {
         return data;
+      })
+      .catch(() => {
+        return "exists";
       });
-    navigate(`/messages/${result._id}`);
+
+    if (result.error) {
+      result = await fetch(
+        `http://localhost:5001/api/chats/get/${user.username}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      )
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          return data.filter(
+            (chat) =>
+              chat.user1 === postInfo.author || chat.user2 === postInfo.author
+          );
+        })
+        .catch((error) => {
+          console.error("Error going to chat: ", error);
+        });
+      navigate(`/messages/${result[0]._id}`);
+    } else {
+      navigate(`/messages/${result._id}`);
+    }
   };
 
   return (
