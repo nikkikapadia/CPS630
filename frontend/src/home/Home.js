@@ -36,7 +36,7 @@ export function HomePage({ admin }) {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalPost, setModalPost] = React.useState({});
 
-  const apiRoot = "http://localhost:5001/api";
+  const apiRoot = "https://cps630.onrender.com/api";
 
   useEffect(() => {
     async function fetchData() {

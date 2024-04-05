@@ -74,7 +74,7 @@ const Login = () => {
           sessionStorage.setItem("authToken", token);
 
           const userInfo = await fetch(
-            `http://localhost:5001/api/users/get/email/${values.email}`,
+            `https://cps630.onrender.com/api/users/get/email/${values.email}`,
             {
               method: "GET",
               headers: {

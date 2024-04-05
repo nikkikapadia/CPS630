@@ -63,7 +63,7 @@ function EditForm({ postInfo, setPostInfo, setEdit, user, onClose }) {
     onSubmit: async (values) => {
       setLoading(true);
 
-      const apiRoute = "http://localhost:5001/api";
+      const apiRoute = "https://cps630.onrender.com/api";
       const samePhotos =
         values.photos.toString() === postInfo.photos.toString();
 

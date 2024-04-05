@@ -24,6 +24,10 @@ mongoose
         console.log(error);
 });
 
+app.get('/api/status', (req, res) => {
+    res.status(200).send({ status: 'Server is running' });
+  });
+
 app.use(express.json());
 app.use(cors());
 app.use(middleware.decodeToken);
@@ -522,4 +526,7 @@ app.get("/api/ads/search", async (req, res) => {
         console.log(error, "error");
         res.status(400).json({ error: error.message });
     }
-});
+})
+
+
+  ;

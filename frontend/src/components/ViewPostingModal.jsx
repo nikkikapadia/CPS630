@@ -34,7 +34,7 @@ function ViewPostingModal({ open, onClose, post }) {
   const token = user.authToken;
 
   const handleChatClick = async () => {
-    let result = await fetch(`http://localhost:5001/api/chats/new`, {
+    let result = await fetch(`https://cps630.onrender.com/api/chats/new`, {
       method: "POST",
       headers: {
         Accept: "application/json",

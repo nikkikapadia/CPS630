@@ -68,7 +68,7 @@ export default function AcademicServices() {
 
   useEffect(() => {
     async function fetchData() {
-      await fetch(`http://localhost:5001/api/ads/get/academicServices`, {
+      await fetch(`https://cps630.onrender.com/api/ads/get/academicServices`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -111,7 +111,7 @@ export default function AcademicServices() {
 
     const fetchSearchData = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/ads/search?category=${selectedCategory.value}&search=${search}`, {
+        const response = await fetch(`https://cps630.onrender.com/api/ads/search?category=${selectedCategory.value}&search=${search}`, {
           method: "GET",
           headers: {
             Accept: "application/json",

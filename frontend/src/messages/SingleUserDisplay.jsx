@@ -16,7 +16,7 @@ const SingleUserDisplay = ({
 
   const handleUserClick = () => {
     setSelectedChat(chat._id);
-    fetch(`http://localhost:5001/api/chats/get/${chat.user1}/${chat.user2}`, {
+    fetch(`https://cps630.onrender.com/api/chats/get/${chat.user1}/${chat.user2}`, {
       method: "GET",
       headers: {
         Accept: "application/json",

@@ -29,7 +29,8 @@ const Messages = () => {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const apiRoot = "http://localhost:5001/api";
+
+  const apiRoot = "https://cps630.onrender.com/api";
 
   const token = user.authToken;
 
