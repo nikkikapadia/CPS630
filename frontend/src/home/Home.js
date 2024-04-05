@@ -44,6 +44,7 @@ export function HomePage({ admin }) {
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       await fetch(`${apiRoot}/ads/get/itemsWanted`, {
         method: "GET",
         headers: {
@@ -82,10 +83,10 @@ export function HomePage({ admin }) {
         .catch((error) => {
           console.error("Error fetching wanted data:", error);
         });
+      setLoading(false);
     }
-    setLoading(true);
+
     fetchData();
-    setLoading(false);
   }, [modalPost]);
 
   const handleModalClose = () => {
