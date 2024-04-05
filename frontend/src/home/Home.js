@@ -13,11 +13,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { UserContext } from "../contexts/UserContext";
 import ViewPostingModal from "../components/ViewPostingModal";
 import { SearchBar, categories } from "../components/SearchBar";
 import { SnackbarContext } from "../contexts/SnackbarContext";
+import { CategoryContext } from "../contexts/CategoryContext";
 
 export function HomePage({ admin }) {
   const { user, setUser } = useContext(UserContext);
@@ -35,6 +37,8 @@ export function HomePage({ admin }) {
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalPost, setModalPost] = React.useState({});
+
+  const [loading, setLoading] = React.useState(false);
 
   const apiRoot = "https://cps630.onrender.com/api";
 
@@ -79,8 +83,9 @@ export function HomePage({ admin }) {
           console.error("Error fetching wanted data:", error);
         });
     }
-
+    setLoading(true);
     fetchData();
+    setLoading(false);
   }, [modalPost]);
 
   const handleModalClose = () => {
@@ -89,7 +94,7 @@ export function HomePage({ admin }) {
   };
 
   const [searchValue, setSearchValue] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState(categories[0]);
+  const { selectedCategory, setSelectedCategory } = useContext(CategoryContext);
 
   return (
     <>
@@ -106,6 +111,7 @@ export function HomePage({ admin }) {
         admin={admin}
         setModalOpen={setModalOpen}
         setModalPost={setModalPost}
+        loading={loading}
       />
       <Row
         title={"Items For Sale"}
@@ -113,6 +119,7 @@ export function HomePage({ admin }) {
         admin={admin}
         setModalOpen={setModalOpen}
         setModalPost={setModalPost}
+        loading={loading}
       />
       <Row
         title={"Academic Services"}
@@ -120,6 +127,7 @@ export function HomePage({ admin }) {
         admin={admin}
         setModalOpen={setModalOpen}
         setModalPost={setModalPost}
+        loading={loading}
       />
       <ViewPostingModal
         open={modalOpen}
@@ -162,7 +170,7 @@ export function HomePage({ admin }) {
   );
 }
 
-function Row({ title, data, admin, setModalOpen, setModalPost }) {
+function Row({ title, data, admin, setModalOpen, setModalPost, loading }) {
   const categoryMap = {
     ItemsForSale: "itemsForSale",
     ItemsWanted: "itemsWanted",
@@ -177,28 +185,45 @@ function Row({ title, data, admin, setModalOpen, setModalPost }) {
   return (
     <Box sx={homeStyles.row}>
       <h2 style={homeStyles.header}>{title}</h2>
-      <Box sx={homeStyles.cardRow}>
-        {data.slice(0, 10).map((posting) => {
-          const updatedPosting = {
-            ...posting,
-            category: categoryMap[title.replaceAll(" ", "")],
-          };
-          return (
-            <ActionAreaCard
-              title={posting.title}
-              description={posting.description}
-              price={posting.price}
-              img={posting.photos[0]}
-              admin={admin}
-              onClick={() => {
-                setModalOpen(true);
-                setModalPost(updatedPosting);
-              }}
-            />
-          );
-        })}
-        {data.length >= 10 && <SeeMoreCard page={pageMap[title]} />}
-      </Box>
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 5,
+          }}
+        >
+          <CircularProgress
+            size={50}
+            thickness={4}
+            style={{ color: "#213555" }}
+          />
+        </Box>
+      ) : (
+        <Box sx={homeStyles.cardRow}>
+          {data.slice(0, 10).map((posting) => {
+            const updatedPosting = {
+              ...posting,
+              category: categoryMap[title.replaceAll(" ", "")],
+            };
+            return (
+              <ActionAreaCard
+                title={posting.title}
+                description={posting.description}
+                price={posting.price}
+                img={posting.photos[0]}
+                admin={admin}
+                onClick={() => {
+                  setModalOpen(true);
+                  setModalPost(updatedPosting);
+                }}
+              />
+            );
+          })}
+          {data.length >= 10 && <SeeMoreCard page={pageMap[title]} />}
+        </Box>
+      )}
     </Box>
   );
 }
