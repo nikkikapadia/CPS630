@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -31,8 +32,6 @@ import * as yup from "yup";
 import "./Users.css";
 import { SnackbarContext } from "../contexts/SnackbarContext";
 import { UserContext } from "../contexts/UserContext";
-
-//const rows = users;
 
 function MyProfile() {
   const {
@@ -67,14 +66,17 @@ function MyProfile() {
 
   const fetchUsers = async () => {
     const token = user.authToken;
-    await fetch(`https://cps630.onrender.com/api/users/get/username/${user.username}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token}`,
-      },
-    })
+    await fetch(
+      `https://cps630.onrender.com/api/users/get/username/${user.username}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((res) => {
         return res.json();
       })
@@ -282,9 +284,11 @@ function DeleteModal({
   const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
     useContext(SnackbarContext);
 
-  const { user, userContext } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleClose = () => {
     setOpenDeleteModal(false);
@@ -407,9 +411,20 @@ function DeleteModal({
     setLoading(false);
     setOpenDeleteModal(false);
     onCloseModal();
+    setUser({
+      isLoggedIn: false,
+      username: "",
+      email: "",
+      fullName: "",
+      isAdmin: "",
+      _id: "",
+      authToken: "",
+    });
+    sessionStorage.clear(); // clear session storage
     setShowSnackbar(true);
     setSnackbarMessage("User Successfully Deleted");
     setSnackbarSeverity("success");
+    navigate("/"); // Redirect to homepage
   };
 
   const handleCancel = () => {
@@ -461,7 +476,14 @@ function DeleteModal({
   );
 }
 
-function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose }) {
+function EditForm({
+  userInfo,
+  setUserInfo,
+  setEdit,
+  rows,
+  fetchUsers,
+  onClose,
+}) {
   const { setShowSnackbar, setSnackbarMessage, setSnackbarSeverity } =
     useContext(SnackbarContext);
   const { user, setUser } = useContext(UserContext);
@@ -634,9 +656,15 @@ function EditForm({ userInfo, setUserInfo, setEdit, rows, fetchUsers, onClose })
         .then((data) => {
           return data;
         });
-      
-      setTimeout(() => {setUser({...user, fullName: values.fullName, username: values.username})}, 100);
-      console.log('changed user: ', user); 
+
+      setTimeout(() => {
+        setUser({
+          ...user,
+          fullName: values.fullName,
+          username: values.username,
+        });
+      }, 100);
+      console.log("changed user: ", user);
       fetchUsers();
       //fetchUsers();
       setLoading(false);

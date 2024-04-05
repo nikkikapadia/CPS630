@@ -65,7 +65,7 @@ function ViewPostingModal({ open, onClose, post }) {
 
     if (result.error) {
       result = await fetch(
-        `http://localhost:5001/api/chats/get/${user.username}`,
+        `https://cps630.onrender.com/api/chats/get/${user.username}`,
         {
           method: "GET",
           headers: {

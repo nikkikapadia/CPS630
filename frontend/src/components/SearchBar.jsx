@@ -50,14 +50,22 @@ const SearchBar = ({
   const navigate = useNavigate();
 
   const pushToCategoryPage = () => {
-    if (!searchValue) return;
-
-    if (selectedCategory.value === "academicServices") {
-      navigate(`/services?search=${searchValue}`);
-    } else if (selectedCategory.value === "itemsForSale") {
-      navigate(`/sale?search=${searchValue}`);
+    if (!searchValue) {
+      if (selectedCategory.value === "academicServices") {
+        navigate("/services");
+      } else if (selectedCategory.value === "itemsForSale") {
+        navigate("/sale");
+      } else {
+        navigate("/wanted");
+      }
     } else {
-      navigate(`/wanted?search=${searchValue}`);
+      if (selectedCategory.value === "academicServices") {
+        navigate(`/services?search=${searchValue}`);
+      } else if (selectedCategory.value === "itemsForSale") {
+        navigate(`/sale?search=${searchValue}`);
+      } else {
+        navigate(`/wanted?search=${searchValue}`);
+      }
     }
   };
 
