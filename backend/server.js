@@ -522,4 +522,9 @@ app.get("/api/ads/search", async (req, res) => {
         console.log(error, "error");
         res.status(400).json({ error: error.message });
     }
-});
+})
+
+app.get('/api/status', (req, res) => {
+    res.status(200).send({ status: 'Server is running' });
+  });
+  ;
