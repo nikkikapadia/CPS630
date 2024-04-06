@@ -1,5 +1,9 @@
 # CPS630
 
+## Pre-requisites
+Ensure you have the latest version of Node.js.
+At the root of both frontend and backend directories, run `npm install`
+
 ## Running the Frontend
 
 `npm start`
