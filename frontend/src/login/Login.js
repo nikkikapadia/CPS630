@@ -25,6 +25,7 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import { SnackbarContext } from "../contexts/SnackbarContext";
 
+// validation schema for login input
 const validationSchema = yup.object({
   email: yup
     .string()
@@ -40,6 +41,7 @@ const validationSchema = yup.object({
     .required("Password is required"),
 });
 
+// Login page
 const Login = () => {
   const { user, setUser } = useContext(UserContext);
   const {
@@ -61,6 +63,7 @@ const Login = () => {
       password: "",
     },
     validationSchema: validationSchema,
+    // try to sign in
     onSubmit: (values) => {
       setLoading(true); // start loading
       signInWithEmailAndPassword(auth, values.email, values.password)
@@ -97,6 +100,7 @@ const Login = () => {
           sessionStorage.setItem("_id", userInfo[0]._id);
           sessionStorage.setItem("username", userInfo[0].username);
 
+          // set user context
           setUser({
             isLoggedIn: true,
             username: userInfo[0].username,

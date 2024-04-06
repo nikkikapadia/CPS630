@@ -20,6 +20,7 @@ import useFetchData from "../hooks/useFetchData";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { CategoryContext } from "../contexts/CategoryContext";
 
+// Items wanted page
 export default function ItemsWanted() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPost, setModalPost] = useState({});

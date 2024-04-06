@@ -33,6 +33,7 @@ import "./Users.css";
 import { SnackbarContext } from "../contexts/SnackbarContext";
 import { UserContext } from "../contexts/UserContext";
 
+// User profile page
 function MyProfile() {
   const {
     showSnackbar,

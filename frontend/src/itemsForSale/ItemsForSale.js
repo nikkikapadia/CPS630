@@ -20,6 +20,7 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import useFetchData from "../hooks/useFetchData";
 import { CategoryContext } from "../contexts/CategoryContext";
 
+// Items for sale page
 export default function ItemsForSale() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPost, setModalPost] = useState({});

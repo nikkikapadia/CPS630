@@ -23,6 +23,7 @@ import { UserContext } from "./contexts/UserContext";
 import { SnackbarContext } from "./contexts/SnackbarContext";
 import { useContext } from "react";
 
+// Navbar component
 export default function Navigation({ admin }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openNav, setOpenNav] = React.useState(false);
@@ -55,6 +56,7 @@ export default function Navigation({ admin }) {
     setAnchorEl(null);
   };
 
+  // logout button clicked
   const handleLogout = () => {
     setUser({
       isLoggedIn: false,
@@ -66,8 +68,8 @@ export default function Navigation({ admin }) {
       authToken: "",
     });
     sessionStorage.clear(); // clear session storage
-    navigate("/"); // Redirect after 3 seconds
-    handleClose(); // close menu if
+    navigate("/"); // Redirect to homepage
+    handleClose();
     setShowSnackbar(true);
     setSnackbarMessage("Successfully logged out");
     setSnackbarSeverity("success");

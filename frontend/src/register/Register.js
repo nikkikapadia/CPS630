@@ -72,6 +72,7 @@ const Register = () => {
       isAgreed: false,
     },
     validationSchema: validationSchema,
+    // try to register new user
     onSubmit: (values) => {
       if (values.isAgreed) {
         setLoading(true); // Start loading before the registration process
@@ -89,6 +90,7 @@ const Register = () => {
             sessionStorage.setItem("isAdmin", "false");
             sessionStorage.setItem("username", values.username);
 
+            // create user info
             const userInfo = await fetch(
               `https://cps630.onrender.com/api/users/new`,
               {
